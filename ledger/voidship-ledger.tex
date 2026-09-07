@@ -1,0 +1,399 @@
+% Voidship Component Ledger — Rogue Trader Core Rulebook, Kapitel VIII
+% Kompilieren: lualatex voidship-ledger.tex (zweimal für Inhaltsverzeichnis)
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage[a4paper,margin=14mm,top=16mm,bottom=16mm,footskip=8mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Heros}[Scale=0.94]
+\newfontfamily\headfont{TeX Gyre Pagella}
+\newfontfamily\monofont{TeX Gyre Cursor}[Scale=0.92]
+\usepackage[german]{babel}
+\usepackage[table]{xcolor}
+\usepackage{booktabs}
+\usepackage{xltabular}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{ragged2e}
+
+\definecolor{ink}{HTML}{241F1A}
+\definecolor{ink2}{HTML}{5A5148}
+\definecolor{ink3}{HTML}{8A7F74}
+\definecolor{brass}{HTML}{8A5A1E}
+\definecolor{brasssoft}{HTML}{F0E2C8}
+\definecolor{good}{HTML}{3F6B3A}
+\definecolor{bad}{HTML}{8F3A2C}
+\definecolor{stripe}{HTML}{EFEAE0}
+
+\hypersetup{colorlinks,linkcolor=brass,urlcolor=brass,pdftitle={Voidship Component Ledger},pdfauthor={Rogue Trader Core Rulebook, Kapitel VIII}}
+\color{ink}
+
+\titleformat{\section}{\headfont\Large\bfseries}{}{0pt}{}[\vspace{-4pt}{\color{brass}\titlerule[0.6pt]}]
+\titlespacing{\section}{0pt}{14pt plus 4pt}{6pt}
+\titleformat{\subsection}{\headfont\large\bfseries}{}{0pt}{}
+\titlespacing{\subsection}{0pt}{10pt plus 2pt}{3pt}
+
+\pagestyle{fancy}\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\footnotesize\color{ink3}Voidship Component Ledger \textperiodcentered{} Rogue Trader Core Rulebook S.\,194--208}
+\fancyfoot[R]{\footnotesize\color{ink3}\thepage}
+
+% Zellenmakros
+\newcommand{\plus}[1]{\textcolor{good}{#1}}
+\newcommand{\minus}[1]{\textcolor{bad}{#1}}
+\newcommand{\nm}[1]{\textbf{#1}}
+\newcommand{\eff}[1]{\textbf{#1:}}
+\newcommand{\src}[1]{\hfill\raisebox{3pt}{\monofont\footnotesize\color{ink3}#1}}
+\newcommand{\once}{{\monofont\scriptsize\color{ink3}[1×]}}
+\newcolumntype{N}{>{\leavevmode\monofont\raggedleft\arraybackslash}p{9mm}}
+\newcolumntype{P}{>{\leavevmode\monofont\raggedleft\arraybackslash}p{13mm}}
+\newcolumntype{H}{>{\leavevmode\small\color{ink2}\RaggedRight\arraybackslash}p{19mm}}
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.18}
+\rowcolors{2}{stripe}{white}
+
+% Urteil-Box
+\usepackage{tcolorbox}
+\newenvironment{urteil}{\begin{tcolorbox}[colback=brasssoft,colframe=brass,boxrule=0pt,leftrule=2pt,arc=0pt,left=6pt,right=6pt,top=4pt,bottom=4pt,before skip=6pt,after skip=10pt,title={\monofont\scriptsize\bfseries\color{brass}URTEIL},coltitle=brass,colbacktitle=brasssoft,toptitle=2pt,bottomtitle=0pt,attach title to upper=\par]\begin{itemize}[leftmargin=10pt,itemsep=1pt,parsep=0pt,topsep=2pt]}{\end{itemize}\end{tcolorbox}}
+
+\begin{document}
+
+{\headfont\Huge\bfseries Voidship Component Ledger\par}
+\vspace{2pt}
+{\color{ink2}Alle Schiffskomponenten aus Kapitel VIII des \emph{Rogue Trader} Core Rulebook auf einem Referenzblatt: Power, Space, Ship Points, Bonus und Malus. Die Urteile sind meine Einschätzung, nicht Regeltext.\par}
+\vspace{4pt}
+{\footnotesize\color{ink3}Quelle: Core Rulebook S.\,194--208, Tabellen 8-1 bis 8-8. Seitenangaben sind Buchseiten. Power bei Antrieben ist erzeugte Leistung, sonst Verbrauch.
+Abkürzungen: T\,=\,Transports, R\,=\,Raiders, F\,=\,Frigates, LC\,=\,Light Cruisers, C\,=\,Cruisers, AP\,=\,Achievement Points, HI\,=\,Hull Integrity, Man\,=\,Manoeuvrability, Det\,=\,Detection. \once{} = nur einmal pro Schiff.\par}
+
+\vspace{4pt}
+{\footnotesize\tableofcontents}
+
+% ------------------------------------------------------------------
+\section{Rümpfe \src{S. 194--196}}
+Der Rumpf setzt Space, Waffenslots und Ship Points. Transports kommen mit vorinstalliertem Main Cargo Hold, der beim Bau 2 Power braucht.
+
+\begin{xltabular}{\linewidth}{l H N N N N N N N N Y}
+\toprule
+\rowcolor{white}\textbf{Hull} & \textbf{Klasse} & \textbf{Spd} & \textbf{Man} & \textbf{Det} & \textbf{HI} & \textbf{Arm} & \textbf{Tur} & \textbf{Space} & \textbf{SP} & \textbf{Waffenslots}\\
+\midrule
+\endhead
+\nm{Jericho-class pilgrim vessel} & Transport & 3 & −10 & +5 & 50 & 12 & 1 & 45 & 20 & 1 Prow, 1 Port, 1 Starboard\\
+\nm{Vagabond-class merchant trader} & Transport & 4 & −5 & +10 & 40 & 13 & 1 & 40 & 20 & 1 Dorsal, 1 Prow\\
+\nm{Hazeroth-class privateer} & Raider & 10 & +23 & +12 & 32 & 14 & 1 & 35 & 30 & 1 Dorsal, 1 Prow\\
+\nm{Havoc-class merchant raider} & Raider & 9 & +25 & +10 & 30 & 16 & 1 & 40 & 35 & 1 Dorsal, 1 Prow\\
+\nm{Sword-class frigate} & Frigate & 8 & +20 & +15 & 35 & 18 & 2 & 40 & 40 & 2 Dorsal\\
+\nm{Tempest-class strike frigate} & Frigate & 8 & +18 & +12 & 36 & 19 & 1 & 42 & 40 & 2 Dorsal\\
+\nm{Dauntless-class light cruiser} & Light Cruiser & 7 & +15 & +20 & 60 & 19 & 1 & 60 & 55 & 1 Prow, 1 Port, 1 Starboard\\
+\nm{Lunar-class cruiser} & Cruiser & 5 & +10 & +10 & 70 & 20 & 2 & 75 & 60 & 1 Prow, 2 Port, 2 Starboard\\
+\bottomrule
+\end{xltabular}
+
+\begin{urteil}
+\item \nm{Sword-class} ist das beste Preis-Leistungs-Verhältnis: Turret 2, Armour 18, zwei Dorsal-Slots und genug Space für alles Wichtige.
+\item \nm{Dauntless} ist die beste Wahl, wenn die SP reichen. Der Prow-Slot erlaubt eine Lanze, dazu 60 HI und Detection +20.
+\item \nm{Havoc} schlägt den Hazeroth fast überall, nur bei Speed nicht. Der Hazeroth ist nur für reine Blockadebrecher sinnvoll.
+\end{urteil}
+
+% ------------------------------------------------------------------
+\section{Essential Components \src{S. 199--202, Tabelle 8-3}}
+Genau eine Komponente aus jeder der acht Kategorien ist Pflicht. Essentials kosten in der Regel keine SP, Ausnahmen sind markiert.
+
+\subsection{Plasma Drives}
+\begin{xltabular}{\linewidth}{l H P N N Y}
+\toprule
+\rowcolor{white}\textbf{Komponente} & \textbf{Hüllen} & \textbf{Power} & \textbf{Space} & \textbf{SP} & \textbf{Effekt}\\
+\midrule
+\endhead
+\nm{Jovian Pattern Class 1 Drive} & T & 35 erz. & 8 & – & Kompakt, aber schwach.\\
+\nm{Lathe Pattern Class 1 Drive} & T & 40 erz. & 12 & +1 & \plus{+5 Power} gegenüber Jovian 1, \minus{+4 Space} Verbrauch.\\
+\nm{Jovian Pattern Class 2 Drive} & R, F & 45 erz. & 10 & – & Standard für Eskorten.\\
+\nm{Jovian Pattern Class 3 Drive} & LC & 60 erz. & 12 & – & Standard für kleine Großkampfschiffe.\\
+\nm{Jovian Pattern Class 4 Drive} & C & 75 erz. & 14 & – & Standard für Kreuzer.\\
+\bottomrule
+\end{xltabular}
+
+\subsection{Warp Engines und Gellar Fields}
+\begin{xltabular}{\linewidth}{l H P N N Y}
+\toprule
+\rowcolor{white}\textbf{Komponente} & \textbf{Hüllen} & \textbf{Power} & \textbf{Space} & \textbf{SP} & \textbf{Effekt}\\
+\midrule
+\endhead
+\nm{Strelov 1 Warp Engine} & T, R, F & 10 & 10 & – & Ermöglicht Warp-Reisen.\\
+\nm{Strelov 2 Warp Engine} & LC, C & 12 & 12 & – & Ermöglicht Warp-Reisen.\\
+\nm{Geller Field} & Alle & 1 & 0 & – & Schützt vor dem Immaterium.\\
+\nm{Warpsbane Hull} & Alle & 1 & 0 & +2 & \eff{Shield of Faith} \plus{+10 Navigation} im Warp. Bei Warp Travel Encounters (Tabelle 7-4) wird zweimal gewürfelt, der Navigator wählt das Ergebnis.\\
+\bottomrule
+\end{xltabular}
+
+\subsection{Void Shields}
+\begin{xltabular}{\linewidth}{l H P N N Y}
+\toprule
+\rowcolor{white}\textbf{Komponente} & \textbf{Hüllen} & \textbf{Power} & \textbf{Space} & \textbf{SP} & \textbf{Effekt}\\
+\midrule
+\endhead
+\nm{Single Void Shield Array} & Alle & 5 & 1 & – & 1 Void Shield.\\
+\nm{Multiple Void Shield Array} & C & 7 & 2 & – & 2 Void Shields.\\
+\bottomrule
+\end{xltabular}
+
+\subsection{Ship's Bridge}
+\begin{xltabular}{\linewidth}{l H P N N Y Y}
+\toprule
+\rowcolor{white}\textbf{Komponente} & \textbf{Hüllen} & \textbf{Power} & \textbf{Space} & \textbf{SP} & \textbf{Bonus} & \textbf{Malus}\\
+\midrule
+\endhead
+\nm{Combat Bridge} & T, R, F / LC, C & 1 / 2 & 1 / 2 & – & \eff{Damage Control Station} \plus{+10 Tech-Use} bei Reparaturen, solange die Brücke unbeschädigt ist. & Keiner\\
+\nm{Command Bridge} & R, F / LC, C & 2 / 3 & 1 / 2 & +1 & \eff{Enhanced Cogitator Relays} \plus{+5 Command} für den Captain, \plus{+5 BS} beim Feuern, solange unbeschädigt. & Bei Critical Hit: W10, ab 3 wird die Brücke stromlos.\\
+\nm{Commerce Bridge} & T & 1 & 1 & – & \eff{Organised} \plus{+50 AP} bei Trade-Zielen. & Keiner\\
+\nm{Armoured Command Bridge} & R, F / LC, C & 2 / 3 & 2 / 2 & – & \eff{Reinforced Armour} Bei Critical Hit, Beschädigung oder Stromverlust: W10, ab 4 bleibt die Brücke unversehrt. & Keiner\\
+\nm{Ship Master's Bridge} & C & 4 & 3 & – & \eff{Master Plotting Table} \plus{+5 Pilot und Navigation} der Brückencrew. \eff{Improved Fire Direction} \plus{+10 BS} beim Feuern. & Keiner\\
+\bottomrule
+\end{xltabular}
+
+\subsection{Life Sustainers und Crew Quarters}
+\begin{xltabular}{\linewidth}{l H P N N Y}
+\toprule
+\rowcolor{white}\textbf{Komponente} & \textbf{Hüllen} & \textbf{Power} & \textbf{Space} & \textbf{SP} & \textbf{Effekt}\\
+\midrule
+\endhead
+\nm{M-1.r Life Sustainer} & T, R, F / LC, C & 3 / 4 & 1 / 2 & – & \eff{Stale Air} \minus{Alle Morale-Verluste +1}.\\
+\nm{Vitae Pattern Life Sustainer} & T, R, F / LC, C & 4 / 5 & 2 / 3 & – & Kein Effekt. STC-Standard im Calixis-Sektor.\\
+\nm{Pressed-crew Quarters} & T, R, F / LC, C & 1 / 2 & 2 / 3 & – & \eff{Cramped} \minus{Morale −2} permanent.\\
+\nm{Voidsmen Quarters} & T, R, F / LC, C & 1 / 2 & 3 / 4 & – & Kein Effekt.\\
+\bottomrule
+\end{xltabular}
+
+\subsection{Auger Arrays}
+Alle Auger Arrays sind External: kein Hüllenplatz, nur durch Critical Hit zerstörbar.
+\begin{xltabular}{\linewidth}{l H P N N Y Y}
+\toprule
+\rowcolor{white}\textbf{Komponente} & \textbf{Hüllen} & \textbf{Power} & \textbf{Space} & \textbf{SP} & \textbf{Bonus} & \textbf{Malus}\\
+\midrule
+\endhead
+\nm{M-100 Auger Array} & Alle & 3 & 0 & – & Navy-Standard, kein Bonus. & Keiner\\
+\nm{M-201.b Auger Array} & Alle & 5 & 0 & – & \eff{Sensitive} \plus{+5 Detection}. & Keiner\\
+\nm{R-50 Auspex Multi-band} & Alle & 4 & 0 & – & \eff{Stellar Detection} \plus{+5 Manoeuvre} gegen Himmelsphänomene. \eff{Long Distance Scan} \plus{+50 AP} bei Exploration-Zielen. & \minus{−2 Detection}.\\
+\nm{Deep Void Auger Array} & Alle & 7 & 0 & +1 & \eff{Eye of the Omnissiah} \plus{+10 Detection}. & Keiner\\
+\bottomrule
+\end{xltabular}
+
+\begin{urteil}
+\item \nm{Brücke:} Auf Kreuzern ist die Ship Master's Bridge konkurrenzlos, +10 BS auf jede Salve. Auf Fregatten ist die Command Bridge für 1 SP der beste Kauf, trotz des Stromrisikos bei Crits.
+\item \nm{Warpsbane Hull} für 2 SP und 0 Space ist einer der besten Käufe im Buch. Zwei Würfe auf der Warp-Encounter-Tabelle verhindern die schlimmsten Kampagnenkatastrophen.
+\item \nm{Auger:} Deep Void Auger für +10 Detection, wenn Power da ist. Detection wirkt auf Erkennung, Lanzen-Feuerleitung und viele Extended Actions.
+\item \nm{Lathe Drive} lohnt sich für Transports fast immer: +5 Power für 1 SP finanziert einen zweiten Cargo Hold.
+\item \nm{Spare nie} an Life Sustainer und Quarters. Morale ist die Ressource, die Meuterei auslöst, und beide Malus-Varianten sparen nur 1 bis 2 Space.
+\end{urteil}
+
+% ------------------------------------------------------------------
+\section{Supplemental Components \src{S. 202--205, Tabellen 8-4 und 8-5}}
+Optional, mehrfach installierbar, außer wenn mit \once{} markiert. Waffen belegen einen Waffenslot. Lanzen auf Fregatten oder kleiner müssen in den Prow-Slot.
+
+\subsection{Macrobatteries und Lances}
+\begin{xltabular}{\linewidth}{l H N N N N P N N Y}
+\toprule
+\rowcolor{white}\textbf{Komponente} & \textbf{Hüllen} & \textbf{Pow} & \textbf{Spc} & \textbf{SP} & \textbf{Str} & \textbf{Dmg} & \textbf{Crit} & \textbf{Rng} & \textbf{Besonderheit}\\
+\midrule
+\endhead
+\rowcolor{white}\multicolumn{10}{l}{\headfont\bfseries Macrobatteries}\\
+\nm{Thunderstrike Macrocannons} & Alle & 2 & 2 & 1 & 3 & 1W10+1 & 6 & 4 & Altes Muster, meist auf Transports.\\
+\nm{Mars Pattern Macrocannons} & Alle & 4 & 2 & 1 & 3 & 1W10+2 & 5 & 6 & Die häufigste Batterie.\\
+\nm{Mars Pattern Macrocannon Broadside} & LC, C & 4 & 5 & 1 & 6 & 1W10+2 & 5 & 6 & \eff{Broadside} nur Port- oder Starboard-Slot.\\
+\nm{Sunsear Laser Battery} & Alle & 6 & 4 & 1 & 4 & 1W10+2 & 4 & 9 & Höchste Reichweite aller Waffen.\\
+\nm{Ryza Pattern Plasma Battery} & Alle & 7 / 8 & 4 & 2 & 4 & 1W10+4 & 4 & 5 & \eff{Vapourisation} Bei 1 oder 2 auf der Critical-Hit-Tabelle werden zwei Komponenten getroffen. Tabelle 8-4 nennt 7 Power, Tabelle 8-5 nennt 8.\\
+\rowcolor{white}\multicolumn{10}{l}{\headfont\bfseries Lances}\\
+\nm{Starbreaker Lance Weapon} & Alle & 6 & 4 & 2 & 1 & 1W10+2 & 3 & 5 & Schwächere Kopie der Titanforge.\\
+\nm{Titanforge Lance Weapon} & Alle & 9 & 4 & 2 & 1 & 1W10+4 & 3 & 6 & STC-Standard der Navy.\\
+\nm{Titanforge Lance Battery} & Alle & 13 & 6 & 2 & 2 & 1W10+4 & 3 & 6 & Zwei Lanzen in einem Slot.\\
+\bottomrule
+\end{xltabular}
+
+\begin{urteil}
+\item \nm{Mars Pattern Macrocannons} sind der Maßstab: 1 SP, 2 Space, Range 6. Zwei davon dorsal auf einer Sword ist die Standardlösung.
+\item \nm{Sunsear} ist die beste Batterie für Distanzkämpfer. Range 9 erlaubt eine volle Runde Feuer, bevor der Gegner antwortet.
+\item \nm{Ryza} ist nur mit Munitorium richtig stark. Ohne genug Power frisst sie die Reserve eines Jovian 2 fast auf.
+\item \nm{Titanforge Lance Weapon} ignoriert Armour und ist auf einem Dauntless-Prow die beste Einzelwaffe. Die Starbreaker ist den Power-Vorteil nicht wert.
+\item \nm{Titanforge Lance Battery} nur auf Kreuzern mit Class 4 Drive. 13 Power sind sonst nicht tragbar.
+\end{urteil}
+
+\subsection{Cargo and Passenger Compartments}
+\begin{xltabular}{\linewidth}{l H P N N Y Y}
+\toprule
+\rowcolor{white}\textbf{Komponente} & \textbf{Hüllen} & \textbf{Power} & \textbf{Space} & \textbf{SP} & \textbf{Bonus} & \textbf{Malus}\\
+\midrule
+\endhead
+\nm{Cargo Hold and Lighter Bay} & R, F, LC, C & 1 & 2 & 1 & \eff{Hidden Spaces} \plus{+50 AP} bei Trade- oder Criminal-Zielen. & \eff{Unbalanced} \minus{−3 Manoeuvrability}.\\
+\nm{Compartmentalised Cargo Hold} & R, F, LC, C & 2 & 5 & 1 & \eff{Storage Area} \plus{+100 AP} bei Trade-Zielen. & Keiner\\
+\nm{Main Cargo Hold} & T & 2 & 4 & 1 & \eff{Stowed and Secured} \plus{+125 AP} bei Trade-Zielen. & Keiner\\
+\nm{Luxury Passenger Quarters} & Alle & 2 & 1 & 1 & \eff{Paying Customers} \plus{+100 AP} bei Trade-, Criminal- oder Creed-Zielen. & \eff{Class Division} \minus{Morale −3} permanent.\\
+\nm{Barracks} & Alle & 2 & 4 & 2 & \eff{Soldiers} \plus{+100 AP} bei Military-Zielen. \eff{Reinforcements} \plus{+20 Command} bei Enterungen und Hit and Run, wenn Truppen an Bord sind. & Keiner\\
+\bottomrule
+\end{xltabular}
+
+\subsection{Augments and Enhancements}
+\begin{xltabular}{\linewidth}{l H P N N Y Y}
+\toprule
+\rowcolor{white}\textbf{Komponente} & \textbf{Hüllen} & \textbf{Power} & \textbf{Space} & \textbf{SP} & \textbf{Bonus} & \textbf{Malus}\\
+\midrule
+\endhead
+\nm{Augmented Retro-thrusters} & R, F / T, LC / C & 3 / 4 / 5 & 0 & 2 & \eff{Agile} \plus{+5 Manoeuvrability}. External. & Keiner\\
+\nm{Reinforced Interior Bulkheads} & T, R, F / LC, C & 0 & 2 / 3 & 2 & \eff{Hard to Breach} \plus{+3 Hull Integrity}. & Keiner\\
+\nm{Armour Plating} \once & T, R, F / LC, C & 0 & 1 / 2 & 2 & \eff{Armour} \plus{+1 Armour}. & \eff{Dead Weight} \minus{−2 Manoeuvrability}.\\
+\nm{Armoured Prow} \once & C & 0 & 4 & 2 & \eff{Imposing} \plus{+4 Armour} im Bug-Bogen, \plus{+1W10 Schaden} beim Rammen. & Keine Prow-Macrobatterien oder Lanzen erlaubt.\\
+\nm{Tenebro-Maze} \once & T, R, F / LC, C & 1 / 2 & 2 / 3 & 2 & \eff{Hidden sally-ports} \plus{+10 Command} bei Verteidigung gegen Enterungen und Hit and Run. \eff{Incomprehensible Layout} Bei Critical Hits wählt der Schiffsführer die betroffene Komponente. & Keiner\\
+\bottomrule
+\end{xltabular}
+
+\subsection{Additional Facilities \once}
+\begin{xltabular}{\linewidth}{l H P N N Y Y}
+\toprule
+\rowcolor{white}\textbf{Komponente} & \textbf{Hüllen} & \textbf{Power} & \textbf{Space} & \textbf{SP} & \textbf{Bonus} & \textbf{Malus}\\
+\midrule
+\endhead
+\nm{Extended Supply Vaults} & Alle & 1 & 4 & 2 & \eff{Extensive Stores} Doppelte Zeit im Leerraum ohne Crew- oder Morale-Verlust. Extended Repairs reparieren \plus{+1 HI}. \eff{Plenty for All} \plus{Morale +1} permanent. & Keiner\\
+\nm{Crew Reclamation Facility} & Alle & 1 & 1 & 1 & \eff{Recycling} \plus{Crew-Population-Verluste −3} (min.\ 1). & \minus{Morale-Verluste +1}.\\
+\nm{Munitorium} & T, R, F / LC, C & 2 / 3 & 3 / 4 & 2 & \eff{Well Armed} \plus{+25 AP} bei Military-Zielen. \eff{Ordinatus Extremus} \plus{+1 Damage} für alle Macrobatteries. & \eff{Volatile} Bei Beschädigung \minus{2W5 HI-Schaden} und eine Komponente nach Wahl des GM brennt.\\
+\nm{Temple-Shrine to the God Emperor} & Alle & 1 & 1 & 1 & \eff{Inspiration} \plus{Morale +3} permanent. \eff{Awe of the God Emperor} \plus{+100 AP} bei Creed-Zielen. & Keiner\\
+\nm{Librarium Vault} & Alle & 1 & 1 & 1 & \eff{Accumulated Data} \plus{+10 Investigation} an Bord. & Keiner\\
+\nm{Trophy Room} & Alle & 1 & 1 & 1 & \eff{Past Experiences} \plus{+50 AP} bei Exploration-, Trade- oder Criminal-Zielen. & Keiner\\
+\nm{Observation Dome} & Alle & 0 & 1 & 1 & \eff{Engraved Star-charts} \plus{+50 AP} bei Exploration-Zielen. \eff{Cure for Claustrophobia} \plus{Morale +1} permanent. & Keiner\\
+\nm{Murder-Servitors} & Alle & 1 & 1 & 2 & \eff{Death-dealers} \plus{+20 Command} bei Hit and Run. \eff{Precise} Critical Hit durch Hit and Run frei wählbar zwischen 1 und 6. & Keiner\\
+\bottomrule
+\end{xltabular}
+
+\begin{urteil}
+\item \nm{Temple-Shrine} ist der beste Kauf des Kapitels: 1 SP, 1 Space, 1 Power für +3 Morale und +100 AP bei Creed. Gehört auf jedes Schiff.
+\item \nm{Trophy Room und Observation Dome} gleich danach. Für zusammen 2 SP und 2 Space liefern sie AP-Boni auf drei Endeavour-Typen und +1 Morale.
+\item \nm{Compartmentalised Cargo Hold} ist der effizienteste Profitbringer auf Kampfschiffen: 100 AP pro 5 Space ohne Malus. Die Lighter Bay ist wegen −3 Manoeuvrability nur für Criminal-Kampagnen sinnvoll.
+\item \nm{Luxury Passenger Quarters} sind eine Falle. 100 AP klingen gut, aber −3 Morale ist der teuerste Malus im Buch.
+\item \nm{Munitorium} macht Macrobatterie-Schiffe deutlich stärker, aber nur mit Armoured Bridge oder Tenebro-Maze, damit die Volatile-Explosion nicht das Schiff kostet.
+\item \nm{Tenebro-Maze} ist die beste Defensivkomponente: den Crit selbst zu platzieren rettet regelmäßig Brücke und Antrieb.
+\item \nm{Armour Plating} nur auf Transports, wo Manoeuvrability ohnehin niedrig ist. Auf Fregatten wiegt −2 Man mehr als +1 Armour.
+\end{urteil}
+
+% ------------------------------------------------------------------
+\section{Archeotech Components \src{S. 206--207, Tabelle 8-6}}
+Nur mit der Komplikation Reliquary of Mars, über den Warrant of Trade oder auf Zuteilung des GM. Verfügbarkeit: Extremely Rare.
+
+\begin{xltabular}{\linewidth}{l H P N N Y Y}
+\toprule
+\rowcolor{white}\textbf{Komponente} & \textbf{Hüllen} & \textbf{Power} & \textbf{Space} & \textbf{SP} & \textbf{Bonus} & \textbf{Malus}\\
+\midrule
+\endhead
+\nm{Ancient Life Sustainer} & T, R, F / LC, C & 2 & 1 / 2 & 2 & \eff{The Air is Sweet} \plus{Morale +2} permanent, \plus{Crew-Verluste −1} aus Nicht-Kampf-Quellen. Ersetzt den Life Sustainer. & Keiner\\
+\nm{Modified Jovian Class 1 Drive} & T & 35 erz. & 4 & 3 & \eff{Overcharged} \plus{+1 Speed}, \plus{−4 Space} gegenüber dem Standardantrieb. Gilt für alle fünf Modified Drives. & Von großem Interesse für den Mechanicus.\\
+\nm{Modified Lathe Class 1 Drive} & T & 40 erz. & 8 & 3 & wie oben & wie oben\\
+\nm{Modified Jovian Class 2 Drive} & R, F & 45 erz. & 6 & 3 & wie oben & wie oben\\
+\nm{Modified Jovian Class 3 Drive} & LC & 60 erz. & 8 & 3 & wie oben & wie oben\\
+\nm{Modified Jovian Class 4 Drive} & C & 75 erz. & 10 & 3 & wie oben & wie oben\\
+\nm{Bridge of Antiquity} & T, R, F / LC, C & 1 / 2 & 1 & 2 & \eff{Eyes Everywhere} \plus{+10 Command und soziale Skills} auf der Brücke. \eff{Hololithic Display Tank} \plus{+5 Manoeuvrability}. Ersetzt die Brücke. & Keiner\\
+\nm{Auto-stabilised Logis-targeter} & Alle & 5 & 0 & 2 & \eff{Image of the Void} \plus{+5 Detection}. \eff{Targeting Matrix} \plus{+5 BS} beim Feuern. External. Ersetzt das Auger Array. & Keiner\\
+\nm{Teleportarium} & Alle & 1 & 1 & 1 & \eff{Surprise Strike} Hit and Run ohne Pilot-Test, \plus{+20 Command} beim Angriff. Vielseitig nach GM-Ermessen. & Keiner\\
+\bottomrule
+\end{xltabular}
+
+\begin{urteil}
+\item \nm{Modified Drive} ist bei Reliquary of Mars die beste Wahl: +1 Speed und 4 Space geschenkt, ohne Power-Kosten. Auf einer Fregatte sind 4 Space ein ganzer Cargo Hold.
+\item \nm{Bridge of Antiquity} ist die beste Brücke für Sozial- und Handelskampagnen und kostet nur 1 Space.
+\item \nm{Teleportarium} ist mit 1/1/1 lächerlich billig und macht Hit and Run zur Hauptwaffe. Mit Murder-Servitors und Barracks: +60 Command.
+\end{urteil}
+
+% ------------------------------------------------------------------
+\section{Xeno-tech Components \src{S. 206--208, Tabelle 8-7}}
+Nur mit der Komplikation Xenophilous oder auf Zuteilung des GM. Verfügbarkeit: Near Unique.
+
+\begin{xltabular}{\linewidth}{l H P N N Y Y}
+\toprule
+\rowcolor{white}\textbf{Komponente} & \textbf{Hüllen} & \textbf{Power} & \textbf{Space} & \textbf{SP} & \textbf{Bonus} & \textbf{Malus}\\
+\midrule
+\endhead
+\nm{Ghost Field} & Alle & 8 & 4 & 3 & \eff{Ghostly Echoes} Gegner erhalten \plus{−20 BS} beim Feuern auf das Schiff, \plus{−30} mit Lanzen. Gegnerische Pilot-Tests für Hit and Run \plus{−30}. & \eff{Energetic Interference} Zu Kampfbeginn Wahl zwischen Ghost Field und Void Shields.\\
+\nm{Shard Cannon Battery} & Alle & 0 & 3 & 2 & \eff{Macrobattery} Str 4, 1W10+2, Crit 3, Range 6. \eff{Unknown energy source} wird nie stromlos. & Bei Zerstörung \minus{2W5 HI-Schaden}, nicht durch Armour oder Schilde reduziert.\\
+\nm{Runecaster} & Alle & 0 & 1 & 2 & \eff{Eye of the Warp} \plus{+20 Navigation} im Warp, \plus{Warp-Reisezeit halbiert}. \eff{Fuelled by Fate} wird nie stromlos. & Keiner\\
+\nm{Micro Laser Defence Grid} & Alle & 2 & 0 & 2 & \eff{Wall of Light} \plus{Turret Rating +2}. External. & Keiner\\
+\nm{Gravity Sails} & T, R, F / LC, C & 3 / 5 & 0 & 3 & \eff{The Currents of Space} \plus{+1 Speed}, \plus{+5 Manoeuvrability}. External. & Keiner\\
+\bottomrule
+\end{xltabular}
+
+\begin{urteil}
+\item \nm{Ghost Field} für Kampf: −20 auf jeden gegnerischen Schuss ist wirksamer als jede Schildanlage.
+\item \nm{Runecaster} für Reisen und Profit: halbierte Warp-Zeit ohne Nachteil für 0 Power und 1 Space.
+\item \nm{Shard Cannon} ist die schwächste Option. Eine Mars-Batterie leistet fast dasselbe ohne Explosionsrisiko.
+\end{urteil}
+
+% ------------------------------------------------------------------
+\section{Machine Spirit Oddities \src{S. 197, Tabelle 8-1}}
+Einmal W10 würfeln, oder der GM wählt passend zum Schiff.
+
+\begin{xltabular}{\linewidth}{N l Y Y}
+\toprule
+\rowcolor{white}\textbf{W10} & \textbf{Oddity} & \textbf{Bonus} & \textbf{Malus}\\
+\midrule
+\endhead
+1 & \nm{A Nose for Trouble} & \plus{+5 Detection} & \minus{−1 Armour}, ungewollte Kämpfe\\
+2 & \nm{Blasphemous Tendencies} & \plus{+15 Navigation} im Warp & \minus{−5 auf alle WP-Tests} der Crew an Bord\\
+3 & \nm{Martial Hubris} & \plus{+5 BS} beim Feuern der Schiffswaffen & \minus{−15 Pilot (Space Craft)} beim Rückzug aus dem Kampf\\
+4 & \nm{Rebellious} & Bei Critical Hit: W10, ab 8 wird der Crit ignoriert & Max.\ einmal pro Session verliert eine zufällige Komponente Strom\\
+5 & \nm{Stoic} & Bei beschädigter oder stromloser Komponente: W10, ab 7 ignoriert & \minus{−1 Profit Factor} pro Endeavour-Gewinn\\
+6 & \nm{Skittish} & Reisezeit zwischen Sternen \plus{−1W5 Wochen} (min.\ 1) & \minus{−1 Speed} im Kampf\\
+7 & \nm{Wrothful} & Im Kampf \plus{+1 Speed, +7 Manoeuvrability} & Außerhalb \minus{−1 Speed, −5 Manoeuvrability und Detection}\\
+8 & \nm{Resolute} & \plus{+3 Hull Integrity}, \plus{+10 Repair-Tests} & \minus{−1 Speed}\\
+9 & \nm{Adventurous} & \plus{+10 Detection} während eines Endeavours & \minus{−10 Detection} außerhalb\\
+10 & \nm{Ancient and Wise} & \plus{+10 auf alle Manoeuvre Actions} (auch Rammen) & \minus{−4 Hull Integrity}\\
+\bottomrule
+\end{xltabular}
+
+\begin{urteil}
+\item \nm{Ancient and Wise} ist mechanisch die stärkste. Martial Hubris folgt für Kampfschiffe, Resolute für Kreuzer. Stoic ist die schwächste.
+\end{urteil}
+
+% ------------------------------------------------------------------
+\section{Past Histories \src{S. 198, Tabelle 8-2}}
+
+\begin{xltabular}{\linewidth}{N l Y Y}
+\toprule
+\rowcolor{white}\textbf{W10} & \textbf{History} & \textbf{Bonus} & \textbf{Malus}\\
+\midrule
+\endhead
+1 & \nm{Reliquary of Mars} & 1 Archeotech-Komponente nach Wahl beim Bau & \minus{−20 Tech-Use} bei Reparaturen. Mechanicus-Pilger und Begehrlichkeiten\\
+2 & \nm{Haunted} & \plus{+6 Detection}. Fremde erleiden \plus{−5 Command} bei Enterungen und Hit and Run gegen das Schiff & \minus{Morale −10} permanent. Weitere Probleme nach GM\\
+3 & \nm{Emissary of the Imperator} & \plus{+15 Intimidate} für Charaktere des Schiffs & \minus{−5 auf alle anderen sozialen Skills}. Xenos und Ketzer reagieren feindlich\\
+4 & \nm{Wolf in Sheep's Clothing} & 3 Komponenten sind bei Scans unsichtbar oder erscheinen als andere Komponente gleichen Typs & \minus{−2 Power}\\
+5 & \nm{Turbulent Past} & \plus{+20 soziale Skills} gegenüber einer GM-gewählten Gruppe & \minus{−20 soziale Skills} gegenüber einer anderen GM-gewählten Gruppe\\
+6 & \nm{Death Cult} & \plus{Alle Morale-Verluste −2}. Kult liefert Assassinen & \minus{Crew Population −8} permanent. Offiziere und Ministorum müssen mit dem Kult umgehen\\
+7 & \nm{Wrested from a Space Hulk} & \plus{+1 Armour, +1 Speed, +3 Manoeuvrability} & Bei jedem Misfortune würfelt der GM zweimal und nimmt das schlechtere Ergebnis\\
+8 & \nm{Temperamental Warp Engine} & Bei jeder Warp-Reise W10: ab 7 \plus{−1W5 Wochen} & Bei 6 oder weniger \minus{+1W5 Wochen}. Selten landet das Schiff woanders\\
+9 & \nm{Finances in Arrears} & Der Geldgeber ist ein verlässlicher Kontakt für Hilfe und Information & \minus{+50 AP} nötig für jedes Endeavour-Ziel. Gläubiger verlangt Gefallen\\
+10 & \nm{Xenophilous} & 1 Xenotech-Komponente nach Wahl beim Bau & \minus{−30 Tech-Use} bei Reparaturen (−10 mit Forbidden Lore Xenos). Ordo Xenos interessiert sich\\
+\bottomrule
+\end{xltabular}
+
+\begin{urteil}
+\item \nm{Xenophilous} und \nm{Reliquary of Mars} sind die einzigen Einträge mit dauerhaftem Materialgewinn. Xenophilous ist wegen Ghost Field und Runecaster stärker, Reliquary hat den geringeren Reparaturmalus.
+\item \nm{Wrested from a Space Hulk} ist der beste rein statistische Bonus, aber der doppelte Misfortune-Wurf trifft irgendwann hart.
+\item \nm{Haunted} und \nm{Death Cult} sind Fallen: −10 Morale beziehungsweise −8 Crew Population sind kaum auszugleichen.
+\end{urteil}
+
+% ------------------------------------------------------------------
+\section{Kosten und Verfügbarkeit \src{S. 207, Tabelle 8-8}}
+Ship Points begrenzen nur den Erstbau. Danach zählen Space, Power und Profit Factor. Die Verfügbarkeit bestimmt die Acquisition-Schwelle, ohne Scale-Bonus.
+
+\begin{xltabular}{\linewidth}{Y l}
+\toprule
+\rowcolor{white}\textbf{Komponenten} & \textbf{Verfügbarkeit}\\
+\midrule
+\endhead
+Supplemental mit 1 SP, Essential ohne SP-Aufschlag & Scarce\\
+Supplemental mit 2 SP, Essential mit +1 SP & Rare\\
+Supplemental mit 3 SP, Essential mit +2 SP & Very Rare\\
+Archeotech Components & Extremely Rare\\
+Xenotech Components & Near Unique\\
+\bottomrule
+\end{xltabular}
+
+{\footnotesize\color{ink3}Einbauzeit: rund drei Wochen auf einer Welt mit interplanetarer Raumfahrt, halb so lang auf einer Hive-Welt mit gutem Dock. Kosten für neue Komponenten stehen auf S.\,274.\par}
+
+\end{document}

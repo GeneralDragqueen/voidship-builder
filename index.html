@@ -1,0 +1,1408 @@
+<title>Voidship Builder</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=EB+Garamond:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#efe9df; --panel:#f7f3ea; --panel-2:#f1ece1; --ink:#241f1a; --ink-2:#5a5148; --ink-3:#8a7f74;
+  --rule:#cfc4b4; --rule-soft:#e2d9cb; --brass:#8a5a1e; --brass-soft:#f0e2c8; --brass-ink:#5c3a10;
+  --good:#3f6b3a; --good-soft:#dfeadb; --bad:#8f3a2c; --bad-soft:#f3dcd6; --warn:#8a6a14; --warn-soft:#f3e9c9;
+  --stripe:#ebe4d7; --meter:#b58a48; --meter-over:#b0463a; --ghost:#6b4f8a; --focus:#2d5fa8; --sel:#e7dcc4;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1a1714; --panel:#221e1a; --panel-2:#2a2520; --ink:#ebe3d6; --ink-2:#b9ae9f; --ink-3:#85796b;
+    --rule:#3f372f; --rule-soft:#2e2823; --brass:#d2a15a; --brass-soft:#3a2d1a; --brass-ink:#e8c48a;
+    --good:#8fbf85; --good-soft:#24331f; --bad:#e08a78; --bad-soft:#3d231d; --warn:#d9b45a; --warn-soft:#3a3018;
+    --stripe:#27221d; --meter:#c9a15e; --meter-over:#d15f4f; --ghost:#b79fd8; --focus:#8fb4ee; --sel:#3a3123;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1a1714; --panel:#221e1a; --panel-2:#2a2520; --ink:#ebe3d6; --ink-2:#b9ae9f; --ink-3:#85796b;
+  --rule:#3f372f; --rule-soft:#2e2823; --brass:#d2a15a; --brass-soft:#3a2d1a; --brass-ink:#e8c48a;
+  --good:#8fbf85; --good-soft:#24331f; --bad:#e08a78; --bad-soft:#3d231d; --warn:#d9b45a; --warn-soft:#3a3018;
+  --stripe:#27221d; --meter:#c9a15e; --meter-over:#d15f4f; --ghost:#b79fd8; --focus:#8fb4ee; --sel:#3a3123;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font:14px/1.45 "IBM Plex Sans",system-ui,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:var(--panel);border:1px solid var(--rule);border-radius:3px;padding:4px 10px}
+button:hover{border-color:var(--brass)}
+button.primary{background:var(--brass);color:#fff;border-color:var(--brass)}
+button.small{padding:2px 8px;font-size:12px}
+button.link{border:none;background:none;padding:0;color:var(--brass);text-decoration:underline}
+button.x{border-color:transparent;color:var(--ink-3);padding:2px 7px;font-size:14px;line-height:1}
+button.x:hover{color:var(--bad);border-color:var(--bad)}
+button:disabled{opacity:.5;cursor:default}
+input[type=text],select,textarea{background:var(--panel);border:1px solid var(--rule);border-radius:3px;padding:4px 7px}
+input[type=text]:focus,select:focus,textarea:focus,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.mono,.n{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.good{color:var(--good)}.bad{color:var(--bad)}.warn{color:var(--warn)}.muted{color:var(--ink-3)}.dim{color:var(--ink-2)}
+h1{font:700 26px/1.1 "Cormorant Garamond",Georgia,serif;margin:0}
+h2{font:600 20px/1.2 "Cormorant Garamond",Georgia,serif;margin:0 0 6px}
+h3{font:600 11px/1.3 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:16px 0 6px}
+.chip{display:inline-block;font:500 11px/1.4 "IBM Plex Mono",ui-monospace,monospace;padding:1px 6px;border:1px solid var(--rule);border-radius:3px;color:var(--ink-2);background:var(--panel);white-space:nowrap}
+.chip.good{color:var(--good);border-color:var(--good);background:var(--good-soft)}
+.chip.bad{color:var(--bad);border-color:var(--bad);background:var(--bad-soft)}
+.chip.warn{color:var(--warn);border-color:var(--warn);background:var(--warn-soft)}
+.chip.brass{color:var(--brass-ink);border-color:var(--brass);background:var(--brass-soft)}
+.chip.ghost{color:var(--ghost);border-color:var(--ghost);border-style:dashed}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+
+/* header */
+.hdr{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--rule);padding:10px 16px 8px}
+.hdr .row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.hdr .row+.row{margin-top:8px}
+.field{display:flex;align-items:center;gap:6px}
+.field label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
+#buildName{font:600 20px/1.1 "Cormorant Garamond",Georgia,serif;width:240px;background:transparent;border:1px solid transparent;padding:2px 6px}
+#buildName:hover,#buildName:focus{border-color:var(--rule);background:var(--panel)}
+.meters{display:grid;grid-template-columns:repeat(3,minmax(150px,1fr)) minmax(150px,auto) auto;gap:14px;align-items:end}
+@media (max-width:900px){.meters{grid-template-columns:repeat(2,1fr)}}
+.meter .lbl{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.meter .val{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:15px;font-weight:600;color:var(--ink)}
+.meter .bar{position:relative;height:8px;background:var(--rule-soft);border-radius:2px;margin-top:3px;overflow:hidden}
+.meter .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--meter)}
+.meter .bar i.over{background:var(--meter-over)}
+.meter .bar i.gh{background:repeating-linear-gradient(45deg,var(--ghost) 0 3px,transparent 3px 6px);opacity:.8}
+.ghost{font-family:"IBM Plex Mono",ui-monospace,monospace;color:var(--ghost);font-size:12px;margin-left:6px}
+.ghost:empty{display:none}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border-radius:3px;border:1px solid var(--rule);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;cursor:pointer;background:var(--panel)}
+.badge.err{border-color:var(--bad);color:var(--bad)}
+.badge.wrn{border-color:var(--warn);color:var(--warn)}
+details.opts{font-size:12.5px}
+details.opts summary{cursor:pointer;color:var(--ink-3);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+details.opts .row{margin-top:6px}
+.sprow{display:flex;gap:6px;align-items:center;margin-top:4px}
+.sprow .cause{flex:1;max-width:360px}
+.sprow .val{width:64px;text-align:right}
+
+/* layout */
+.app{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;padding:14px 16px 60px;max-width:1240px;margin:0 auto}
+@media (max-width:860px){.app{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:4px}
+.panel .body{padding:12px 14px}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.stat{background:var(--panel-2);border:1px solid var(--rule-soft);border-radius:3px;padding:7px 9px}
+.stat .k{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.stat .v{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:22px;font-weight:600;line-height:1.2}
+.stat .v small{font-size:11px;font-weight:500;color:var(--ink-2)}
+.stat .parts{font-size:11px;color:var(--ink-3);margin-top:2px}
+.stat .sit{font-size:11px;color:var(--warn);margin-top:2px}
+.sechead{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+
+/* loadout */
+.group{margin-top:14px;border:1px solid var(--rule-soft);border-radius:4px;overflow:hidden}
+.ghead{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 10px;background:var(--panel-2);border-bottom:1px solid var(--rule-soft)}
+.ghead h3{margin:0}
+.ghead .hint{font-size:11.5px;color:var(--ink-3)}
+.lrow{display:grid;grid-template-columns:82px minmax(0,1fr) auto;gap:2px 10px;align-items:center;padding:7px 10px;border-bottom:1px solid var(--rule-soft)}
+.lrow:last-child{border-bottom:none}
+.lrow.err{box-shadow:inset 3px 0 var(--bad)}
+.lrow.empty .nm{color:var(--ink-3);font-weight:400;font-style:italic}
+.lrow .cat{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.lrow .nm{font-weight:600;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
+.lrow .nm .cost{font-weight:400}
+.lrow .fxs{grid-column:2;font-size:12px}
+.lrow .btns{display:flex;gap:4px;align-items:center;grid-row:1/3;grid-column:3}
+.lrow select.slot{font-size:12px;padding:2px 4px}
+.tech-a{color:var(--brass)}.tech-x{color:var(--ghost)}
+
+/* tables and ledgers */
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{font:500 10.5px "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:5px 7px;border-bottom:1px solid var(--rule)}
+td{padding:5px 7px;border-bottom:1px solid var(--rule-soft);vertical-align:top}
+td.n,th.n{text-align:right;white-space:nowrap}
+tbody tr:nth-child(even) td{background:var(--stripe)}
+.tblwrap{overflow-x:auto}
+.ledger{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px 14px;font-size:13px}
+.ledger div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dotted var(--rule-soft);padding:2px 0}
+.ledger .n{font-weight:600}
+.ledger .src{font-size:11px;color:var(--ink-3)}
+.texts{font-size:12.5px;color:var(--ink-2)}
+.texts p{margin:4px 0}
+.texts b{color:var(--ink)}
+.texts .src{color:var(--ink-3);font-size:11px;font-family:"IBM Plex Mono",ui-monospace,monospace}
+details.sec{margin-top:14px;border-top:1px solid var(--rule-soft);padding-top:6px}
+details.sec>summary{cursor:pointer;font:600 11px/1.3 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);list-style:none;display:flex;gap:8px;align-items:center}
+details.sec>summary::before{content:"▸";font-size:10px}
+details.sec[open]>summary::before{content:"▾"}
+details.sec>summary .cnt{font-weight:400;color:var(--ink-3)}
+
+/* aside */
+.issue{padding:5px 8px;border-left:3px solid var(--rule);margin:4px 0;font-size:12.5px;background:var(--panel-2);border-radius:0 3px 3px 0;cursor:pointer}
+.issue.error{border-left-color:var(--bad)}.issue.warn{border-left-color:var(--warn)}.issue.info{border-left-color:var(--ink-3)}
+.issue .code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.blist{display:grid;gap:4px}
+.brow{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;padding:5px 6px;border:1px solid var(--rule-soft);border-radius:3px;font-size:13px}
+.brow.active{border-color:var(--brass);background:var(--brass-soft)}
+.brow .meta{font-size:11px;color:var(--ink-3)}
+.actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.banner{background:var(--warn-soft);border:1px solid var(--warn);color:var(--warn);padding:6px 10px;font-size:12.5px;border-radius:3px;margin-bottom:8px}
+.banner:empty{display:none}
+.savestate{font-size:11.5px;color:var(--ink-3);margin-bottom:6px;line-height:1.35}
+.savestate.bad{color:var(--bad);font-weight:600}
+.legal{margin:14px 0 0;font-size:10.5px;color:var(--ink-3);line-height:1.4}
+.share input{width:100%;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:7px 14px;border-radius:4px;font-size:13px;z-index:60;opacity:0;transition:opacity .2s}
+.toast.on{opacity:1}
+dialog{background:var(--panel);color:var(--ink);border:1px solid var(--rule);border-radius:4px;padding:0}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+#help{max-width:560px;padding:16px 20px}
+kbd{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;border:1px solid var(--rule);border-bottom-width:2px;border-radius:3px;padding:0 5px;background:var(--panel-2)}
+
+/* picker */
+#picker{width:min(760px,96vw);max-height:92vh;display:none;flex-direction:column;overflow:hidden}
+#picker[open]{display:flex}
+.pk-head{padding:12px 16px 8px;border-bottom:1px solid var(--rule);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.pk-head h2{margin:0}
+.pk-budget{display:flex;gap:14px;flex-wrap:wrap;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;padding:6px 16px;background:var(--panel-2);border-bottom:1px solid var(--rule-soft)}
+.pk-budget span b{font-weight:600}
+.pk-summary{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;color:var(--ghost);padding:4px 16px;min-height:24px;border-bottom:1px solid var(--rule-soft)}
+.pk-search{padding:8px 16px;border-bottom:1px solid var(--rule-soft)}
+.pk-search input{width:100%}
+.pk-list{overflow:auto;flex:1 1 auto;min-height:120px;max-height:calc(92vh - 250px);padding:4px 0 8px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.pk-sec{padding:8px 16px 2px;font:600 11px/1.3 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.prow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:center;padding:8px 16px;border-bottom:1px solid var(--rule-soft)}
+.prow:hover,.prow:focus-within{background:var(--panel-2)}
+.prow.cur{background:var(--sel)}
+.prow.na{opacity:.6}
+.prow .nm{font-weight:600}
+.prow .nm .pg{font-weight:400;color:var(--ink-3);font-size:11px;margin-left:4px}
+.prow .fx{grid-column:1;font-size:12px}
+.prow .btns{grid-row:1/3;grid-column:2;display:flex;gap:6px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+.prow .txt{grid-column:1/-1;font-size:12.5px;color:var(--ink-2);border-left:2px solid var(--rule);padding-left:8px;margin-top:3px}
+.prow .txt b{color:var(--ink)}
+.pk-foot{padding:8px 16px;border-top:1px solid var(--rule);display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--ink-3);align-items:center}
+.cmp th.anchor{color:var(--brass)}
+.cmp td.best{font-weight:600;color:var(--good)}
+.cmp .d{font-size:11px;margin-left:4px}
+
+/* export & print */
+#export{width:min(900px,96vw);max-height:92vh;display:none;flex-direction:column;overflow:hidden}
+#export[open]{display:flex}
+.ex-head{padding:10px 16px;border-bottom:1px solid var(--rule);display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.ex-head .btns{display:flex;gap:6px;flex-wrap:wrap}
+.ex-body{overflow:auto;padding:12px 18px 18px;flex:1 1 auto;min-height:120px;max-height:calc(92vh - 70px);-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.ex-fallback{padding:8px 18px 12px;border-top:1px solid var(--rule);font-size:12px;color:var(--ink-2)}
+.ex-fallback textarea{width:100%;height:150px;font:11.5px/1.4 "IBM Plex Mono",ui-monospace,monospace;margin-top:6px}
+/* Ship sheet — follows design/character-sheet/contract.md: EB Garamond for name and headings,
+   Helvetica Neue/Arial for everything else, ink/navy/paper palette, 30/16/23/13.5/10.5/9.5/7.5 type tokens,
+   20px section gap, 8px heading gap, 5px row padding, 8px gutters. Always renders on paper, in any theme. */
+.sheet{--ink:#202a29;--navy:#244651;--paper:#fbfaf5;--muted:#65716d;--soft:#edf0ed;--quiet:#f4f5f1;--line:#c7ceca;--unavail:#586159;
+  --bg:#fbfaf5;--panel:#fbfaf5;--panel-2:#f4f5f1;--ink-2:#333d3b;--ink-3:#65716d;--rule:#c7ceca;--rule-soft:#dce1de;--stripe:transparent;--brass:#244651;--brass-soft:#edf0ed;--brass-ink:#244651;--good:#2d5a2a;--bad:#8b2a1f;--warn:#7a5a00;--ghost:#586159;--sel:#edf0ed;
+  --fs-display:30px;--fs-heading:16px;--fs-num-xl:23px;--fs-num-lg:13.5px;--fs-body:10.5px;--fs-secondary:9.5px;--fs-label:7.5px;
+  --gap-section:20px;--gap-head:8px;--pad-row:5px;--gutter:8px;
+  color-scheme:light;background:var(--paper);color:var(--ink);font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:var(--fs-body);line-height:1.35;font-variant-numeric:tabular-nums;font-synthesis:none;padding:34px 34px 30px}
+.sheet *{box-sizing:border-box}
+.sheet h1,.sheet h2,.sheet h3,.sheet p{margin:0}
+.sheet .page-header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;min-height:52px;padding:2px 0 4px 11px;border-left:4px solid var(--navy)}
+.sheet .eyebrow,.sheet .page-marker{color:var(--muted);font-size:var(--fs-label);font-weight:700;letter-spacing:.15em;text-transform:uppercase}
+.sheet h1{margin-top:4px;font-family:'EB Garamond',Georgia,serif;font-weight:500;font-size:var(--fs-display);line-height:1;letter-spacing:-.01em;color:var(--ink)}
+.sheet .identity-note{margin-top:4px;color:var(--muted);font-size:var(--fs-secondary)}
+.sheet .identity-note b{color:var(--ink);font-weight:600}
+.sheet .page-marker{text-align:right;line-height:1.55;white-space:nowrap}
+.sheet .page-marker span{display:block;color:var(--ink);letter-spacing:.06em}
+.sheet .rule{height:0;border-top:1px solid var(--line)}
+.sheet .rule-double{height:3px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.sheet .masthead-rule{margin-top:8px}
+.sheet .section{margin-top:var(--gap-section);break-inside:avoid}
+.sheet .section.flow{break-inside:auto}
+.sheet .section-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:var(--gap-head);border-bottom:1px solid var(--line);padding-bottom:3px}
+.sheet .section-head p{color:var(--muted);font-size:var(--fs-label);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.sheet h2{color:var(--navy);font-family:'EB Garamond',Georgia,serif;font-weight:600;font-size:var(--fs-heading);line-height:1}
+.sheet .characteristics{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:0;border:1px solid var(--line)}
+.sheet .characteristic{padding:6px 8px 7px;border-right:1px solid var(--line);min-width:0}
+.sheet .characteristic:last-child{border-right:0}
+.sheet .characteristic span{display:block;min-height:2.3em;color:var(--muted);font-size:var(--fs-label);font-weight:700;letter-spacing:.05em;text-transform:uppercase;line-height:1.15;hyphens:manual}
+.sheet .characteristic b{display:block;margin-top:3px;color:var(--navy);font-size:var(--fs-num-xl);letter-spacing:-.04em;line-height:1;white-space:nowrap}
+.sheet .characteristic b small{font-size:var(--fs-secondary);font-weight:400;letter-spacing:0;color:var(--muted)}
+.sheet .characteristic i{display:block;margin-top:3px;font-style:normal;color:var(--muted);font-size:var(--fs-label);line-height:1.25}
+.sheet .band-row{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-top:0}
+.sheet .band-cell{min-width:0;padding:4px 8px 6px;border-right:1px solid var(--line)}
+.sheet .band-cell:last-child{border-right:0}
+.sheet .band-cell>span{display:block;color:var(--muted);font-size:var(--fs-label);font-weight:700;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap}
+.sheet .band-cell b{display:block;margin-top:3px;color:var(--navy);font-size:var(--fs-num-lg);font-weight:700;letter-spacing:-.02em;white-space:nowrap}
+.sheet .band-cell b small{color:var(--muted);font-weight:400;font-size:var(--fs-secondary);letter-spacing:0}
+.sheet .band-cell.over b{color:#8b2a1f}
+.sheet table{width:100%;border-collapse:collapse;table-layout:auto}
+.sheet tbody tr:nth-child(even) td{background:transparent}
+.sheet th,.sheet td{font-family:inherit;letter-spacing:0;text-transform:none;color:var(--ink)}
+.sheet .weapon-table th{padding:4px var(--gutter);background:var(--soft);color:var(--muted)!important;font-size:var(--fs-label);font-weight:700;letter-spacing:.08em!important;text-align:left;text-transform:uppercase!important;border-bottom:0}
+.sheet .weapon-table td{padding:var(--pad-row) var(--gutter);border-bottom:1px solid var(--line);font-size:var(--fs-secondary);line-height:1.3;vertical-align:top}
+.sheet .weapon-table td.wtest,.sheet .weapon-table th.wtest{text-align:right}
+.sheet .weapon-table td.wtest{color:var(--navy);font-size:var(--fs-num-lg);font-weight:700}
+.sheet .weapon-table td.wname{font-weight:600;color:var(--ink);font-size:var(--fs-body)}
+.sheet table.cat{table-layout:fixed}
+.sheet table.cat.small,.sheet .keep,.sheet .card{break-inside:avoid;page-break-inside:avoid}
+.sheet table.cat.cont tr{break-inside:avoid;page-break-inside:avoid}
+.sheet .section-head{break-after:avoid;page-break-after:avoid}
+.sheet .ability-table td.none{color:var(--muted);font-size:var(--fs-secondary)}
+.sheet .ability-table td{padding:3.5px var(--gutter);border-bottom:1px solid var(--line);font-size:var(--fs-body);line-height:1.35;vertical-align:top}
+.sheet .ability-table .category td{padding-top:10px;border-bottom:0;color:var(--muted)!important;font-size:var(--fs-label);font-weight:700;letter-spacing:.08em!important;text-transform:uppercase!important}
+.sheet .ability-table td.aname{width:31%;font-weight:600}
+.sheet .ability-table td.aname small{display:block;font-weight:400;color:var(--muted);font-size:var(--fs-label);letter-spacing:.04em;margin-top:1px}
+.sheet .ability-table td.acost{width:19%;color:var(--navy);font-size:var(--fs-secondary);white-space:nowrap}
+.sheet .ability-table td.acost b{font-weight:700}
+.sheet .ability-table td.aeff{color:var(--ink)}
+.sheet .ability-table td.aeff p{margin:0 0 2px}
+.sheet .ability-table td.aeff b{color:var(--navy);font-weight:700}
+.sheet .ability-table td.aeff .unavail{color:var(--unavail);font-style:italic}
+.sheet .tag{display:inline-block;margin-left:4px;padding:0 4px;border:1px solid var(--line);border-radius:2px;color:var(--muted);font-size:var(--fs-label);font-weight:700;letter-spacing:.06em;text-transform:uppercase;vertical-align:1px}
+.sheet .tag.navy{color:var(--navy);border-color:var(--navy)}
+.sheet .cards{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sheet .card{padding:8px 9px;border:1px solid var(--line);background:var(--quiet);break-inside:avoid}
+.sheet .card .meta{display:flex;justify-content:space-between;gap:8px;padding-bottom:4px;margin-bottom:5px;border-bottom:1px solid var(--line);color:var(--muted);font-size:var(--fs-label);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.sheet .card h3{color:var(--navy);font-size:var(--fs-body);font-weight:700;margin-bottom:3px}
+.sheet .card p{font-size:var(--fs-secondary);line-height:1.4}
+.sheet .ledger{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.sheet .ledger div{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid var(--line);font-size:var(--fs-body)}
+.sheet .ledger div span small{display:block;color:var(--muted);font-size:var(--fs-label);letter-spacing:.02em}
+.sheet .ledger div b{color:var(--navy);font-size:var(--fs-num-lg);font-weight:700;white-space:nowrap}
+.sheet .ledger div b.neg{color:#8b2a1f}
+.sheet .notes p{font-size:var(--fs-secondary);line-height:1.45;white-space:pre-wrap}
+.sheet .page-footer{margin-top:var(--gap-section)}
+.sheet .page-footer .rule-double{margin-bottom:5px}
+.sheet .page-footer p{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:var(--fs-label);font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.sheet .page-footer .code{margin-top:4px;color:var(--muted);font-size:var(--fs-label);letter-spacing:0;text-transform:none;font-weight:400;word-break:break-all;font-family:"IBM Plex Mono",ui-monospace,monospace}
+.sheet .errors{margin-top:8px;padding:6px 9px;border:1px solid #8b2a1f;color:#8b2a1f;font-size:var(--fs-secondary)}
+.ex-body{padding:0;background:#313735}
+.ex-body .sheet{max-width:700px;margin:16px auto;box-shadow:0 10px 28px #0006}
+#printsheet{display:none;background:#fff}
+body[data-print="1"] .hdr,body[data-print="1"] .app,body[data-print="1"] dialog,body[data-print="1"] .toast{display:none!important}
+body[data-print="1"] #printsheet{display:block}
+@media print{
+  html,body{background:#fff!important;color:#202a29}
+  .hdr,.app,dialog,.toast{display:none!important}
+  #printsheet{display:block!important}
+  #printsheet .sheet{padding:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .sheet .weapon-table th,.sheet .card{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .sheet .section,.sheet tr,.sheet .card,.sheet .ledger div{break-inside:avoid}
+  .sheet .section{break-inside:auto}
+  .sheet .section:not(.flow){break-inside:avoid}
+  @page{size:A4 portrait;margin:14mm 14mm 18mm;
+    @bottom-left{content:"Voidship dossier";font:700 7.5px/1 "Helvetica Neue",Helvetica,Arial,sans-serif;color:#65716d;letter-spacing:.12em;text-transform:uppercase}
+    @bottom-right{content:"Page " counter(page) " of " counter(pages);font:700 7.5px/1 "Helvetica Neue",Helvetica,Arial,sans-serif;color:#65716d;letter-spacing:.12em;text-transform:uppercase}}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="hdr" id="hdr"></div>
+<div class="app">
+  <div class="panel" id="sheet"><div class="body"></div></div>
+  <aside class="panel" id="aside"><div class="body"></div></aside>
+</div>
+<dialog id="picker" aria-label="Component picker"></dialog>
+<dialog id="export" aria-label="Export ship dossier"></dialog>
+<div id="printsheet"></div>
+<div class="toast" id="toast"></div>
+<dialog id="help">
+  <h2>How to use</h2>
+  <p>Every category in the loadout shows what is installed. <b>Change</b> or <b>Add</b> opens a picker listing everything that fits this hull, with the items that do not fit shown below and the reason why. Hover or arrow through a row to see what it would do to your budgets and stats before you install it. <b>✕</b> removes a supplemental component; essentials are required and can only be swapped.</p>
+  <p><b>Export</b> (or <kbd>e</kbd>) builds a full dossier of the ship: stats, budgets, every component with its rules text, weapons, bonuses and complications. Copy it as Discord-ready text (split into message-sized parts) or Markdown, or print it to PDF. If this viewer blocks printing or the clipboard, the text appears in a box you can select and copy by hand; the offline copy of this file prints normally.</p>
+  <h2>Sources</h2>
+  <p>Core Rulebook Chapter VIII (pp. 194–208) with the official Errata applied: Ryza Pattern Plasma Battery draws 8 Power, every Additional Facility is once per ship, the Titanforge Lance Battery fits Light Cruisers and Cruisers only, and a weapon's Strength caps the hits of lances as well as macrobatteries. Components from other sourcebooks (Into the Storm, Battlefleet Koronus) are not included.</p>
+  <h2>Saving</h2>
+  <p>Builds autosave in the browser you are using, tied to the page's address: a downloaded copy of the file, the artifact link, and each device keep separate lists. To carry builds across, use <b>Copy backup code</b> or <b>Download backup</b> in the Builds panel and <b>Restore backup…</b> on the other side; restoring skips builds that are already there. A single ship travels as a share code or link.</p>
+  <h2>About</h2>
+  <p>An unofficial, non-commercial fan tool. It is not affiliated with, endorsed by or licensed by Games Workshop Limited or Fantasy Flight Games. Warhammer 40,000, Rogue Trader and associated names are trademarks of Games Workshop Limited, used here only to identify the game the tool supports. The tool holds component statistics and short rule summaries in its own words; it contains no rulebook text, artwork or scans. Owners of the rights may request removal at any time.</p>
+  <h2>Budgets</h2>
+  <p>Space comes from the hull, Power from the plasma drive, Ship Points from your Warrant roll. None may overflow at creation. Leftover Ship Points are added to your starting Profit Factor (p. 207). After creation only Space, Power and Profit Factor matter. Spare Power has no use in play under the Core rules: damage makes components unpowered but never lowers what the drive generates. Its only value is headroom for components you buy later.</p>
+  <h2>Keyboard</h2>
+  <p><kbd>/</kbd> search in the open picker · <kbd>↑</kbd><kbd>↓</kbd> move through picker rows (focus previews) · <kbd>Enter</kbd> install · <kbd>Esc</kbd> close · <kbd>Ctrl</kbd>+<kbd>Z</kbd> undo · <kbd>Ctrl</kbd>+<kbd>S</kbd> save now · <kbd>g</kbd> GM override · <kbd>?</kbd> this sheet</p>
+  <p style="text-align:right"><button onclick="this.closest('dialog').close()">Close</button></p>
+</dialog>
+
+<script>
+'use strict';
+/* ========================================================================
+   DATA — Rogue Trader Core Rulebook, Chapter VIII (pp. 194–208), Table 1-5 (p. 33)
+   ======================================================================== */
+const DATA = (() => {
+  const T='T',R='R',F='F',LC='LC',C='C';
+  const ALL=[T,R,F,LC,C], SMALL=[T,R,F], LARGE=[LC,C];
+  const HULL_CLASSES=[T,R,F,LC,C];
+  const CLASS_NAME={T:'Transport',R:'Raider',F:'Frigate',LC:'Light Cruiser',C:'Cruiser'};
+  const HULLS=[
+    {id:'jericho',name:'Jericho-class pilgrim vessel',cls:T,page:194,speed:3,man:-10,det:5,hi:50,armour:12,turret:1,space:45,sp:20,slots:{prow:1,port:1,starboard:1},preinstalled:['main_cargo_hold']},
+    {id:'vagabond',name:'Vagabond-class merchant trader',cls:T,page:194,speed:4,man:-5,det:10,hi:40,armour:13,turret:1,space:40,sp:20,slots:{dorsal:1,prow:1},preinstalled:['main_cargo_hold']},
+    {id:'hazeroth',name:'Hazeroth-class privateer',cls:R,page:194,speed:10,man:23,det:12,hi:32,armour:14,turret:1,space:35,sp:30,slots:{dorsal:1,prow:1}},
+    {id:'havoc',name:'Havoc-class merchant raider',cls:R,page:195,speed:9,man:25,det:10,hi:30,armour:16,turret:1,space:40,sp:35,slots:{dorsal:1,prow:1}},
+    {id:'sword',name:'Sword-class frigate',cls:F,page:195,speed:8,man:20,det:15,hi:35,armour:18,turret:2,space:40,sp:40,slots:{dorsal:2}},
+    {id:'tempest',name:'Tempest-class strike frigate',cls:F,page:195,speed:8,man:18,det:12,hi:36,armour:19,turret:1,space:42,sp:40,slots:{dorsal:2}},
+    {id:'dauntless',name:'Dauntless-class light cruiser',cls:LC,page:196,speed:7,man:15,det:20,hi:60,armour:19,turret:1,space:60,sp:55,slots:{prow:1,port:1,starboard:1}},
+    {id:'lunar',name:'Lunar-class cruiser',cls:C,page:196,speed:5,man:10,det:10,hi:70,armour:20,turret:2,space:75,sp:60,slots:{prow:1,port:2,starboard:2}},
+  ];
+  const CATS=[
+    ['plasma_drive','Plasma Drive','Drive'],['warp_engine','Warp Engine','Warp'],['gellar_field','Gellar Field','Gellar'],
+    ['void_shield','Void Shield','Shields'],['bridge','Bridge','Bridge'],['life_sustainer','Life Sustainer','Life'],
+    ['crew_quarters','Crew Quarters','Quarters'],['auger_array','Auger Array','Auger'],
+    ['weapon','Weapons','Weapons'],['cargo','Cargo & Passengers','Cargo'],['augment','Augments','Augments'],['facility','Additional Facilities','Facilities'],
+  ].map(([id,name,short])=>({id,name,short}));
+  const ESSENTIAL_CATS=CATS.slice(0,8).map(c=>c.id);
+  const ENDEAVOURS=['trade','criminal','creed','military','exploration'];
+  const SKILLS={
+    bs_fire:'BS to fire ship weapons',command:'Command (captain)',command_boarding:'Command: boarding actions',command_hitrun:'Command: Hit and Run',
+    command_defend:'Command: defending vs boarding / Hit and Run',pilot:'Pilot (Space Craft)',pilot_disengage:'Pilot: disengaging from combat',
+    navigation:'Navigation (warp)',manoeuvre_action:'Manoeuvre Actions',techuse_repair:'Tech-Use: ship repairs',intimidate:'Intimidate',
+    social:'Other social skills',investigation:'Investigation (aboard)',willpower:'Willpower tests (crew aboard)',pilot_hitrun_enemy:'Enemy Pilot tests for Hit and Run',
+  };
+  const V=(hulls,power,space,sp=0)=>({hulls,power,space,sp});
+  const M=(stat,v,extra)=>Object.assign({stat,v},extra||{});
+  const S=(skill,v,extra)=>Object.assign({stat:'skill',skill,v},extra||{});
+  const AP=(type,v)=>({stat:'ap',type,v});
+  const X=(title,body)=>({title,body});
+  const comps=[];
+  const add=(o)=>{comps.push(Object.assign({group:ESSENTIAL_CATS.includes(o.cat)?'essential':'supplemental',tech:'standard',variants:[],mods:[],text:[]},o));};
+
+  /* ---- Essentials ---- */
+  add({id:'jovian_1',name:'Jovian Pattern Class 1 Drive',cat:'plasma_drive',page:199,generates:true,variants:[V([T],35,8)],blurb:'STC standard for transports; compact but underpowered.'});
+  add({id:'lathe_1',name:'Lathe Pattern Class 1 Drive',cat:'plasma_drive',page:199,generates:true,variants:[V([T],40,12,1)],blurb:'Extended transport drive: more Power for less Space.'});
+  add({id:'jovian_2',name:'Jovian Pattern Class 2 Drive',cat:'plasma_drive',page:199,generates:true,variants:[V([R,F],45,10)],blurb:'STC standard for escort-grade warships.'});
+  add({id:'jovian_3',name:'Jovian Pattern Class 3 Drive',cat:'plasma_drive',page:199,generates:true,variants:[V([LC],60,12)],blurb:'STC standard for smaller capital-grade warships.'});
+  add({id:'jovian_4',name:'Jovian Pattern Class 4 Drive',cat:'plasma_drive',page:199,generates:true,variants:[V([C],75,14)],blurb:'STC standard for cruiser-grade warships.'});
+  add({id:'mod_jovian',name:'Modified Jovian Pattern Drive',cat:'plasma_drive',page:206,tech:'archeotech',generates:true,
+    variants:[V([T],35,4,3),V([R,F],45,6,3),V([LC],60,8,3),V([C],75,10,3)],mods:[M('speed',1)],
+    text:[X('Overcharged','Hotter plasma burn: +1 Speed and the drive takes 4 less Space than the standard pattern. Of extreme interest to the Mechanicus.')]});
+  add({id:'mod_lathe',name:'Modified Lathe Pattern Class 1 Drive',cat:'plasma_drive',page:206,tech:'archeotech',generates:true,
+    variants:[V([T],40,8,3)],mods:[M('speed',1)],text:[X('Overcharged','+1 Speed, 4 less Space than the standard Lathe drive. Of extreme interest to the Mechanicus.')]});
+
+  add({id:'strelov_1',name:'Strelov 1 Warp Engine',cat:'warp_engine',page:199,variants:[V(SMALL,10,10)]});
+  add({id:'strelov_2',name:'Strelov 2 Warp Engine',cat:'warp_engine',page:199,variants:[V(LARGE,12,12)]});
+
+  add({id:'geller_field',name:'Geller Field',cat:'gellar_field',page:199,variants:[V(ALL,1,0)]});
+  add({id:'warpsbane_hull',name:'Warpsbane Hull',cat:'gellar_field',page:199,variants:[V(ALL,1,0,2)],mods:[S('navigation',10)],
+    text:[X('Shield of Faith','+10 to Navigation tests through the warp. On Table 7-4 Warp Travel Encounters the GM rolls twice and the Navigator chooses which result applies.')]});
+
+  add({id:'single_void_shield',name:'Single Void Shield Array',cat:'void_shield',page:199,variants:[V(ALL,5,1)],mods:[M('shields',1)]});
+  add({id:'multiple_void_shield',name:'Multiple Void Shield Array',cat:'void_shield',page:200,variants:[V([C],7,2)],mods:[M('shields',2)]});
+
+  add({id:'combat_bridge',name:'Combat Bridge',cat:'bridge',page:200,variants:[V(SMALL,1,1),V(LARGE,2,2)],mods:[S('techuse_repair',10,{cond:'while the bridge is undamaged'})],
+    text:[X('Damage Control Station','As long as the bridge remains undamaged, all Tech-Use tests to repair the ship gain +10.')]});
+  add({id:'command_bridge',name:'Command Bridge',cat:'bridge',page:200,variants:[V([R,F],2,1,1),V(LARGE,3,2,1)],mods:[S('command',5,{cond:'while undamaged'}),S('bs_fire',5,{cond:'while undamaged'})],
+    text:[X('Enhanced Cogitator Relays','While undamaged: +5 to the captain\'s Command tests and +5 BS to fire shipboard weapons. If this Component ever suffers a Critical Hit it becomes unpowered on a d10 roll of 3 or higher.')]});
+  add({id:'commerce_bridge',name:'Commerce Bridge',cat:'bridge',page:200,variants:[V([T],1,1)],mods:[AP('trade',50)],text:[X('Organised','+50 Achievement Points toward Trade objectives.')]});
+  add({id:'armoured_bridge',name:'Armoured Command Bridge',cat:'bridge',page:200,variants:[V([R,F],2,2),V(LARGE,3,2)],
+    text:[X('Reinforced Armour','If this Component takes a Critical Hit or becomes damaged or unpowered, roll d10. On 4 or higher it is unharmed.')]});
+  add({id:'ship_masters_bridge',name:'Ship Master\'s Bridge',cat:'bridge',page:200,variants:[V([C],4,3)],mods:[S('pilot',5),S('navigation',5),S('bs_fire',10)],
+    text:[X('Master Plotting Table','+5 to all Piloting and Navigation tests by crew on the bridge.'),X('Improved Fire Direction','+10 BS to fire shipboard weapons.')]});
+  add({id:'bridge_of_antiquity',name:'Bridge of Antiquity',cat:'bridge',page:207,tech:'archeotech',variants:[V(SMALL,1,1,2),V(LARGE,2,1,2)],mods:[S('command',10),S('social',10,{cond:'on the bridge'}),M('man',5)],
+    text:[X('Eyes Everywhere','+10 to all Command tests or social Skill tests made while on the bridge.'),X('Hololithic Display Tank','+5 Manoeuvrability.')]});
+
+  add({id:'m1r_life',name:'M-1.r Life Sustainer',cat:'life_sustainer',page:200,variants:[V(SMALL,3,1),V(LARGE,4,2)],mods:[M('moraleLoss',1)],text:[X('Stale Air','Increase all Morale loss by 1.')]});
+  add({id:'vitae_life',name:'Vitae Pattern Life Sustainer',cat:'life_sustainer',page:200,variants:[V(SMALL,4,2),V(LARGE,5,3)],blurb:'STC origins, common in the Calixis Sector. No special rules.'});
+  add({id:'ancient_life',name:'Ancient Life Sustainer',cat:'life_sustainer',page:206,tech:'archeotech',variants:[V(SMALL,2,1,2),V(LARGE,2,2,2)],mods:[M('morale',2),M('crewLoss',-1,{cond:'non-combat sources'})],
+    text:[X('The Air is Sweet','Morale +2 permanently; reduce all Crew Population losses from non-combat sources by 1.')]});
+
+  add({id:'pressed_quarters',name:'Pressed-crew Quarters',cat:'crew_quarters',page:200,variants:[V(SMALL,1,2),V(LARGE,2,3)],mods:[M('morale',-2)],text:[X('Cramped','Decrease Morale permanently by 2.')]});
+  add({id:'voidsmen_quarters',name:'Voidsmen Quarters',cat:'crew_quarters',page:200,variants:[V(SMALL,1,3),V(LARGE,2,4)],blurb:'Standard quarters for a long-distance trader. No special rules.'});
+
+  add({id:'m100_auger',name:'M-100 Auger Array',cat:'auger_array',page:201,external:true,variants:[V(ALL,3,0)],blurb:'Imperial Navy standard sensor array. External.'});
+  add({id:'m201_auger',name:'M-201.b Auger Array',cat:'auger_array',page:201,external:true,variants:[V(ALL,5,0)],mods:[M('det',5)],text:[X('Sensitive','+5 Detection.')]});
+  add({id:'r50_auspex',name:'R-50 Auspex Multi-band',cat:'auger_array',page:202,external:true,variants:[V(ALL,4,0)],mods:[M('det',-2),S('manoeuvre_action',5,{cond:'to avoid celestial phenomena'}),AP('exploration',50)],
+    text:[X('Stellar Detection','+5 to Manoeuvre tests to avoid celestial phenomena, but −2 Detection.'),X('Long Distance Scan','+50 Achievement Points toward Exploration objectives.')]});
+  add({id:'deep_void_auger',name:'Deep Void Auger Array',cat:'auger_array',page:202,external:true,variants:[V(ALL,7,0,1)],mods:[M('det',10)],text:[X('Eye of the Omnissiah','+10 Detection.')]});
+  add({id:'logis_targeter',name:'Auto-stabilised Logis-targeter',cat:'auger_array',page:207,tech:'archeotech',external:true,variants:[V(ALL,5,0,2)],mods:[M('det',5),S('bs_fire',5)],
+    text:[X('Image of the Void','+5 Detection.'),X('Targeting Matrix','+5 BS to fire the ship\'s weapons.')]});
+
+  /* ---- Weapons ---- */
+  const W=(kind,str,bonus,crit,range,slotRule='any')=>({kind,str,dmg:{dice:'1d10',bonus},crit,range,slotRule});
+  add({id:'thunderstrike',name:'Thunderstrike Macrocannons',cat:'weapon',page:202,variants:[V(ALL,2,2,1)],weapon:W('macrobattery',3,1,6,4)});
+  add({id:'mars_macro',name:'Mars Pattern Macrocannons',cat:'weapon',page:202,variants:[V(ALL,4,2,1)],weapon:W('macrobattery',3,2,5,6)});
+  add({id:'mars_broadside',name:'Mars Pattern Macrocannon Broadside',cat:'weapon',page:202,variants:[V(LARGE,4,5,1)],weapon:W('macrobattery',6,2,5,6,'broadside'),text:[X('Broadside','Must occupy a Port or Starboard Weapon Capacity slot.')]});
+  add({id:'sunsear',name:'Sunsear Laser Battery',cat:'weapon',page:202,variants:[V(ALL,6,4,1)],weapon:W('macrobattery',4,2,4,9)});
+  add({id:'ryza_plasma',name:'Ryza Pattern Plasma Battery',cat:'weapon',page:203,variants:[V(ALL,8,4,2)],weapon:W('macrobattery',4,4,4,5),dataNote:'Table 8-4 lists 7 Power, Table 8-5 lists 8; the Errata confirms 8.',
+    text:[X('Vapourisation','When this weapon rolls a 1 or 2 on the Critical Hit chart, it affects two Components instead of one.')]});
+  add({id:'starbreaker',name:'Starbreaker Lance Weapon',cat:'weapon',page:203,variants:[V(ALL,6,4,2)],weapon:W('lance',1,2,3,5,'lance')});
+  add({id:'titanforge_lance',name:'Titanforge Lance Weapon',cat:'weapon',page:203,variants:[V(ALL,9,4,2)],weapon:W('lance',1,4,3,6,'lance')});
+  add({id:'titanforge_battery',name:'Titanforge Lance Battery',cat:'weapon',page:203,variants:[V(LARGE,13,6,2)],weapon:W('lance',2,4,3,6,'lance'),dataNote:'Errata: Appropriate Hull Types corrected from "All ships" to Light Cruisers and Cruisers.'});
+  add({id:'shard_cannon',name:'Shard Cannon Battery',cat:'weapon',page:208,tech:'xenotech',variants:[V(ALL,0,3,2)],weapon:W('macrobattery',4,2,3,6),
+    text:[X('Unknown energy source','May not become unpowered for any reason. If destroyed, the ship takes 2d5 additional Hull Integrity damage with no reduction from Armour or Shields.')]});
+
+  /* ---- Cargo & passengers ---- */
+  add({id:'cargo_lighter',name:'Cargo Hold and Lighter Bay',cat:'cargo',page:203,variants:[V([R,F,LC,C],1,2,1)],mods:[AP('trade',50),AP('criminal',50),M('man',-3)],
+    text:[X('Hidden Spaces','+50 Achievement Points toward Trade or Criminal objectives.'),X('Unbalanced','−3 Manoeuvrability.')]});
+  add({id:'compartmentalised_cargo',name:'Compartmentalised Cargo Hold',cat:'cargo',page:203,variants:[V([R,F,LC,C],2,5,1)],mods:[AP('trade',100)],text:[X('Storage Area','+100 Achievement Points toward Trade objectives.')]});
+  add({id:'main_cargo_hold',name:'Main Cargo Hold',cat:'cargo',page:203,variants:[V([T],2,4,1)],mods:[AP('trade',125)],text:[X('Stowed and Secured','+125 Achievement Points toward Trade objectives.')]});
+  add({id:'luxury_quarters',name:'Luxury Passenger Quarters',cat:'cargo',page:203,variants:[V(ALL,2,1,1)],mods:[AP('trade',100),AP('criminal',100),AP('creed',100),M('morale',-3)],
+    text:[X('Paying Customers','+100 Achievement Points toward Trade, Criminal or Creed objectives.'),X('Class Division','Decrease Morale permanently by 3.')]});
+  add({id:'barracks',name:'Barracks',cat:'cargo',page:203,variants:[V(ALL,2,4,2)],mods:[AP('military',100),S('command_boarding',20,{cond:'while transporting troops'}),S('command_hitrun',20,{cond:'while transporting troops'})],
+    text:[X('Soldiers','+100 Achievement Points toward Military objectives.'),X('Reinforcements','If the ship is transporting troops, +20 to all Command tests involving boarding actions and Hit and Run actions.')]});
+
+  /* ---- Augments ---- */
+  add({id:'retro_thrusters',name:'Augmented Retro-thrusters',cat:'augment',page:203,external:true,variants:[V([R,F],3,0,2),V([T,LC],4,0,2),V([C],5,0,2)],mods:[M('man',5)],text:[X('Agile','+5 Manoeuvrability. External.')]});
+  add({id:'bulkheads',name:'Reinforced Interior Bulkheads',cat:'augment',page:203,variants:[V(SMALL,0,2,2),V(LARGE,0,3,2)],mods:[M('hi',3)],text:[X('Hard to Breach','+3 Hull Integrity.')]});
+  add({id:'armour_plating',name:'Armour Plating',cat:'augment',page:204,once:true,variants:[V(SMALL,0,1,2),V(LARGE,0,2,2)],mods:[M('armour',1),M('man',-2)],text:[X('Armour','+1 Armour.'),X('Dead Weight','−2 Manoeuvrability.')]});
+  add({id:'armoured_prow',name:'Armoured Prow',cat:'augment',page:204,once:true,variants:[V([C],0,4,2)],mods:[M('armour',4,{arc:'fore'})],
+    text:[X('Imposing','No Prow macrobatteries or lances. +4 Armour in the fore arc only. +1d10 additional damage when ramming.')]});
+  add({id:'tenebro_maze',name:'Tenebro-Maze',cat:'augment',page:205,once:true,variants:[V(SMALL,1,2,2),V(LARGE,2,3,2)],mods:[S('command_defend',10)],
+    text:[X('Hidden sally-ports','+10 to Command tests when defending against boarding actions and Hit and Run actions.'),X('Incomprehensible Layout','When the ship suffers a Critical Hit that affects a Component, the ship\'s controller chooses which Component is hit.')]});
+  add({id:'ghost_field',name:'Ghost Field',cat:'augment',page:207,tech:'xenotech',variants:[V(ALL,8,4,3)],mods:[S('pilot_hitrun_enemy',-30)],
+    text:[X('Ghostly Echoes','All ships firing at this vessel suffer −20 BS (−30 if firing a lance). Enemy piloting tests for Hit and Run attacks suffer −30.'),X('Energetic Interference','At the start of combat the ship must choose whether it is using its Void Shields or the Ghost Field.')]});
+  add({id:'runecaster',name:'Runecaster',cat:'augment',page:208,tech:'xenotech',variants:[V(ALL,0,1,2)],mods:[S('navigation',20)],
+    text:[X('Eye of the Warp','Navigators using this Component gain +20 to all Navigation tests to pilot the ship through the empyrean. Any journey made using it takes half its normal time.'),X('Fuelled by Fate','This Component never becomes unpowered for any reason.')]});
+  add({id:'micro_laser_grid',name:'Micro Laser Defence Grid',cat:'augment',page:208,tech:'xenotech',external:true,variants:[V(ALL,2,0,2)],mods:[M('turret',2)],text:[X('Wall of Light','Turret Rating +2. External.')]});
+  add({id:'gravity_sails',name:'Gravity Sails',cat:'augment',page:208,tech:'xenotech',external:true,variants:[V(SMALL,3,0,3),V(LARGE,5,0,3)],mods:[M('speed',1),M('man',5)],text:[X('The Currents of Space','+1 Speed, +5 Manoeuvrability. External.')]});
+
+  /* ---- Additional facilities (once each) ---- */
+  add({id:'supply_vaults',name:'Extended Supply Vaults',cat:'facility',page:205,once:true,variants:[V(ALL,1,4,2)],mods:[M('morale',1)],
+    text:[X('Extensive Stores','The ship can spend twice as long in the void without Crew Population or Morale loss. Extended Repairs restore +1 Hull Integrity.'),X('Plenty for All','Morale +1 permanently.')]});
+  add({id:'crew_reclamation',name:'Crew Reclamation Facility',cat:'facility',page:205,once:true,variants:[V(ALL,1,1,1)],mods:[M('crewLoss',-3),M('moraleLoss',1)],
+    text:[X('Recycling','Reduce all Crew Population losses by 3, to a minimum of 1. Increase all Morale losses by 1.')]});
+  add({id:'munitorium',name:'Munitorium',cat:'facility',page:205,once:true,variants:[V(SMALL,2,3,2),V(LARGE,3,4,2)],mods:[AP('military',25),M('macroDmg',1)],
+    text:[X('Well Armed','+25 Achievement Points toward Military objectives.'),X('Ordinatus Extremus','+1 damage for all macrobatteries.'),X('Volatile','If this Component is damaged, the ship takes 2d5 Hull Integrity damage and a Component of the GM\'s choice is set on fire.')]});
+  add({id:'temple_shrine',name:'Temple-Shrine to the God Emperor',cat:'facility',page:205,once:true,variants:[V(ALL,1,1,1)],mods:[M('morale',3),AP('creed',100)],
+    text:[X('Inspiration','Morale +3 permanently.'),X('Awe of the God Emperor','+100 Achievement Points toward Creed objectives.')]});
+  add({id:'librarium',name:'Librarium Vault',cat:'facility',page:205,once:true,variants:[V(ALL,1,1,1)],mods:[S('investigation',10)],text:[X('Accumulated Data','+10 to Investigation tests made aboard the ship.')]});
+  add({id:'trophy_room',name:'Trophy Room',cat:'facility',page:206,once:true,variants:[V(ALL,1,1,1)],mods:[AP('exploration',50),AP('trade',50),AP('criminal',50)],text:[X('Past Experiences','+50 Achievement Points toward Exploration, Trade or Criminal objectives.')]});
+  add({id:'observation_dome',name:'Observation Dome',cat:'facility',page:206,once:true,variants:[V(ALL,0,1,1)],mods:[AP('exploration',50),M('morale',1)],
+    text:[X('Engraved Star-charts','+50 Achievement Points toward Exploration objectives.'),X('Cure for Claustrophobia','Morale +1 permanently.')]});
+  add({id:'murder_servitors',name:'Murder-Servitors',cat:'facility',page:206,once:true,variants:[V(ALL,1,1,2)],mods:[S('command_hitrun',20)],
+    text:[X('Death-dealers','+20 to the opposed Command test when conducting a Hit and Run action.'),X('Precise','When determining the Critical Hit inflicted by a Hit and Run they took part in, choose any result from 1 to 6 instead of rolling.')]});
+  add({id:'teleportarium',name:'Teleportarium',cat:'facility',page:207,tech:'archeotech',variants:[V(ALL,1,1,1)],mods:[S('command_hitrun',20)],
+    text:[X('Surprise Strike','Hit and Run attacks need no piloting test; the attacker gains +20 to the Command test. Also usable to escape sticky situations on a nearby planet, at the GM\'s discretion.')]});
+
+  const COMP={}; comps.forEach(c=>COMP[c.id]=c);
+
+  const SPIRITS=[
+    {id:'nose_for_trouble',roll:1,name:'A Nose for Trouble',mods:[M('det',5),M('armour',-1)],text:[X('Effect','+5 Detection, −1 Armour. Expect the occasional unwanted fight.')]},
+    {id:'blasphemous',roll:2,name:'Blasphemous Tendencies',mods:[S('navigation',15),S('willpower',-5)],text:[X('Effect','+15 Navigation in the warp; crew aboard take −5 on Willpower-based tests.')]},
+    {id:'martial_hubris',roll:3,name:'Martial Hubris',mods:[S('bs_fire',5),S('pilot_disengage',-15)],text:[X('Effect','+5 BS with ship weapons; −15 Pilot (Space Craft) to escape combat.')]},
+    {id:'rebellious',roll:4,name:'Rebellious',mods:[],text:[X('Effect','In at most one space combat per session the GM picks a random Component that loses power until repaired. On any Critical Hit roll d10: 8+ ignores the critical effect.')]},
+    {id:'stoic',roll:5,name:'Stoic',mods:[M('pfPerEndeavour',-1)],text:[X('Effect','−1 Profit Factor from every Endeavour. When a Component would be damaged or unpowered roll d10: 7+ ignores it.')]},
+    {id:'skittish',roll:6,name:'Skittish',mods:[M('speed',-1,{when:'combat'})],text:[X('Effect','−1 Speed in combat. Star-to-star voyages take 1d5 weeks less, minimum 1.')]},
+    {id:'wrothful',roll:7,name:'Wrothful',mods:[M('speed',1,{when:'combat'}),M('man',7,{when:'combat'}),M('speed',-1,{when:'noncombat'}),M('man',-5,{when:'noncombat'}),M('det',-5,{when:'noncombat'})],text:[X('Effect','In combat +1 Speed, +7 Manoeuvrability. Out of combat −1 Speed, −5 Manoeuvrability, −5 Detection.')]},
+    {id:'resolute',roll:8,name:'Resolute',mods:[M('speed',-1),M('hi',3),S('techuse_repair',10)],text:[X('Effect','−1 Speed; +3 Hull Integrity; +10 on Repair tests.')]},
+    {id:'adventurous',roll:9,name:'Adventurous',mods:[M('det',10,{when:'endeavour'}),M('det',-10,{when:'nonendeavour'})],text:[X('Effect','+10 Detection during an Endeavour, −10 outside one.')]},
+    {id:'ancient_and_wise',roll:10,name:'Ancient and Wise',mods:[M('hi',-4),S('manoeuvre_action',10)],text:[X('Effect','−4 Hull Integrity; +10 on every Manoeuvre Action, ramming and out-of-combat manoeuvres included.')]},
+  ];
+  const HISTORIES=[
+    {id:'reliquary_of_mars',roll:1,name:'Reliquary of Mars',grants:'archeotech',mods:[S('techuse_repair',-20)],text:[X('Effect','One Archeotech Component of your choice at construction. −20 on Tech-Use repairs. The Mechanicus takes a reverent interest in the ship.')]},
+    {id:'haunted',roll:2,name:'Haunted',mods:[M('morale',-10),M('det',6)],text:[X('Effect','Morale −10 permanently; +6 Detection. Outsiders take −5 on Command tests for boarding or Hit and Run against this ship. Further hauntings at the GM\'s discretion.')]},
+    {id:'emissary',roll:3,name:'Emissary of the Imperator',mods:[S('intimidate',15,{cond:'if known to be from the vessel'}),S('social',-5,{cond:'if known to be from the vessel'})],text:[X('Effect','When known to be from this ship: +15 Intimidate, −5 on other social skills. Reactions from xenos, the faithful and heretics colour accordingly.')]},
+    {id:'wolf_in_sheeps_clothing',roll:4,name:'Wolf in Sheep\'s Clothing',mods:[M('powerGen',-2)],text:[X('Effect','Three chosen Components hide from scans or read as a different Component of the same type; only a thorough internal inspection reveals them. −2 Power to keep up the disguise.')]},
+    {id:'turbulent_past',roll:5,name:'Turbulent Past',mods:[],text:[X('Effect','The GM names a group that hates the ship (−20 social skills with them) and an opposed group that favours it (+20).')]},
+    {id:'death_cult',roll:6,name:'Death Cult',mods:[M('crew',-8),M('moraleLoss',-2)],text:[X('Effect','Crew Population −8 permanently; all Morale losses reduced by 2. The cult complicates dealings with officers and the Ministorum, but breeds assassins.')]},
+    {id:'space_hulk',roll:7,name:'Wrested from a Space Hulk',mods:[M('armour',1),M('speed',1),M('man',3)],text:[X('Effect','+1 Armour, +1 Speed, +3 Manoeuvrability. Every Misfortune is rolled twice and the worse result applies.')]},
+    {id:'temperamental_warp',roll:8,name:'Temperamental Warp Engine',mods:[],text:[X('Effect','Each warp voyage: d10, 1–6 adds 1d5 weeks, 7+ saves 1d5 weeks. Rarely the ship emerges somewhere else entirely.')]},
+    {id:'finances_in_arrears',roll:9,name:'Finances in Arrears',mods:ENDEAVOURS.map(t=>AP(t,-50)),text:[X('Effect','Every Endeavour objective needs +50 Achievement Points. The creditor is a reliable contact who can also demand missions.')]},
+    {id:'xenophilous',roll:10,name:'Xenophilous',grants:'xenotech',mods:[S('techuse_repair',-30,{altFL:-10})],text:[X('Effect','One Xeno-tech Component of your choice at construction. −30 on Tech-Use repairs, −10 with Forbidden Lore (Xenos). The Ordo Xenos takes notice.')]},
+  ];
+  const PF_TABLE=[{lo:1,hi:1,pf:60,sp:30},{lo:2,hi:3,pf:50,sp:40},{lo:4,hi:7,pf:40,sp:50},{lo:8,hi:9,pf:30,sp:60},{lo:10,hi:10,pf:20,sp:70}];
+  const GRANT_WAIVES_SP=false;
+  const STAT_LABEL={speed:'Speed',man:'Manoeuvrability',det:'Detection',armour:'Armour',hi:'Hull Integrity',turret:'Turret Rating',shields:'Void Shields',morale:'Morale',crew:'Crew Population'};
+  return {HULL_CLASSES,CLASS_NAME,HULLS,HULL:Object.fromEntries(HULLS.map(h=>[h.id,h])),CATS,CAT:Object.fromEntries(CATS.map(c=>[c.id,c])),ESSENTIAL_CATS,ENDEAVOURS,SKILLS,COMPS:comps,COMP,SPIRITS,HISTORIES,
+    SPIRIT:Object.fromEntries(SPIRITS.map(s=>[s.id,s])),HISTORY:Object.fromEntries(HISTORIES.map(s=>[s.id,s])),PF_TABLE,GRANT_WAIVES_SP,STAT_LABEL};
+})();
+
+/* ========================================================================
+   RULES — pure helpers
+   ======================================================================== */
+const Rules=(()=>{
+  const {HULL,COMP,HULL_CLASSES,HISTORY}=DATA;
+  const sizeIndex=cls=>HULL_CLASSES.indexOf(cls);
+  const hullOf=b=>HULL[b.hull];
+  const variantFor=(comp,cls)=>comp.variants.find(v=>v.hulls.includes(cls))||null;
+  const slotTypes=hull=>['prow','dorsal','port','starboard'].filter(t=>(hull.slots[t]||0)>0);
+  const allSlots=hull=>slotTypes(hull).flatMap(t=>Array.from({length:hull.slots[t]},(_,i)=>t+':'+i));
+  const hasArmouredProw=b=>b.supplementals.some(s=>s.id==='armoured_prow');
+  function allowedSlotTypes(comp,b){
+    if(!comp.weapon) return [];
+    const hull=hullOf(b); let types=slotTypes(hull);
+    if(comp.weapon.slotRule==='lance' && sizeIndex(hull.cls)<=sizeIndex('F')) types=types.filter(t=>t==='prow');
+    if(comp.weapon.slotRule==='broadside') types=types.filter(t=>t==='port'||t==='starboard');
+    if(hasArmouredProw(b)) types=types.filter(t=>t!=='prow');
+    return types;
+  }
+  const allowedSlots=(comp,b)=>{const hull=hullOf(b);return allowedSlotTypes(comp,b).flatMap(t=>Array.from({length:hull.slots[t]},(_,i)=>t+':'+i));};
+  const usedSlots=(b,exceptUid)=>new Set(b.supplementals.filter(s=>s.slot&&s.uid!==exceptUid).map(s=>s.slot));
+  const freeSlots=(comp,b,exceptUid)=>{const used=usedSlots(b,exceptUid);return allowedSlots(comp,b).filter(s=>!used.has(s));};
+  const autoSlot=(comp,b)=>freeSlots(comp,b)[0]||null;
+  function slotReason(comp,b){
+    const hull=hullOf(b);
+    if(comp.weapon.slotRule==='lance' && sizeIndex(hull.cls)<=sizeIndex('F') && !hull.slots.prow) return 'Lances need a Prow slot on Frigates and smaller';
+    if(comp.weapon.slotRule==='lance' && sizeIndex(hull.cls)<=sizeIndex('F') && hasArmouredProw(b)) return 'Armoured Prow blocks the Prow slot';
+    if(comp.weapon.slotRule==='broadside' && !allowedSlotTypes(comp,b).length) return 'Needs a Port or Starboard slot';
+    if(!allowedSlotTypes(comp,b).length) return 'No usable weapon slot';
+    return 'No free weapon slot';
+  }
+  const grantOf=b=>b.history?HISTORY[b.history].grants:null;
+  function isGated(comp,b){
+    if(comp.tech==='standard'||b.gmOverride) return null;
+    if(comp.tech==='archeotech' && grantOf(b)!=='archeotech') return 'Archeotech: needs Reliquary of Mars or GM override';
+    if(comp.tech==='xenotech' && grantOf(b)!=='xenotech') return 'Xeno-tech: needs Xenophilous or GM override';
+    return null;
+  }
+  const installedCount=(b,id)=>b.supplementals.filter(s=>s.id===id).length;
+  const onceBlocked=(comp,b)=>!!(comp.once && installedCount(b,comp.id)>0);
+  function availability(comp,b){
+    const v=variantFor(comp,hullOf(b).cls);
+    if(!v) return {ok:false,reason:DATA.HULL_CLASSES.filter(c=>comp.variants.some(x=>x.hulls.includes(c))).map(c=>DATA.CLASS_NAME[c]).join(' / ')+' only',variant:null};
+    const g=isGated(comp,b); if(g) return {ok:false,reason:g,variant:v};
+    if(comp.group==='essential') return {ok:true,variant:v,installed:b.essentials[comp.cat]===comp.id};
+    if(onceBlocked(comp,b)) return {ok:false,reason:'Once per ship: installed',variant:v};
+    if(comp.weapon){const s=autoSlot(comp,b); if(!s) return {ok:false,reason:slotReason(comp,b),variant:v}; return {ok:true,variant:v,slot:s};}
+    return {ok:true,variant:v};
+  }
+  const pfRow=roll=>DATA.PF_TABLE.find(r=>roll>=r.lo&&roll<=r.hi);
+  return {sizeIndex,hullOf,variantFor,slotTypes,allSlots,allowedSlotTypes,allowedSlots,freeSlots,autoSlot,usedSlots,hasArmouredProw,isGated,grantOf,installedCount,onceBlocked,availability,pfRow,slotReason};
+})();
+
+/* ========================================================================
+   DERIVE — build → derived sheet + issues
+   ======================================================================== */
+const Derive=(()=>{
+  const {COMP,HULL,ESSENTIAL_CATS,ENDEAVOURS,SKILLS,SPIRIT,HISTORY,STAT_LABEL}=DATA;
+  const statKeys=['speed','man','det','armour','hi','turret','shields','morale','crew'];
+  function derive(b){
+    const hull=HULL[b.hull]; const cls=hull.cls;
+    const rows=[]; const issues=[];
+    const issue=(level,code,msg,ref)=>issues.push({level,code,msg,ref});
+    for(const cat of ESSENTIAL_CATS){
+      const id=b.essentials[cat]; const comp=COMP[id]||null; const variant=comp?Rules.variantFor(comp,cls):null;
+      rows.push({uid:'e:'+cat,kind:'essential',cat,comp,variant,available:!!variant});
+      if(!comp) issue('error','missing_essential',`No ${DATA.CAT[cat].name} installed`,'e:'+cat);
+      else if(!variant) issue('error','hull_mismatch',`${comp.name} is not available on a ${DATA.CLASS_NAME[cls]}`,'e:'+cat);
+    }
+    for(const s of b.supplementals){
+      const comp=COMP[s.id]; if(!comp) continue; const variant=Rules.variantFor(comp,cls);
+      rows.push({uid:s.uid,kind:'supp',comp,variant,slot:s.slot||null,available:!!variant});
+      if(!variant) issue('error','hull_mismatch',`${comp.name} is not available on a ${DATA.CLASS_NAME[cls]}`,s.uid);
+    }
+    for(const p of (hull.preinstalled||[])){
+      const comp=COMP[p]; rows.push({uid:'pre:'+p,kind:'pre',comp,variant:{power:2,space:0,sp:0},available:true});
+    }
+    // budgets
+    let gen=0,used=0,space=0,sp=hull.sp;
+    for(const r of rows){ if(!r.variant) continue;
+      if(r.comp.generates) gen+=r.variant.power; else used+=r.variant.power;
+      space+=r.variant.space; sp+=r.variant.sp; }
+    // stats
+    const stats={}; for(const k of statKeys){stats[k]={value:0,parts:[],situational:[]};}
+    stats.armour.fore=0; stats.armour.foreParts=[];
+    for(const k of ['speed','man','det','armour','hi','turret']) {stats[k].value=hull[k]; stats[k].parts.push({src:hull.name,v:hull[k]});}
+    stats.morale.value=100; stats.crew.value=100; stats.morale.parts.push({src:'Base',v:100}); stats.crew.parts.push({src:'Base',v:100});
+    const ap={}; ENDEAVOURS.forEach(t=>ap[t]={value:0,parts:[]});
+    const skills={}; const loss={morale:{value:0,parts:[]},crew:{value:0,parts:[]}}; let pfPer={value:0,parts:[]}; let macroDmg=0; let powerGenMods=[];
+    const texts=[];
+    function applyMods(src,mods){
+      for(const m of mods){
+        const v=(m.altFL!==undefined && b.forbiddenLoreXenos)?m.altFL:m.v;
+        if(m.stat==='skill'){ (skills[m.skill]??={value:0,parts:[]}); skills[m.skill].value+=v; skills[m.skill].parts.push({src,v,cond:m.cond}); }
+        else if(m.stat==='ap'){ ap[m.type].value+=v; ap[m.type].parts.push({src,v}); }
+        else if(m.stat==='moraleLoss'){ loss.morale.value+=v; loss.morale.parts.push({src,v}); }
+        else if(m.stat==='crewLoss'){ loss.crew.value+=v; loss.crew.parts.push({src,v,cond:m.cond}); }
+        else if(m.stat==='pfPerEndeavour'){ pfPer.value+=v; pfPer.parts.push({src,v}); }
+        else if(m.stat==='macroDmg'){ macroDmg+=v; }
+        else if(m.stat==='powerGen'){ gen+=v; powerGenMods.push({src,v}); }
+        else if(m.stat==='armour' && m.arc==='fore'){ stats.armour.fore+=v; stats.armour.foreParts.push({src,v}); }
+        else if(m.when){ stats[m.stat].situational.push({src,v,when:m.when}); }
+        else { stats[m.stat].value+=v; stats[m.stat].parts.push({src,v,cond:m.cond}); }
+      }
+    }
+    for(const r of rows){ if(!r.variant) continue; applyMods(r.comp.name,r.comp.mods); r.comp.text.forEach(t=>texts.push({src:r.comp.name,...t})); }
+    if(hull.preinstalled?.length) texts.push({src:hull.name,title:'Cargo Hauler',body:'Pre-equipped with one Main Cargo Hold; its Space is already deducted from the hull, but the ship must provide 2 Power to it.'});
+    const spirit=b.spirit?SPIRIT[b.spirit]:null, history=b.history?HISTORY[b.history]:null;
+    if(spirit){applyMods('Machine Spirit: '+spirit.name,spirit.mods); spirit.text.forEach(t=>texts.push({src:'Machine Spirit: '+spirit.name,...t}));}
+    if(history){applyMods('Past History: '+history.name,history.mods); history.text.forEach(t=>texts.push({src:'Past History: '+history.name,...t}));}
+    const ghost=rows.some(r=>r.comp.id==='ghost_field'&&r.variant);
+    // weapons
+    const weapons=rows.filter(r=>r.kind==='supp'&&r.comp.weapon).map(r=>{const w=r.comp.weapon; const bonus=w.dmg.bonus+(w.kind==='macrobattery'?macroDmg:0);
+      return {uid:r.uid,name:r.comp.name,slot:r.slot,kind:w.kind,str:w.str,dmg:`${w.dmg.dice}+${bonus}`,crit:w.crit,range:w.range,notes:(w.kind==='macrobattery'&&macroDmg?['+'+macroDmg+' Munitorium']:[]),available:!!r.variant};});
+    // budgets object
+    const spMods=(b.spMods||[]).map(m=>({id:m.id,cause:m.cause||'',value:+m.value||0})); const spAdj=spMods.reduce((n,m)=>n+m.value,0); const spBudget=b.warrant.sp+spAdj;
+    const budgets={power:{gen,used,free:gen-used},space:{total:hull.space,used:space,free:hull.space-space},sp:{budget:spBudget,base:b.warrant.sp,adjust:spAdj,mods:spMods,spent:sp,left:spBudget-sp}};
+    const pf={base:b.warrant.pf,leftover:Math.max(0,budgets.sp.left),get total(){return this.base+this.leftover;}};
+    // validation
+    if(budgets.power.used>budgets.power.gen) issue('error','power',`Power overdrawn: ${used} used of ${gen} generated`,'meter:power');
+    else if(budgets.power.free<=2 && budgets.power.gen>0) issue('info','power_tight',`Only ${budgets.power.free} Power spare: no headroom for later upgrades (the Core rules never reduce generated Power; damage only unpowers components)`,'meter:power');
+    if(space>hull.space) issue('error','space',`Space overfilled: ${space} used of ${hull.space}`,'meter:space');
+    if(spMods.length) issue('info','sp_adjust',`Ship Point budget ${spBudget}: Warrant ${b.warrant.sp}${spMods.map(m=>` ${sign(m.value)} ${m.cause||'unnamed adjustment'}`).join('')}`,'meter:sp');
+    if(spMods.some(m=>!m.cause.trim())) issue('warn','sp_cause','A Ship Point adjustment has no cause noted','meter:sp');
+    if(sp>spBudget) issue('error','sp',`Ship Points exceeded: ${sp} spent of ${spBudget}`,'meter:sp');
+    else if(budgets.sp.left>0) issue('info','pf',`${budgets.sp.left} unspent Ship Points are added to starting Profit Factor (p. 207): ${pf.base} + ${pf.leftover} = ${pf.total}`,'meter:sp');
+    // slots
+    const slotSeen=new Map();
+    for(const r of rows){ if(r.kind!=='supp'||!r.comp.weapon||!r.variant) continue;
+      if(!r.slot){issue('error','no_slot',`${r.comp.name}: no weapon slot assigned`,r.uid);continue;}
+      const [type]=r.slot.split(':'); const idx=+r.slot.split(':')[1];
+      if(!(hull.slots[type]>idx)) issue('error','bad_slot',`${r.comp.name}: slot ${fmtSlot(r.slot)} does not exist on ${hull.name}`,r.uid);
+      else if(!Rules.allowedSlotTypes(r.comp,b).includes(type)){
+        const why=(type==='prow'&&Rules.hasArmouredProw(b))?'Armoured Prow forbids Prow weapons':r.comp.weapon.slotRule==='lance'?'lances must be in a Prow slot on Frigates and smaller':'broadsides must be Port or Starboard';
+        issue('error','slot_rule',`${r.comp.name} in ${fmtSlot(r.slot)}: ${why}`,r.uid);
+      }
+      if(slotSeen.has(r.slot)) issue('error','slot_dup',`${fmtSlot(r.slot)} holds two weapons`,r.uid); slotSeen.set(r.slot,r.uid);
+    }
+    const freeSlotCount=Rules.allSlots(hull).filter(s=>!slotSeen.has(s)).length;
+    if(freeSlotCount>0) issue('warn','unused_slot',`${freeSlotCount} weapon slot${freeSlotCount>1?'s':''} unused`,'group:weapon');
+    // once
+    const counts={}; b.supplementals.forEach(s=>counts[s.id]=(counts[s.id]||0)+1);
+    for(const [id,n] of Object.entries(counts)) if(COMP[id]?.once && n>1) issue('error','once',`${COMP[id].name} may only be installed once`,id);
+    // tech gating
+    for(const tech of ['archeotech','xenotech']){
+      const installed=rows.filter(r=>r.comp.tech===tech&&r.kind!=='pre'); if(!installed.length) continue;
+      const label=tech==='archeotech'?'Archeotech':'Xeno-tech'; const need=tech==='archeotech'?'Reliquary of Mars':'Xenophilous';
+      if(b.gmOverride) issue('info','gm',`${label} allowed by GM override (${installed.length} installed)`,'gm');
+      else if(Rules.grantOf(b)!==tech) issue('error','gated',`${label} requires the ${need} Past History or a GM override`,installed[0].uid);
+      else if(installed.length>1) issue('error','grant_limit',`${need} grants one ${label} Component; ${installed.length} installed`,installed[1].uid);
+      else if(!DATA.GRANT_WAIVES_SP) issue('info','grant_sp',`${need} grants your choice of ${label}; the builder still charges its SP (book does not waive it)`,'gm');
+    }
+    if(ghost) issue('warn','ghost',`Ghost Field: choose Ghost Field or Void Shields at the start of each combat`,'ghost_field');
+    if(loss.morale.parts.length>1 && loss.morale.value>0) issue('warn','morale_loss',`Morale losses increased by ${loss.morale.value} (${loss.morale.parts.map(p=>p.src).join(' + ')})`,'ledger');
+    rows.filter(r=>r.comp.dataNote&&r.variant&&r.comp.id==='ryza_plasma').forEach(r=>issue('info','data',`${r.comp.name}: ${r.comp.dataNote}`,r.uid));
+    if(!b.spirit) issue('warn','no_spirit','No Machine Spirit Oddity: roll or pick one (Table 8-1)','spirit');
+    if(!b.history) issue('warn','no_history','No Past History: roll or pick one (Table 8-2)','history');
+    const order={error:0,warn:1,info:2}; issues.sort((x,y)=>order[x.level]-order[y.level]);
+    return {hull,cls,rows,budgets,pf,stats,weapons,ap,skills,loss,pfPer,macroDmg,powerGenMods,ghost,texts,issues,valid:!issues.some(i=>i.level==='error'),
+      errors:issues.filter(i=>i.level==='error').length,warns:issues.filter(i=>i.level==='warn').length};
+  }
+  return {derive,statKeys};
+})();
+function fmtSlot(s){ if(!s) return '—'; const [t,i]=s.split(':'); return t[0].toUpperCase()+t.slice(1)+' '+(+i+1); }
+function sign(v){ return (v>0?'+':'')+v; }
+
+/* ========================================================================
+   ACTIONS / STORE
+   ======================================================================== */
+const Actions=(()=>{
+  const {COMP,HULL,ESSENTIAL_CATS,SPIRITS,HISTORIES}=DATA;
+  let uidCounter=Date.now()%100000;
+  const uid=()=>'s'+(uidCounter++).toString(36);
+  const clone=o=>JSON.parse(JSON.stringify(o));
+  function defaultEssentials(cls){
+    const e={}; for(const cat of ESSENTIAL_CATS){
+      const opts=DATA.COMPS.filter(c=>c.cat===cat&&c.tech==='standard'&&Rules.variantFor(c,cls));
+      const pen=c=>c.mods.filter(m=>(m.stat==='morale'&&m.v<0)||(m.stat==='moraleLoss'&&m.v>0)).length;
+      opts.sort((a,b)=>{const va=Rules.variantFor(a,cls),vb=Rules.variantFor(b,cls);return (va.sp-vb.sp)||(pen(a)-pen(b))||(va.power-vb.power)||(va.space-vb.space);});
+      e[cat]=opts[0]?.id||null;
+    } return e;
+  }
+  function newBuild(name){
+    const b={v:1,name:name||'New vessel',hull:'sword',spirit:null,history:null,essentials:defaultEssentials('F'),supplementals:[],gmOverride:false,forbiddenLoreXenos:false,warrant:{roll:2,pf:50,sp:40,manual:false},spMods:[],notes:''};
+    return b;
+  }
+  function reduce(b0,a){
+    const b=clone(b0);
+    switch(a.type){
+      case 'setHull': b.hull=a.id; break;
+      case 'setEssential': b.essentials[a.cat]=a.id; break;
+      case 'addSupp': { const comp=COMP[a.id]; const s={uid:uid(),id:a.id}; if(comp.weapon) s.slot=a.slot||Rules.autoSlot(comp,b); b.supplementals.push(s); break; }
+      case 'removeSupp': b.supplementals=b.supplementals.filter(s=>s.uid!==a.uid); break;
+      case 'moveWeapon': { const s=b.supplementals.find(x=>x.uid===a.uid); if(s) s.slot=a.slot; break; }
+      case 'setSpirit': b.spirit=a.id||null; break;
+      case 'setHistory': b.history=a.id||null; break;
+      case 'rollSpirit': b.spirit=SPIRITS[Math.floor(Math.random()*10)].id; break;
+      case 'rollHistory': b.history=HISTORIES[Math.floor(Math.random()*10)].id; break;
+      case 'setWarrantRoll': { const r=Rules.pfRow(a.roll); b.warrant={roll:a.roll,pf:r.pf,sp:r.sp,manual:false}; break; }
+      case 'rollWarrant': { const roll=1+Math.floor(Math.random()*10); const r=Rules.pfRow(roll); b.warrant={roll,pf:r.pf,sp:r.sp,manual:false}; break; }
+      case 'setWarrantManual': b.warrant={roll:b.warrant.roll,pf:a.pf??b.warrant.pf,sp:a.sp??b.warrant.sp,manual:true}; break;
+      case 'toggleGm': b.gmOverride=!b.gmOverride; break;
+      case 'toggleFL': b.forbiddenLoreXenos=!b.forbiddenLoreXenos; break;
+      case 'addSpMod': (b.spMods??=[]).push({id:uid(),cause:a.cause||'',value:a.value||0}); break;
+      case 'setSpMod': { const m=(b.spMods||[]).find(x=>x.id===a.id); if(m){ if(a.cause!==undefined) m.cause=a.cause; if(a.value!==undefined) m.value=a.value; } break; }
+      case 'removeSpMod': b.spMods=(b.spMods||[]).filter(x=>x.id!==a.id); break;
+      case 'rename': b.name=a.name; break;
+      case 'setNotes': b.notes=a.notes; break;
+      case 'fixEssentials': { const cls=HULL[b.hull].cls; const d=defaultEssentials(cls);
+        for(const cat of ESSENTIAL_CATS){ const cur=COMP[b.essentials[cat]]; if(!cur||!Rules.variantFor(cur,cls)) b.essentials[cat]=d[cat]; } break; }
+      case 'replace': return clone(a.build);
+    }
+    return b;
+  }
+  function parseMod(str){ const m=String(str??'').trim().match(/^([+\-−–]?)\s*(\d+)$/); if(!m) return null; const n=+m[2]; return (m[1]==='-'||m[1]==='−'||m[1]==='–')?-n:n; }
+  return {reduce,newBuild,defaultEssentials,clone,uid,parseMod};
+})();
+
+const Store=(()=>{
+  let build=null; let derived=null; const undo=[]; const listeners=[];
+  const ui={picker:null,expanded:new Set(),compare:null,selected:new Set(),showParts:false,open:{},freeOnly:false,pendingDelete:null,importOpen:false};
+  function set(b,{record=true}={}){ if(record&&build){undo.push(build); if(undo.length>50) undo.shift();} build=b; derived=Derive.derive(build); listeners.forEach(f=>f()); }
+  function dispatch(a){ set(Actions.reduce(build,a)); }
+  function undoLast(){ if(!undo.length) return false; build=undo.pop(); derived=Derive.derive(build); listeners.forEach(f=>f()); return true; }
+  return {get build(){return build;},get derived(){return derived;},ui,set,dispatch,undo:undoLast,subscribe:f=>listeners.push(f),canUndo:()=>undo.length>0};
+})();
+
+/* ========================================================================
+   PERSIST / SHARE
+   ======================================================================== */
+const Persist=(()=>{
+  const KEY='voidship-builder:v1'; let mem=null; let storageOk=true;
+  function load(){ try{ const raw=localStorage.getItem(KEY); if(raw){ mem=JSON.parse(raw); if(mem.version!==1) mem=null; } }catch(e){ storageOk=false; }
+    if(!mem) mem={version:1,activeId:null,order:[],prefs:{theme:'auto'},builds:{}}; return mem; }
+  let lastSaved=null;
+  function save(){ try{ localStorage.setItem(KEY,JSON.stringify(mem)); storageOk=true; lastSaved=Date.now(); }catch(e){ storageOk=false; } }
+  const id=()=>'b'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  function create(build){ const i=id(); mem.builds[i]={id:i,name:build.name,createdAt:Date.now(),updatedAt:Date.now(),build}; mem.order.push(i); mem.activeId=i; save(); return i; }
+  function update(i,build){ const e=mem.builds[i]; if(!e) return; e.build=build; e.name=build.name; e.updatedAt=Date.now(); save(); }
+  function remove(i){ delete mem.builds[i]; mem.order=mem.order.filter(x=>x!==i); if(mem.activeId===i) mem.activeId=mem.order[0]||null; save(); }
+  function findByCode(code){ return mem.order.find(i=>Share.encode(mem.builds[i].build)===code)||null; }
+  return {load,save,create,update,remove,findByCode,get mem(){return mem;},get ok(){return storageOk;},get lastSaved(){return lastSaved;}};
+})();
+
+const Share=(()=>{
+  const b64=s=>btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  const unb64=s=>decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'/'))));
+  function encode(b){ const o={v:1,n:b.name,h:b.hull,ms:b.spirit,ph:b.history,e:b.essentials,s:b.supplementals.map(x=>[x.id,x.slot||null]),g:b.gmOverride?1:0,fl:b.forbiddenLoreXenos?1:0,w:[b.warrant.roll,b.warrant.pf,b.warrant.sp,b.warrant.manual?1:0],sm:(b.spMods||[]).map(m=>[m.cause||'',+m.value||0]),no:b.notes||''}; return b64(JSON.stringify(o)); }
+  function decode(code){
+    const o=JSON.parse(unb64(code)); if(o.v!==1||!DATA.HULL[o.h]) throw new Error('unknown format');
+    const warnings=[]; const e={}; for(const cat of DATA.ESSENTIAL_CATS){ const id=o.e?.[cat]; if(id&&DATA.COMP[id]) e[cat]=id; else {e[cat]=null; if(id) warnings.push('Unknown component '+id);} }
+    const s=(o.s||[]).filter(([id])=>{ if(DATA.COMP[id]) return true; warnings.push('Unknown component '+id); return false; }).map(([id,slot])=>({uid:Actions.uid(),id,slot:slot||undefined}));
+    const b={v:1,name:String(o.n||'Shared vessel').slice(0,80),hull:o.h,spirit:DATA.SPIRIT[o.ms]?o.ms:null,history:DATA.HISTORY[o.ph]?o.ph:null,essentials:e,supplementals:s,gmOverride:!!o.g,forbiddenLoreXenos:!!o.fl,
+      warrant:{roll:+o.w?.[0]||5,pf:+o.w?.[1]||40,sp:+o.w?.[2]||50,manual:!!o.w?.[3]},spMods:(Array.isArray(o.sm)?o.sm:[]).map(([c,v])=>({id:Actions.uid(),cause:String(c||'').slice(0,80),value:+v||0})),notes:String(o.no||'')};
+    return {build:b,warnings};
+  }
+  return {encode,decode};
+})();
+
+/* ========================================================================
+   BACKUP — every build in one code or file, restorable on any device
+   ======================================================================== */
+const Backup=(()=>{
+  function payload(){ const mem=Persist.mem; return {v:1,app:'voidship-builder',at:new Date().toISOString(),builds:mem.order.map(i=>({name:mem.builds[i].name,code:Share.encode(mem.builds[i].build)}))}; }
+  const b64=s=>btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  const unb64=s=>decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'/'))));
+  function encode(){ return 'VSB1.'+b64(JSON.stringify(payload())); }
+  function json(){ return JSON.stringify(payload(),null,2); }
+  function parse(text){ let t=String(text||'').trim(); if(!t) throw new Error('empty'); let o; if(t.startsWith('VSB1.')) o=JSON.parse(unb64(t.slice(5))); else o=JSON.parse(t); if(!o||o.app!=='voidship-builder'||!Array.isArray(o.builds)) throw new Error('not a backup'); return o; }
+  function restore(text){ const o=parse(text); let added=0,skipped=0,bad=0; for(const b of o.builds){ try{ if(Persist.findByCode(b.code)){skipped++;continue;} const {build}=Share.decode(b.code); if(b.name) build.name=String(b.name).slice(0,80); Persist.create(build); added++; }catch(e){ bad++; } } return {added,skipped,bad,total:o.builds.length}; }
+  async function download(){ const name='voidship-builds-'+new Date().toISOString().slice(0,10)+'.json'; const data=json();
+    let dl=null; try{ dl=window.claude?.use?await window.claude.use('downloads'):null; }catch(e){ dl=null; }
+    if(dl){ try{ await dl.save({filename:name,data}); toast('Backup saved'); return; }catch(e){ if(e&&e.code==='declined') return; } }
+    if(!window.claude?.use){ try{ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([data],{type:'application/json'})); a.download=name; document.body.appendChild(a); a.click(); a.remove(); toast('Backup downloaded'); return; }catch(e){} }
+    App.copy(encode(),'Download unavailable here; backup code copied instead'); }
+  return {payload,encode,json,parse,restore,download};
+})();
+
+/* ========================================================================
+   RENDER
+   ======================================================================== */
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=(sel,root=document)=>root.querySelector(sel);
+const $$=(sel,root=document)=>Array.from(root.querySelectorAll(sel));
+let toastT; function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('on'),1800); }
+
+function modLabel(m,b){
+  const v=(m.altFL!==undefined&&b?.forbiddenLoreXenos)?m.altFL:m.v; const cls=v>0?'good':v<0?'bad':'';
+  let t='';
+  if(m.stat==='skill') t=`${sign(v)} ${shortSkill(m.skill)}`;
+  else if(m.stat==='ap') t=`${sign(v)} AP ${m.type}`;
+  else if(m.stat==='moraleLoss') t=`Morale losses ${sign(v)}`;
+  else if(m.stat==='crewLoss') t=`Crew losses ${sign(v)}`;
+  else if(m.stat==='pfPerEndeavour') t=`${sign(v)} PF per Endeavour`;
+  else if(m.stat==='macroDmg') t=`${sign(v)} dmg macrobatteries`;
+  else if(m.stat==='powerGen') t=`${sign(v)} Power`;
+  else if(m.stat==='shields') t=`${v} Void Shield${v!==1?'s':''}`;
+  else t=`${sign(v)} ${shortStat(m.stat)}${m.arc==='fore'?' (fore)':''}${m.when?' '+whenLabel(m.when):''}`;
+  const inv=(m.stat==='moraleLoss'||m.stat==='crewLoss'); const c=inv?(v>0?'bad':'good'):(m.stat==='shields'?'':cls);
+  return {text:t,cls:c};
+}
+function modChips(mods,b,max){
+  const out=mods.map(m=>{const l=modLabel(m,b);return `<span class="chip ${l.cls}">${esc(l.text)}</span>`;});
+  if(max&&out.length>max) return out.slice(0,max).join('')+`<span class="chip">+${out.length-max}</span>`;
+  return out.join('');
+}
+const shortStat=k=>({speed:'Speed',man:'Man',det:'Det',armour:'Armour',hi:'HI',turret:'Turret',morale:'Morale',crew:'Crew'}[k]||k);
+const shortSkill=k=>({bs_fire:'BS fire',command:'Command',command_boarding:'Cmd boarding',command_hitrun:'Cmd H&R',command_defend:'Cmd defend',pilot:'Pilot',pilot_disengage:'Pilot disengage',navigation:'Navigation',manoeuvre_action:'Manoeuvre',techuse_repair:'Tech-Use repair',intimidate:'Intimidate',social:'Social',investigation:'Investigation',willpower:'WP (crew)',pilot_hitrun_enemy:'Enemy H&R pilot'}[k]||k);
+const whenLabel=w=>({combat:'in combat',noncombat:'out of combat',endeavour:'in Endeavour',nonendeavour:'outside Endeavour'}[w]||w);
+const costChips=(v,comp)=>v?`<span class="chip">${comp.generates?'P +'+v.power:'P '+v.power}</span> <span class="chip">S ${v.space}</span>${v.sp?` <span class="chip">SP ${v.sp}</span>`:''}`:`<span class="chip bad">n/a</span>`;
+const weaponChip=w=>`<span class="chip">${w.kind==='lance'?'Lance':'Macro'} · Str ${w.str} · ${w.dmg.dice}+${w.dmg.bonus} · Crit ${w.crit} · Rng ${w.range}</span>`;
+const techCls=c=>c.tech==='archeotech'?'tech-a':c.tech==='xenotech'?'tech-x':'';
+
+const Render=(()=>{
+  const {HULLS,CATS,ESSENTIAL_CATS,SPIRITS,HISTORIES,COMP,ENDEAVOURS,SKILLS,STAT_LABEL,CLASS_NAME}=DATA;
+  const SUPP_GROUPS=[{id:'weapon',name:'Weapons',hint:'one per weapon slot'},{id:'cargo',name:'Cargo & passengers',hint:'any number'},{id:'augment',name:'Augments',hint:'plating, prow and maze once each'},{id:'facility',name:'Additional facilities',hint:'once each'}];
+  const meter=(k,used,total,label,over)=>`<div class="meter" data-meter="${k}"><div class="lbl"><span>${label}</span><span class="val">${used}<span class="muted">/${total}</span><span class="ghost" data-ghost="m:${k}"></span></span></div>
+      <div class="bar"><i class="${over?'over':''}" style="width:${total?Math.min(100,used/total*100):0}%"></i><i class="gh" data-gbar="${k}" style="width:0"></i></div></div>`;
+  function header(){
+    const b=Store.build,d=Store.derived; const w=b.warrant;
+    $('#hdr').innerHTML=`
+      <div class="row">
+        <div style="display:flex;align-items:baseline;gap:10px"><h1>Voidship Builder</h1><input id="buildName" type="text" value="${esc(b.name)}" aria-label="Build name"></div>
+        <div class="field"><label>Hull</label><select id="hullSel">${HULLS.map(h=>`<option value="${h.id}" ${h.id===b.hull?'selected':''}>${esc(h.name)} (${CLASS_NAME[h.cls]}, ${h.sp} SP)</option>`).join('')}</select></div>
+        <div class="field"><label>Machine Spirit</label><select id="spiritSel"><option value="">— none —</option>${SPIRITS.map(s=>`<option value="${s.id}" ${s.id===b.spirit?'selected':''}>${s.roll}. ${esc(s.name)}</option>`).join('')}</select><button class="small" id="rollSpirit" title="Roll d10">d10</button></div>
+        <div class="field"><label>Past History</label><select id="historySel"><option value="">— none —</option>${HISTORIES.map(s=>`<option value="${s.id}" ${s.id===b.history?'selected':''}>${s.roll}. ${esc(s.name)}</option>`).join('')}</select><button class="small" id="rollHistory" title="Roll d10">d10</button></div>
+        <div style="margin-left:auto;display:flex;gap:6px"><button class="small primary" id="exportBtn" title="Export dossier (e)">Export</button><button class="small" id="undoBtn" ${Store.canUndo()?'':'disabled'} title="Ctrl+Z">Undo</button><button class="small" id="themeBtn">Theme</button><button class="small" id="helpBtn" title="Help">?</button></div>
+      </div>
+      <div class="row meters">
+        ${meter('power',d.budgets.power.used,d.budgets.power.gen,'Power',d.budgets.power.used>d.budgets.power.gen)}
+        ${meter('space',d.budgets.space.used,d.budgets.space.total,'Space',d.budgets.space.used>d.budgets.space.total)}
+        ${meter('sp',d.budgets.sp.spent,d.budgets.sp.budget,'Ship Points',d.budgets.sp.spent>d.budgets.sp.budget)}
+        <div class="meter"><div class="lbl"><span>Profit Factor</span></div><div class="val">${d.pf.base} <span class="muted">+${d.pf.leftover} SP =</span> ${d.pf.total}<span class="ghost" data-ghost="pf"></span></div></div>
+        <div><span class="badge ${d.errors?'err':d.warns?'wrn':''}" id="issueBadge" role="button" tabindex="0">${d.errors?d.errors+' error'+(d.errors>1?'s':''):'valid'}${d.warns?' · '+d.warns+' warn':''}<span class="ghost" data-ghost="issues"></span></span></div>
+      </div>
+      <details class="opts" ${b.warrant.manual||b.gmOverride||b.forbiddenLoreXenos||(b.spMods||[]).length?'open':''}><summary>Warrant &amp; options</summary>
+        <div class="row">
+          <div class="field"><label>Warrant roll</label><select id="warrantSel" ${w.manual?'disabled':''}>${[1,2,3,4,5,6,7,8,9,10].map(r=>{const x=Rules.pfRow(r);return `<option value="${r}" ${r===w.roll?'selected':''}>Roll ${r}: PF ${x.pf} / SP ${x.sp}</option>`;}).join('')}</select><button class="small" id="rollWarrant" title="Roll d10 on Table 1-5">d10</button>
+            <label style="display:flex;gap:4px;align-items:center;text-transform:none;letter-spacing:0"><input type="checkbox" id="manualW" ${w.manual?'checked':''}> manual</label>
+            ${w.manual?`<span class="field"><label>PF</label><input type="text" id="pfIn" class="n" size="3" value="${w.pf}"><label>SP</label><input type="text" id="spIn" class="n" size="3" value="${w.sp}"></span>`:''}</div>
+          <label class="field" style="gap:5px"><input type="checkbox" id="gmChk" ${b.gmOverride?'checked':''}> <span>GM override: unlock Archeotech / Xeno-tech</span></label>
+          <label class="field" style="gap:5px"><input type="checkbox" id="flChk" ${b.forbiddenLoreXenos?'checked':''}> <span>Repairer has Forbidden Lore (Xenos)</span></label>
+        </div>
+        <div class="spmods">
+          <div class="field" style="margin-top:8px"><label>Ship Point adjustments</label><span class="muted" style="font-size:12px">Warrant ${w.sp}${d.budgets.sp.mods.map(m=>` ${sign(m.value)} ${esc(m.cause||'…')}`).join('')} = <b class="n">${d.budgets.sp.budget}</b> SP</span></div>
+          ${d.budgets.sp.mods.map(m=>`<div class="sprow" data-spmod="${m.id}"><input type="text" class="cause" value="${esc(m.cause)}" placeholder="Cause, e.g. GM provides the hull" aria-label="Cause"><input type="text" class="n val" value="${m.value>0?'+'+m.value:m.value}" size="5" aria-label="Modifier" title="Signed number, e.g. +40 or -5"><button class="x" data-rmspmod="${m.id}" title="Remove" aria-label="Remove adjustment">✕</button></div>`).join('')}
+          <button class="small" id="addSpMod" style="margin-top:4px">+ Add adjustment</button>
+        </div></details>`;
+    $('#buildName').addEventListener('change',e=>Store.dispatch({type:'rename',name:e.target.value.trim()||'Unnamed vessel'}));
+    $('#hullSel').addEventListener('change',e=>Store.dispatch({type:'setHull',id:e.target.value}));
+    $('#warrantSel').addEventListener('change',e=>Store.dispatch({type:'setWarrantRoll',roll:+e.target.value}));
+    $('#rollWarrant').addEventListener('click',()=>{Store.dispatch({type:'rollWarrant'});toast('Warrant roll: '+Store.build.warrant.roll);});
+    $('#manualW').addEventListener('change',e=>{ if(e.target.checked) Store.dispatch({type:'setWarrantManual'}); else Store.dispatch({type:'setWarrantRoll',roll:Store.build.warrant.roll}); });
+    $('#pfIn')?.addEventListener('change',e=>Store.dispatch({type:'setWarrantManual',pf:+e.target.value||0}));
+    $('#spIn')?.addEventListener('change',e=>Store.dispatch({type:'setWarrantManual',sp:+e.target.value||0}));
+    $('#spiritSel').addEventListener('change',e=>Store.dispatch({type:'setSpirit',id:e.target.value}));
+    $('#historySel').addEventListener('change',e=>Store.dispatch({type:'setHistory',id:e.target.value}));
+    $('#rollSpirit').addEventListener('click',()=>{Store.dispatch({type:'rollSpirit'});toast('Machine Spirit: '+DATA.SPIRIT[Store.build.spirit].name);});
+    $('#rollHistory').addEventListener('click',()=>{Store.dispatch({type:'rollHistory'});toast('Past History: '+DATA.HISTORY[Store.build.history].name);});
+    $('#gmChk').addEventListener('change',()=>Store.dispatch({type:'toggleGm'}));
+    $('#addSpMod').addEventListener('click',()=>{ Store.dispatch({type:'addSpMod'}); const rows=$$('.sprow'); rows[rows.length-1]?.querySelector('.cause').focus(); });
+    $$('.sprow').forEach(row=>{ const id=row.dataset.spmod;
+      row.querySelector('.cause').addEventListener('change',e=>Store.dispatch({type:'setSpMod',id,cause:e.target.value.trim().slice(0,80)}));
+      row.querySelector('.val').addEventListener('change',e=>{ const v=Actions.parseMod(e.target.value); if(v===null){ toast('Use a signed number such as +40 or -5'); e.target.value=''; return; } Store.dispatch({type:'setSpMod',id,value:v}); });
+      row.querySelector('[data-rmspmod]').addEventListener('click',()=>Store.dispatch({type:'removeSpMod',id})); });
+    $('#flChk').addEventListener('change',()=>Store.dispatch({type:'toggleFL'}));
+    $('#undoBtn').addEventListener('click',()=>Store.undo());
+    $('#exportBtn').addEventListener('click',()=>Export.open());
+    $('#themeBtn').addEventListener('click',()=>App.cycleTheme());
+    $('#helpBtn').addEventListener('click',()=>$('#help').showModal());
+    $('#issueBadge').addEventListener('click',()=>{$('#issues')?.scrollIntoView({behavior:'smooth',block:'start'});});
+  }
+
+  function statCell(k,s,d){
+    const ui=Store.ui;
+    const val=k==='armour'&&s.fore?`${s.value} <small>(${s.value+s.fore} fore)</small>`:k==='shields'&&d.ghost?`${s.value} <small>or Ghost Field</small>`:(k==='morale'||k==='crew')?`${s.value} <small>max</small>`:(k==='man'||k==='det')?sign(s.value):String(s.value);
+    const parts=s.parts.filter(p=>p.src!==d.hull.name&&p.src!=='Base').map(p=>`${esc(p.src.replace(/^Machine Spirit: |^Past History: /,''))} ${sign(p.v)}`).concat((s.foreParts||[]).map(p=>`${esc(p.src)} ${sign(p.v)} fore`));
+    const sit=s.situational.map(p=>`${sign(p.v)} ${whenLabel(p.when)}`);
+    return `<div class="stat" data-stat="${k}"><div class="k">${STAT_LABEL[k]}</div><div class="v">${val}<span class="ghost" data-ghost="s:${k}"></span></div>${ui.showParts&&parts.length?`<div class="parts">${parts.join(' · ')}</div>`:''}${sit.length?`<div class="sit">${sit.join(' · ')}</div>`:''}</div>`;
+  }
+  function slotSelect(r,b){
+    const hull=Store.derived.hull; const free=new Set(Rules.freeSlots(r.comp,b,r.uid)); const all=Rules.allSlots(hull);
+    const opts=all.map(s=>{const legal=free.has(s); return `<option value="${s}" ${s===r.slot?'selected':''} ${legal||s===r.slot?'':'disabled'}>${fmtSlot(s)}${legal||s===r.slot?'':' ·'}</option>`;}).join('');
+    return `<select class="slot" data-move="${r.uid}" aria-label="Weapon slot"><option value="" ${r.slot?'':'selected'}>no slot</option>${opts}</select>`;
+  }
+  function sheet(){
+    const b=Store.build,d=Store.derived; const ui=Store.ui;
+    if(ui.compare){ Compare.render(); return; }
+    const errRefs=new Set(d.issues.filter(i=>i.level==='error').map(i=>i.ref));
+    const essRows=d.rows.filter(r=>r.kind==='essential').map(r=>{
+      const c=r.comp; const missing=!c||!r.variant;
+      return `<div class="lrow ${errRefs.has(r.uid)?'err':''} ${c?'':'empty'}" data-ref="${r.uid}"><span class="cat">${DATA.CAT[r.cat].short}</span>
+        <div class="nm"><span class="${c?techCls(c):''}">${c?esc(c.name):'nothing installed'}</span>${c?`<span class="cost">${costChips(r.variant,c)}</span>`:''}${c&&!r.variant?`<span class="chip bad">not for ${CLASS_NAME[d.cls]}</span>`:''}</div>
+        ${c&&(c.mods.length)?`<div class="fxs chips">${modChips(c.mods,b,4)}</div>`:''}
+        <div class="btns"><button class="small ${missing?'primary':''}" data-pick="${r.cat}">${missing?'Choose':'Change'}</button></div></div>`;}).join('');
+    const suppGroup=g=>{
+      const rows=d.rows.filter(r=>r.kind!=='essential'&&r.comp.cat===g.id);
+      const body=rows.map(r=>`<div class="lrow ${errRefs.has(r.uid)?'err':''}" data-ref="${r.uid}"><span class="cat">${r.kind==='pre'?'built-in':(r.comp.weapon?(r.comp.weapon.kind==='lance'?'lance':'macro'):(r.comp.tech==='standard'?'':r.comp.tech))}</span>
+        <div class="nm"><span class="${techCls(r.comp)}">${esc(r.comp.name)}</span><span class="cost">${costChips(r.variant,r.comp)}</span>${!r.variant?`<span class="chip bad">not for ${CLASS_NAME[d.cls]}</span>`:''}${r.kind==='pre'?'<span class="chip">locked</span>':''}</div>
+        <div class="fxs chips">${r.comp.weapon?weaponChip(r.comp.weapon):''}${modChips(r.comp.mods,b,4)}</div>
+        <div class="btns">${r.comp.weapon&&r.kind==='supp'?slotSelect(r,b):''}${r.kind==='pre'?'':`<button class="x" data-remove="${r.uid}" data-act='${esc(JSON.stringify({type:'removeSupp',uid:r.uid}))}' title="Remove" aria-label="Remove ${esc(r.comp.name)}">✕</button>`}</div></div>`).join('');
+      const slotsInfo=g.id==='weapon'?`<span class="hint">${Rules.allSlots(d.hull).map(s=>fmtSlot(s)).join(' · ')||'no weapon slots'}</span>`:`<span class="hint">${g.hint}</span>`;
+      return `<div class="group" data-ref="group:${g.id}"><div class="ghead"><h3>${g.name} <span class="muted" style="font-weight:400">${rows.length}</span></h3>${slotsInfo}<button class="small primary" data-pick="${g.id}">+ Add</button></div>${body||`<div class="lrow empty"><span class="cat"></span><div class="nm">nothing installed</div><div class="btns"></div></div>`}</div>`;
+    };
+    const weapons=d.weapons.length?`<div class="tblwrap"><table><thead><tr><th>Slot</th><th>Weapon</th><th>Type</th><th class="n">Str</th><th class="n">Dmg</th><th class="n">Crit</th><th class="n">Range</th><th>Notes</th></tr></thead><tbody>
+      ${d.weapons.map(w=>`<tr><td>${fmtSlot(w.slot)}</td><td>${esc(w.name)}</td><td>${w.kind==='lance'?'Lance':'Macrobattery'}</td><td class="n">${w.str}</td><td class="n">${w.dmg}</td><td class="n">${w.crit}</td><td class="n">${w.range}</td><td class="muted">${w.notes.join(', ')}</td></tr>`).join('')}</tbody></table></div>`:'<p class="muted">No weapons installed.</p>';
+    const ledger=(obj,labelOf)=>Object.entries(obj).filter(([,v])=>v.parts.length).map(([k,v])=>`<div><span>${esc(labelOf(k))}<br><span class="src">${v.parts.map(p=>`${esc(p.src.replace(/^Machine Spirit: |^Past History: /,''))} ${sign(p.v)}${p.cond?' ('+esc(p.cond)+')':''}`).join(' · ')}</span></span><span class="n ${v.value>0?'good':v.value<0?'bad':''}">${sign(v.value)}</span></div>`).join('');
+    const apL=ledger(d.ap,k=>k[0].toUpperCase()+k.slice(1)+' objectives');
+    const skL=ledger(d.skills,k=>SKILLS[k]||k);
+    const lossL=[d.loss.morale.parts.length?`<div><span>Morale losses<br><span class="src">${d.loss.morale.parts.map(p=>esc(p.src)+' '+sign(p.v)).join(' · ')}</span></span><span class="n ${d.loss.morale.value>0?'bad':'good'}">${sign(d.loss.morale.value)}</span></div>`:'',
+      d.loss.crew.parts.length?`<div><span>Crew Population losses<br><span class="src">${d.loss.crew.parts.map(p=>esc(p.src)+' '+sign(p.v)+(p.cond?' ('+p.cond+')':'')).join(' · ')}</span></span><span class="n ${d.loss.crew.value>0?'bad':'good'}">${sign(d.loss.crew.value)}</span></div>`:'',
+      d.pfPer.parts.length?`<div><span>Profit Factor per Endeavour<br><span class="src">${d.pfPer.parts.map(p=>esc(p.src)).join(' · ')}</span></span><span class="n bad">${sign(d.pfPer.value)}</span></div>`:''].join('');
+    const apCount=Object.values(d.ap).filter(v=>v.parts.length).length, skCount=Object.keys(d.skills).length;
+    $('#sheet .body').innerHTML=`
+      <div class="sechead"><h2>${esc(b.name)} <span class="muted" style="font-size:14px;font-family:'IBM Plex Sans',sans-serif">${esc(d.hull.name)} · ${CLASS_NAME[d.cls]} · p.${d.hull.page}</span></h2>
+        <label class="muted" style="font-size:12px;display:flex;gap:5px;align-items:center"><input type="checkbox" id="partsChk" ${ui.showParts?'checked':''}> breakdowns</label></div>
+      <div class="stats">${Derive.statKeys.map(k=>statCell(k,d.stats[k],d)).join('')}</div>
+      <div class="group"><div class="ghead"><h3>Essential components</h3><span class="hint">one of each, required</span></div>${essRows}</div>
+      ${d.issues.some(i=>i.code==='hull_mismatch'&&i.ref.startsWith('e:'))?`<div class="actions"><button class="primary small" id="fixEss">Fix essentials for this hull</button></div>`:''}
+      ${SUPP_GROUPS.map(suppGroup).join('')}
+      <details class="sec" ${ui.open?.weapons?'open':''} data-sec="weapons"><summary>Weapons table <span class="cnt">${d.weapons.length}</span></summary>${weapons}</details>
+      <details class="sec" ${ui.open?.ap?'open':''} data-sec="ap"><summary>Achievement Point bonuses <span class="cnt">${apCount}</span></summary><div class="ledger">${apL||'<span class="muted">None.</span>'}</div></details>
+      <details class="sec" ${ui.open?.skills?'open':''} data-sec="skills"><summary>Skill &amp; loss modifiers <span class="cnt">${skCount}</span></summary><div class="ledger">${skL||'<span class="muted">None.</span>'}${lossL}</div></details>
+      <details class="sec" ${ui.open?.rules?'open':''} data-sec="rules"><summary>Special rules in play <span class="cnt">${d.texts.length}</span></summary><div class="texts">${d.texts.map(t=>`<p><span class="src">${esc(t.src)}</span> <b>${esc(t.title)}:</b> ${esc(t.body)}</p>`).join('')||'<span class="muted">None.</span>'}</div></details>
+      <details class="sec" ${ui.open?.notes||b.notes?'open':''} data-sec="notes"><summary>Notes</summary><textarea id="notes" rows="3" style="width:100%;margin-top:6px" placeholder="Captain's notes for this build">${esc(b.notes||'')}</textarea></details>`;
+    $$('[data-pick]').forEach(x=>x.addEventListener('click',()=>Picker.open(x.dataset.pick)));
+    $$('[data-remove]').forEach(x=>{x.addEventListener('click',()=>{Preview.clear();const n=COMP[Store.build.supplementals.find(s=>s.uid===x.dataset.remove)?.id]?.name;Store.dispatch({type:'removeSupp',uid:x.dataset.remove});toast('Removed '+n);});
+      x.addEventListener('mouseenter',()=>Preview.show(JSON.parse(x.dataset.act)));x.addEventListener('mouseleave',()=>Preview.clear());x.addEventListener('focus',()=>Preview.show(JSON.parse(x.dataset.act)));x.addEventListener('blur',()=>Preview.clear());});
+    $$('select[data-move]').forEach(x=>x.addEventListener('change',()=>Store.dispatch({type:'moveWeapon',uid:x.dataset.move,slot:x.value||null})));
+    $('#fixEss')?.addEventListener('click',()=>Store.dispatch({type:'fixEssentials'}));
+    $('#notes').addEventListener('change',e=>Store.dispatch({type:'setNotes',notes:e.target.value}));
+    $('#partsChk').addEventListener('change',e=>{ui.showParts=e.target.checked;sheet();});
+    $$('details.sec').forEach(dd=>dd.addEventListener('toggle',()=>{ui.open=ui.open||{};ui.open[dd.dataset.sec]=dd.open;}));
+  }
+
+  function aside(){
+    const b=Store.build,d=Store.derived,ui=Store.ui;
+    const mem=Persist.mem; const active=mem.activeId;
+    const builds=mem.order.map(id=>{const e=mem.builds[id]; const dd=Derive.derive(e.build);
+      return `<div class="brow ${id===active?'active':''}"><input type="checkbox" data-cmp="${id}" ${ui.selected.has(id)?'checked':''} aria-label="Select for compare"><span><button class="link" data-load="${id}" style="font-weight:600">${esc(e.name)}</button><div class="meta">${esc(dd.hull.name)} · PF ${dd.pf.total} · ${dd.valid?'<span class="good">valid</span>':`<span class="bad">${dd.errors} error${dd.errors>1?'s':''}</span>`}</div></span>
+        <span style="display:flex;gap:3px">${ui.pendingDelete===id?`<button class="small" style="border-color:var(--bad);color:var(--bad)" data-del="${id}">Delete?</button><button class="small" data-undel="${id}">Keep</button>`:`<button class="small" data-dup="${id}" title="Duplicate">⧉</button><button class="small" data-del="${id}" title="Delete" aria-label="Delete ${esc(e.name)}">✕</button>`}</span></div>`;}).join('');
+    $('#aside .body').innerHTML=`
+      <div class="banner">${Persist.ok?'':'Browser storage is unavailable here; builds live only in this tab. Use share codes to keep them.'}</div>
+      <h3 id="issues" style="margin-top:0">Issues</h3>
+      <div aria-live="polite">${d.issues.map(i=>`<div class="issue ${i.level}" data-ref="${esc(i.ref||'')}"><span class="code">${i.level}</span> ${esc(i.msg)}</div>`).join('')||'<div class="issue info">No issues. Ship is ready to sail.</div>'}</div>
+      <h3>Builds</h3>
+      <div class="savestate ${Persist.ok?'':'bad'}">${Persist.ok?`Autosaved in this browser for <b>${esc(location.protocol==='file:'?'this file':location.host||'this page')}</b>${Persist.lastSaved?' · '+new Date(Persist.lastSaved).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):''}. Other browsers, other copies of the file and other devices each keep their own list: move builds with a backup.`:'Not saved: this viewer blocks browser storage. Copy a backup code before you close the page.'}</div>
+      <div class="blist">${builds}</div>
+      <div class="actions"><button class="small" id="newBuild">New</button><button class="small" id="cmpBtn" ${ui.selected.size>=2?'':'disabled'}>Compare selected (${ui.selected.size})</button>${ui.compare?'<button class="small" id="backBtn">Back to sheet</button>':''}</div>
+      <div class="actions"><button class="small" id="bkCode" title="All builds as one code">Copy backup code</button><button class="small" id="bkFile" title="All builds as a .json file">Download backup</button><button class="small" id="bkRestore">${ui.restoreOpen?'Cancel restore':'Restore backup…'}</button></div>
+      ${ui.restoreOpen?`<div class="actions" style="flex-wrap:nowrap"><input type="text" id="bkIn" placeholder="Paste a backup code or JSON" style="flex:1"><label class="small" style="display:inline-block;padding:2px 8px;border:1px solid var(--rule);border-radius:3px;cursor:pointer;background:var(--panel)">File…<input type="file" id="bkFileIn" accept=".json,application/json,text/plain" hidden></label><button class="small primary" id="bkGo">Restore</button></div>`:''}
+      <h3>Share</h3>
+      <div class="share"><input type="text" id="shareCode" readonly value="${esc(Share.encode(b))}" aria-label="Share code"><div class="actions"><button class="small" id="copyCode">Copy code</button><button class="small" id="copyLink">Copy link</button><button class="small" id="importCode">${ui.importOpen?'Cancel import':'Import code…'}</button></div>${ui.importOpen?`<div class="actions" style="flex-wrap:nowrap"><input type="text" id="importIn" placeholder="Paste a share code or link" style="flex:1"><button class="small primary" id="importGo">Import</button></div>`:''}</div>
+      <p class="legal">Unofficial fan tool, not affiliated with Games Workshop or Fantasy Flight Games. Rogue Trader and Warhammer 40,000 are trademarks of Games Workshop Limited. Rules summaries reference the Rogue Trader Core Rulebook, pp. 194–208.</p>`;
+    $$('.issue[data-ref]').forEach(el=>el.addEventListener('click',()=>{const ref=el.dataset.ref; const t=$(`[data-ref="${CSS.escape(ref)}"]`,$('#sheet'))||(ref.startsWith('meter:')?$(`[data-meter="${ref.slice(6)}"]`):null); if(t){t.scrollIntoView({behavior:'smooth',block:'center'});t.animate([{outline:'2px solid var(--brass)'},{outline:'2px solid transparent'}],{duration:1200});}}));
+    $$('[data-load]').forEach(x=>x.addEventListener('click',()=>App.loadBuild(x.dataset.load)));
+    $$('[data-dup]').forEach(x=>x.addEventListener('click',()=>App.duplicate(x.dataset.dup)));
+    $$('[data-del]').forEach(x=>x.addEventListener('click',()=>App.remove(x.dataset.del)));
+    $$('[data-undel]').forEach(x=>x.addEventListener('click',()=>{ui.pendingDelete=null;aside();}));
+    $('#importGo')?.addEventListener('click',()=>App.importFrom($('#importIn').value));
+    $('#importIn')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();App.importFrom(e.target.value);}});
+    $$('[data-cmp]').forEach(x=>x.addEventListener('change',()=>{x.checked?ui.selected.add(x.dataset.cmp):ui.selected.delete(x.dataset.cmp); if(ui.selected.size>3){ui.selected.delete(x.dataset.cmp);x.checked=false;toast('Compare up to three builds');} aside();}));
+    $('#newBuild').addEventListener('click',()=>App.newBuild());
+    $('#bkCode').addEventListener('click',()=>App.copy(Backup.encode(),'Backup code copied ('+Persist.mem.order.length+' builds)'));
+    $('#bkFile').addEventListener('click',()=>Backup.download());
+    $('#bkRestore').addEventListener('click',()=>{ui.restoreOpen=!ui.restoreOpen;aside(); if(ui.restoreOpen) $('#bkIn')?.focus();});
+    const doRestore=text=>{ try{ const r=Backup.restore(text); ui.restoreOpen=false; toast(`Restored ${r.added} build${r.added===1?'':'s'}${r.skipped?', '+r.skipped+' already present':''}${r.bad?', '+r.bad+' unreadable':''}`); if(r.added&&Persist.mem.activeId) App.loadBuild(Persist.mem.activeId); else aside(); }catch(e){ toast('That backup could not be read'); } };
+    $('#bkGo')?.addEventListener('click',()=>doRestore($('#bkIn').value));
+    $('#bkIn')?.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); doRestore(e.target.value); } });
+    $('#bkFileIn')?.addEventListener('change',e=>{ const f=e.target.files?.[0]; if(!f) return; f.text().then(doRestore); });
+    $('#cmpBtn').addEventListener('click',()=>{ui.compare=[...ui.selected];sheet();aside();});
+    $('#backBtn')?.addEventListener('click',()=>{ui.compare=null;sheet();aside();});
+    $('#copyCode').addEventListener('click',()=>App.copy($('#shareCode').value,'Share code copied'));
+    $('#copyLink').addEventListener('click',()=>App.copy(location.href.split('#')[0]+'#b='+$('#shareCode').value,'Link copied'));
+    $('#importCode').addEventListener('click',()=>App.importCode());
+  }
+  function all(){ header(); sheet(); aside(); if(Store.ui.picker) Picker.render(); }
+  return {header,sheet,aside,all};
+})();
+
+/* ========================================================================
+   PICKER — per-category chooser
+   ======================================================================== */
+const Picker=(()=>{
+  const {COMP,CAT,ESSENTIAL_CATS,CLASS_NAME}=DATA;
+  const TITLES={weapon:'Add a weapon',cargo:'Add cargo or passenger space',augment:'Add an augment',facility:'Add a facility'};
+  function open(cat){ Store.ui.picker={cat,search:''}; render(); const dlg=$('#picker'); if(!dlg.open) dlg.showModal(); $('#pickSearch')?.focus(); }
+  function close(){ Preview.clear(); Store.ui.picker=null; const dlg=$('#picker'); if(dlg.open) dlg.close(); }
+  function rowHtml(comp,b,av,cur){
+    const isEss=comp.group==='essential'; const v=av.variant; const expanded=Store.ui.expanded.has(comp.id);
+    const act=isEss?{type:'setEssential',cat:comp.cat,id:comp.id}:{type:'addSupp',id:comp.id,slot:av.slot};
+    const variants=comp.variants.length>1?`<div class="muted">Other hulls: ${comp.variants.map(x=>x.hulls.join('/')+': '+(comp.generates?'+':'')+x.power+'P '+x.space+'S'+(x.sp?' '+x.sp+'SP':'')).join(' · ')}</div>`:'';
+    const btn=cur?`<span class="chip brass">installed</span>`:av.ok?`<button class="small primary" data-add>${isEss?'Install':'Add'}${av.slot?' → '+fmtSlot(av.slot):''}</button>`:`<span class="chip warn">${esc(av.reason)}</span>`;
+    const tech=comp.tech!=='standard'?`<span class="chip ${comp.tech==='archeotech'?'brass':'ghost'}">${comp.tech==='archeotech'?'Archeotech':'Xeno-tech'}</span>`:'';
+    return `<div class="prow ${cur?'cur':''} ${av.ok||cur?'':'na'}" tabindex="0" data-comp="${comp.id}" data-act='${esc(JSON.stringify(act))}' data-ok="${av.ok&&!cur?1:0}">
+      <div class="nm"><span class="${techCls(comp)}">${esc(comp.name)}</span><span class="pg">p.${comp.page}</span> ${tech}${comp.once?' <span class="chip">once</span>':''}${comp.external?' <span class="chip">external</span>':''} <span style="margin-left:6px">${costChips(v,comp)}</span></div>
+      <div class="fx chips">${comp.weapon?weaponChip(comp.weapon):''}${modChips(comp.mods,b)}${!comp.mods.length&&!comp.weapon&&comp.blurb?`<span class="muted">${esc(comp.blurb)}</span>`:''}</div>
+      ${expanded?`<div class="txt">${variants}${comp.text.map(t=>`<div><b>${esc(t.title)}:</b> ${esc(t.body)}</div>`).join('')}${comp.dataNote?`<div class="warn">Note: ${esc(comp.dataNote)}</div>`:''}${!comp.text.length&&comp.blurb?`<div>${esc(comp.blurb)}</div>`:''}</div>`:''}
+      <div class="btns">${comp.text.length||comp.variants.length>1||comp.dataNote?`<button class="small link" data-expand>${expanded?'less':'details'}</button>`:''}${btn}</div></div>`;
+  }
+  function render(){
+    const pk=Store.ui.picker; if(!pk) return; const b=Store.build,d=Store.derived; const cat=pk.cat; const isEss=ESSENTIAL_CATS.includes(cat);
+    const q=pk.search.trim().toLowerCase();
+    let list=DATA.COMPS.filter(c=>c.cat===cat); if(q) list=list.filter(c=>c.name.toLowerCase().includes(q)||c.text.some(t=>(t.title+' '+t.body).toLowerCase().includes(q)));
+    if(isEss&&Store.ui.freeOnly) list=list.filter(c=>b.essentials[cat]===c.id||(Rules.variantFor(c,d.cls)?.sp===0));
+    const withAv=list.map(c=>({c,av:Rules.availability(c,b),cur:isEss&&b.essentials[cat]===c.id}));
+    const avail=withAv.filter(x=>x.av.ok&&!x.cur), na=withAv.filter(x=>!x.av.ok&&!x.cur), cur=withAv.filter(x=>x.cur);
+    const installedSupp=isEss?[]:d.rows.filter(r=>r.kind!=='essential'&&r.comp.cat===cat);
+    const bud=d.budgets;
+    $('#picker').innerHTML=`
+      <div class="pk-head"><h2>${isEss?'Choose '+CAT[cat].name:TITLES[cat]}</h2><div style="display:flex;gap:6px;align-items:center"><span class="muted" style="font-size:12px">${esc(d.hull.name)}</span><button class="small" id="pkClose">Close</button></div></div>
+      <div class="pk-budget"><span>Power <b>${bud.power.used}/${bud.power.gen}</b><span class="ghost" data-ghost="m:power"></span></span><span>Space <b>${bud.space.used}/${bud.space.total}</b><span class="ghost" data-ghost="m:space"></span></span><span>SP <b>${bud.sp.spent}/${bud.sp.budget}</b><span class="ghost" data-ghost="m:sp"></span></span><span>PF <b>${d.pf.total}</b><span class="ghost" data-ghost="pf"></span></span><span>${d.errors?`<span class="bad">${d.errors} err</span>`:'<span class="good">valid</span>'}<span class="ghost" data-ghost="issues"></span></span></div>
+      <div class="pk-summary" data-ghost="summary"></div>
+      <div class="pk-search" style="display:flex;gap:12px;align-items:center"><input type="text" id="pkSearch" placeholder="Filter…" value="${esc(pk.search)}" aria-label="Filter components">${isEss?`<label style="display:flex;gap:5px;align-items:center;white-space:nowrap;font-size:12.5px"><input type="checkbox" id="pkFree" ${Store.ui.freeOnly?'checked':''}> 0 SP only</label>`:''}</div>
+      <div class="pk-list" id="pkList">
+        ${cur.length?`<div class="pk-sec">Installed</div>${cur.map(x=>rowHtml(x.c,b,x.av,true)).join('')}`:''}
+        ${installedSupp.length?`<div class="pk-sec">Installed</div>${installedSupp.map(r=>`<div class="prow cur" data-ref="${r.uid}"><div class="nm"><span class="${techCls(r.comp)}">${esc(r.comp.name)}</span>${r.slot?` <span class="chip brass">${fmtSlot(r.slot)}</span>`:''}${r.kind==='pre'?' <span class="chip">locked</span>':''} <span style="margin-left:6px">${costChips(r.variant,r.comp)}</span></div><div class="fx chips">${r.comp.weapon?weaponChip(r.comp.weapon):''}${modChips(r.comp.mods,b)}</div><div class="btns">${r.kind==='pre'?'':`<button class="small" data-rm="${r.uid}">Remove</button>`}</div></div>`).join('')}`:''}
+        <div class="pk-sec">Available on this hull <span style="font-weight:400">(${avail.length})</span></div>
+        ${avail.map(x=>rowHtml(x.c,b,x.av,false)).join('')||'<div class="prow na"><div class="nm muted">Nothing else fits right now.</div></div>'}
+        ${na.length?`<div class="pk-sec">Not available <span style="font-weight:400">(${na.length}, hover to see the effect anyway)</span></div>${na.map(x=>rowHtml(x.c,b,x.av,false)).join('')}`:''}
+      </div>
+      <div class="pk-foot"><span>${isEss?'Exactly one '+CAT[cat].name+' is required; installing replaces the current one.':cat==='weapon'?'Weapons take a Weapon Capacity slot. Lances need Prow on Frigates and smaller; Broadsides need Port or Starboard.':cat==='facility'?'Each facility may be installed once.':'Cargo can be installed multiple times.'}</span><span>Hover a row to preview · <kbd>Esc</kbd> closes</span></div>`;
+    $('#pkClose').addEventListener('click',close);
+    $('#pkFree')?.addEventListener('change',e=>{Store.ui.freeOnly=e.target.checked;render();});
+    const si=$('#pkSearch'); si.addEventListener('input',e=>{pk.search=e.target.value;render();const s=$('#pkSearch');s.focus();s.setSelectionRange(s.value.length,s.value.length);});
+    const lst=$('#pkList');
+    lst.addEventListener('click',e=>{
+      const rm=e.target.closest('[data-rm]'); if(rm){Preview.clear();Store.dispatch({type:'removeSupp',uid:rm.dataset.rm});toast('Removed');return;}
+      const row=e.target.closest('.prow'); if(!row||!row.dataset.comp) return;
+      if(e.target.closest('[data-expand]')){const id=row.dataset.comp; Store.ui.expanded.has(id)?Store.ui.expanded.delete(id):Store.ui.expanded.add(id); render(); return;}
+      if(row.dataset.ok==='1'&&(e.target.closest('[data-add]')||!e.target.closest('button'))) install(row);
+    });
+    lst.addEventListener('mouseover',e=>{const row=e.target.closest('.prow'); if(row?.dataset.act&&!row.classList.contains('cur')) Preview.show(JSON.parse(row.dataset.act),row.dataset.ok!=='1');});
+    lst.addEventListener('mouseleave',()=>Preview.clear());
+    lst.addEventListener('focusin',e=>{const row=e.target.closest('.prow'); if(row?.dataset.act&&!row.classList.contains('cur')) Preview.show(JSON.parse(row.dataset.act),row.dataset.ok!=='1');});
+    lst.addEventListener('keydown',e=>{
+      const row=e.target.closest('.prow'); if(!row) return;
+      if(e.key==='Enter'&&row.dataset.ok==='1'){e.preventDefault();install(row);}
+      const rows=$$('.prow[tabindex]',lst); const i=rows.indexOf(row);
+      if(e.key==='ArrowDown'){e.preventDefault();(rows[i+1]||row).focus();}
+      if(e.key==='ArrowUp'){e.preventDefault();(rows[i-1]||row).focus();}
+    });
+  }
+  function install(row){
+    const act=JSON.parse(row.dataset.act); const comp=COMP[row.dataset.comp]; Preview.clear(); Store.dispatch(act); toast('Installed '+comp.name);
+    if(act.type==='setEssential') close();
+  }
+  return {open,close,render};
+})();
+
+/* ========================================================================
+   PREVIEW — hover/focus deltas
+   ======================================================================== */
+const Preview=(()=>{
+  const upGood={speed:1,man:1,det:1,armour:1,hi:1,turret:1,shields:1,morale:1,crew:1};
+  function setGhost(key,text,cls){ document.querySelectorAll(`[data-ghost="${key}"]`).forEach(el=>{el.textContent=text; el.className=(el.classList.contains('pk-summary')?'pk-summary ':'')+'ghost '+(cls||'');}); }
+  function show(action,blocked){
+    clear();
+    let nb; try{ nb=Actions.reduce(Store.build,action); }catch(e){ return; }
+    const d0=Store.derived, d1=Derive.derive(nb); const summary=[];
+    const m=(k,a,b,total,invert)=>{ if(a!==b||total!==undefined){ const worse=invert?b>a:b<a; setGhost('m:'+k,`→ ${b}${total!==undefined?'/'+total:''}`,a===b?'':(worse?'bad':'good')); }
+      const tot=total??(k==='power'?d1.budgets.power.gen:k==='space'?d1.budgets.space.total:d1.budgets.sp.budget);
+      document.querySelectorAll(`[data-gbar="${k}"]`).forEach(bar=>{ bar.style.left=Math.min(100,a/tot*100)+'%'; bar.style.width=Math.max(0,Math.min(100,b/tot*100)-Math.min(100,a/tot*100))+'%'; }); };
+    const p0=d0.budgets.power,p1=d1.budgets.power; if(p0.used!==p1.used||p0.gen!==p1.gen) m('power',p0.used,p1.used,p1.gen!==p0.gen?p1.gen:undefined,true);
+    const s0=d0.budgets.space,s1=d1.budgets.space; if(s0.used!==s1.used||s0.total!==s1.total) m('space',s0.used,s1.used,s1.total!==s0.total?s1.total:undefined,true);
+    const q0=d0.budgets.sp,q1=d1.budgets.sp; if(q0.spent!==q1.spent||q0.budget!==q1.budget) m('sp',q0.spent,q1.spent,q1.budget!==q0.budget?q1.budget:undefined,true);
+    if(d0.pf.total!==d1.pf.total){ setGhost('pf',`→ ${d1.pf.total}`,d1.pf.total>d0.pf.total?'good':'bad'); summary.push(`PF ${sign(d1.pf.total-d0.pf.total)}`); }
+    for(const k of Derive.statKeys){ const a=d0.stats[k].value,b=d1.stats[k].value; const fa=d0.stats.armour.fore,fb=d1.stats.armour.fore;
+      if(a!==b){ setGhost('s:'+k,`→ ${(k==='man'||k==='det')?sign(b):b}`,(b>a)===!!upGood[k]?'good':'bad'); summary.push(`${shortStat(k)} ${sign(b-a)}`); }
+      else if(k==='armour'&&fa!==fb){ setGhost('s:armour',`→ ${b} (${b+fb} fore)`,fb>fa?'good':'bad'); summary.push(`Armour fore ${sign(fb-fa)}`); } }
+    for(const t of DATA.ENDEAVOURS){ const a=d0.ap[t].value,b=d1.ap[t].value; if(a!==b) summary.push(`AP ${t} ${sign(b-a)}`); }
+    for(const k of new Set([...Object.keys(d0.skills),...Object.keys(d1.skills)])){ const a=d0.skills[k]?.value||0,b=d1.skills[k]?.value||0; if(a!==b) summary.push(`${shortSkill(k)} ${sign(b-a)}`); }
+    if(d0.loss.morale.value!==d1.loss.morale.value) summary.push(`Morale losses ${sign(d1.loss.morale.value-d0.loss.morale.value)}`);
+    if(d0.loss.crew.value!==d1.loss.crew.value) summary.push(`Crew losses ${sign(d1.loss.crew.value-d0.loss.crew.value)}`);
+    const e0=d0.errors,e1=d1.errors; if(e0!==e1){ setGhost('issues',`→ ${e1} error${e1!==1?'s':''}`,e1>e0?'bad':'good'); }
+    const newErr=d1.issues.filter(i=>i.level==='error'&&!d0.issues.some(j=>j.msg===i.msg)).map(i=>i.msg);
+    setGhost('summary',(blocked?'Cannot install here. If it could: ':'If installed: ')+(summary.join(' · ')||'no stat change')+(newErr.length?' — would cause: '+newErr.join('; '):''),newErr.length?'bad':'');
+  }
+  function clear(){ document.querySelectorAll('.ghost').forEach(el=>{el.textContent='';el.className=(el.classList.contains('pk-summary')?'pk-summary ':'')+'ghost';}); document.querySelectorAll('[data-gbar]').forEach(b=>{b.style.width='0';}); }
+  return {show,clear};
+})();
+
+/* ========================================================================
+   COMPARE
+   ======================================================================== */
+const Compare=(()=>{
+  function render(){
+    const ui=Store.ui; const mem=Persist.mem; const ids=ui.compare.filter(id=>mem.builds[id]); if(ids.length<2){ui.compare=null;Render.sheet();return;}
+    ui.anchor=ui.anchor&&ids.includes(ui.anchor)?ui.anchor:ids[0];
+    const ds=ids.map(id=>({id,name:mem.builds[id].name,b:mem.builds[id].build,d:Derive.derive(mem.builds[id].build)}));
+    const ai=ids.indexOf(ui.anchor);
+    const row=(label,get,{higherBetter=true,fmt=v=>String(v),numeric=true}={})=>{
+      const vals=ds.map(x=>get(x)); const nums=numeric?vals.map(Number):null; const best=numeric?(higherBetter?Math.max(...nums):Math.min(...nums)):null;
+      return `<tr><td>${esc(label)}</td>${vals.map((v,i)=>{const delta=numeric&&i!==ai?nums[i]-nums[ai]:0; const cls=numeric&&nums[i]===best&&new Set(nums).size>1?'best':'';
+        return `<td class="n ${cls}">${fmt(v)}${delta?`<span class="d ${(delta>0)===higherBetter?'good':'bad'}">${sign(delta)}</span>`:''}</td>`;}).join('')}</tr>`;};
+    const st=k=>x=>x.d.stats[k].value;
+    const compList=x=>[...x.d.rows.filter(r=>r.kind!=='pre').map(r=>r.comp?.name||'?')];
+    const common=compList(ds[0]).filter(n=>ds.every(x=>compList(x).includes(n)));
+    const diffRow=`<tr><td>Components not shared</td>${ds.map(x=>{const mine=compList(x); const only=mine.filter(n=>!common.includes(n)); const counts={}; only.forEach(n=>counts[n]=(counts[n]||0)+1); return `<td style="font-size:12px">${Object.entries(counts).map(([n,c])=>esc(n)+(c>1?' ×'+c:'')).join('<br>')||'<span class="muted">—</span>'}</td>`;}).join('')}</tr>`;
+    $('#sheet .body').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px"><h2>Compare builds</h2><span class="muted" style="font-size:12px">Deltas are relative to the anchor column; click a header to re-anchor.</span></div>
+      <div class="tblwrap"><table class="cmp"><thead><tr><th></th>${ds.map((x,i)=>`<th class="n ${i===ai?'anchor':''}" style="cursor:pointer" data-anchor="${x.id}">${esc(x.name)}${i===ai?' ⚓':''}<br><span class="muted" style="text-transform:none;letter-spacing:0">${esc(x.d.hull.name)}</span></th>`).join('')}</tr></thead><tbody>
+      ${row('Valid',x=>x.d.valid?'yes':x.d.errors+' errors',{numeric:false})}
+      ${row('Power used / generated',x=>x.d.budgets.power.used+' / '+x.d.budgets.power.gen,{numeric:false})}
+      ${row('Power free',x=>x.d.budgets.power.free)}
+      ${row('Space used / total',x=>x.d.budgets.space.used+' / '+x.d.budgets.space.total,{numeric:false})}
+      ${row('Space free',x=>x.d.budgets.space.free)}
+      ${row('Ship Points spent / budget',x=>x.d.budgets.sp.spent+' / '+x.d.budgets.sp.budget,{numeric:false})}
+      ${row('Profit Factor (start)',x=>x.d.pf.total)}
+      ${Derive.statKeys.map(k=>row(DATA.STAT_LABEL[k],st(k),{fmt:v=>(k==='man'||k==='det')?sign(v):String(v)})).join('')}
+      ${row('Armour (fore arc)',x=>x.d.stats.armour.value+x.d.stats.armour.fore)}
+      ${row('Weapons',x=>x.d.weapons.length)}
+      ${row('Total battery Strength',x=>x.d.weapons.reduce((a,w)=>a+w.str,0))}
+      ${row('Best weapon range',x=>x.d.weapons.reduce((a,w)=>Math.max(a,w.range),0))}
+      ${DATA.ENDEAVOURS.map(t=>row('AP '+t,x=>x.d.ap[t].value,{fmt:sign})).join('')}
+      ${Object.keys(DATA.SKILLS).filter(k=>ds.some(x=>x.d.skills[k])).map(k=>row(DATA.SKILLS[k],x=>x.d.skills[k]?.value||0,{fmt:sign})).join('')}
+      ${row('Morale losses modifier',x=>x.d.loss.morale.value,{higherBetter:false,fmt:sign})}
+      ${row('Crew losses modifier',x=>x.d.loss.crew.value,{higherBetter:false,fmt:sign})}
+      <tr><td>Machine Spirit</td>${ds.map(x=>`<td>${x.b.spirit?esc(DATA.SPIRIT[x.b.spirit].name):'—'}</td>`).join('')}</tr>
+      <tr><td>Past History</td>${ds.map(x=>`<td>${x.b.history?esc(DATA.HISTORY[x.b.history].name):'—'}</td>`).join('')}</tr>
+      ${diffRow}
+      </tbody></table></div>
+      <div class="actions"><button class="small" id="cmpBack">Back to sheet</button><button class="small" id="cmpLink">Copy compare link</button></div>`;
+    $$('[data-anchor]').forEach(h=>h.addEventListener('click',()=>{ui.anchor=h.dataset.anchor;render();}));
+    $('#cmpBack').addEventListener('click',()=>{ui.compare=null;Render.sheet();Render.aside();});
+    $('#cmpLink').addEventListener('click',()=>App.copy(location.href.split('#')[0]+'#c='+ds.map(x=>Share.encode(x.b)).join(','),'Compare link copied'));
+  }
+  return {render};
+})();
+
+/* ========================================================================
+   EXPORT — dossier for the group (Discord text, Markdown, print)
+   ======================================================================== */
+const Export=(()=>{
+  const {CAT,STAT_LABEL,SKILLS,ESSENTIAL_CATS,CLASS_NAME,SPIRIT,HISTORY,ENDEAVOURS}=DATA;
+  const GROUPS=[['weapon','Weapons'],['cargo','Cargo & passengers'],['augment','Augments'],['facility','Additional facilities']];
+  const cap=k=>k?k[0].toUpperCase()+k.slice(1):'';
+  const cleanSrc=src=>src.replace(/^Machine Spirit: |^Past History: /,'');
+  function dossier(b,d){
+    const stats=Derive.statKeys.map(k=>{const s=d.stats[k]; let v;
+      if(k==='armour') v=s.fore?`${s.value} (${s.value+s.fore} fore arc)`:String(s.value);
+      else if(k==='shields') v=d.ghost?`${s.value} (or Ghost Field)`:String(s.value);
+      else if(k==='morale'||k==='crew') v=`${s.value} max`;
+      else if(k==='man'||k==='det') v=sign(s.value); else v=String(s.value);
+      return {key:k,label:STAT_LABEL[k],value:v,situational:s.situational.map(p=>`${sign(p.v)} ${whenLabel(p.when)} (${cleanSrc(p.src)})`)};});
+    const compOf=(r,category)=>({category,name:r.comp.name,page:r.comp.page,tech:r.comp.tech,generates:!!r.comp.generates,
+      cost:r.variant?{power:r.variant.power,space:r.variant.space,sp:r.variant.sp}:null,slot:r.slot?fmtSlot(r.slot):null,locked:r.kind==='pre',
+      once:!!r.comp.once,external:!!r.comp.external,available:!!r.variant,
+      weapon:r.comp.weapon?{kind:r.comp.weapon.kind,str:r.comp.weapon.str,dmg:(d.weapons.find(w=>w.uid===r.uid)||{}).dmg||`${r.comp.weapon.dmg.dice}+${r.comp.weapon.dmg.bonus}`,crit:r.comp.weapon.crit,range:r.comp.weapon.range}:null,
+      mods:r.comp.mods.map(m=>modLabel(m,b).text),text:r.comp.text,blurb:r.comp.blurb||'',dataNote:r.comp.dataNote||''});
+    const components=[];
+    for(const cat of ESSENTIAL_CATS){ const r=d.rows.find(x=>x.kind==='essential'&&x.cat===cat); if(r&&r.comp) components.push(compOf(r,CAT[cat].name)); }
+    const groups=GROUPS.map(([id,name])=>({id,name,items:d.rows.filter(r=>r.kind!=='essential'&&r.comp.cat===id).map(r=>compOf(r,name))}));
+    const spirit=b.spirit?SPIRIT[b.spirit]:null, history=b.history?HISTORY[b.history]:null;
+    const complications=[spirit&&{kind:'Machine Spirit Oddity',roll:spirit.roll,name:spirit.name,text:spirit.text},history&&{kind:'Past History',roll:history.roll,name:history.name,text:history.text}].filter(Boolean);
+    const ledgers={
+      ap:ENDEAVOURS.filter(t=>d.ap[t].parts.length).map(t=>({label:cap(t)+' objectives',value:d.ap[t].value,parts:d.ap[t].parts.map(p=>`${cleanSrc(p.src)} ${sign(p.v)}`)})),
+      skills:Object.entries(d.skills).map(([k,v])=>({label:SKILLS[k]||k,value:v.value,parts:v.parts.map(p=>`${cleanSrc(p.src)} ${sign(p.v)}${p.cond?' ('+p.cond+')':''}`)})),
+      loss:[d.loss.morale.parts.length&&{label:'Morale losses',value:d.loss.morale.value,parts:d.loss.morale.parts.map(p=>`${cleanSrc(p.src)} ${sign(p.v)}`)},
+            d.loss.crew.parts.length&&{label:'Crew Population losses',value:d.loss.crew.value,parts:d.loss.crew.parts.map(p=>`${cleanSrc(p.src)} ${sign(p.v)}${p.cond?' ('+p.cond+')':''}`)},
+            d.pfPer.parts.length&&{label:'Profit Factor per Endeavour',value:d.pfPer.value,parts:d.pfPer.parts.map(p=>cleanSrc(p.src))}].filter(Boolean)};
+    return {title:{name:b.name,hull:d.hull.name,cls:CLASS_NAME[d.cls],page:d.hull.page},stats,
+      budgets:{power:d.budgets.power,space:d.budgets.space,sp:d.budgets.sp,pf:{base:d.pf.base,leftover:d.pf.leftover,total:d.pf.total}},spMods:d.budgets.sp.mods,
+      weapons:d.weapons.map(w=>({slot:fmtSlot(w.slot),name:w.name,kind:w.kind==='lance'?'Lance':'Macrobattery',str:w.str,dmg:w.dmg,crit:w.crit,range:w.range,notes:w.notes.join(', ')})),
+      components,groups,complications,ledgers,rules:d.texts.filter(t=>t.src===d.hull.name),
+      issues:d.issues.filter(i=>i.level==='error').map(i=>i.msg),notes:b.notes||'',shareCode:Share.encode(b)};
+  }
+  const costStr=c=>c.cost?`${c.generates?'Power +':'Power '}${c.cost.power} · Space ${c.cost.space}${c.cost.sp?' · SP '+c.cost.sp:''}`:'not available on this hull';
+  const wStr=w=>`${w.kind==='lance'?'Lance':'Macrobattery'} · Str ${w.str} · ${w.dmg} · Crit ${w.crit} · Range ${w.range}`;
+  function markdown(ds){
+    const L=[]; const push=(...x)=>L.push(...x);
+    push(`# ${ds.title.name}`,`**${ds.title.hull}** · ${ds.title.cls} · Core Rulebook p.${ds.title.page}`);
+    if(ds.complications.length) push(ds.complications.map(c=>`${c.kind}: **${c.roll}. ${c.name}**`).join(' · '));
+    if(ds.issues.length) push('',`⚠ Build has errors: ${ds.issues.join('; ')}`);
+    push('','## Stats','```');
+    const st=Object.fromEntries(ds.stats.map(x=>[x.key,x.value]));
+    push(`Speed ${st.speed}   Manoeuvrability ${st.man}   Detection ${st.det}`,`Armour ${st.armour}   Hull Integrity ${st.hi}   Turret Rating ${st.turret}   Void Shields ${st.shields}`,`Morale ${st.morale}   Crew Population ${st.crew}`);
+    const bu=ds.budgets; push(`Power ${bu.power.used}/${bu.power.gen}   Space ${bu.space.used}/${bu.space.total}   Ship Points ${bu.sp.spent}/${bu.sp.budget}`,`Profit Factor ${bu.pf.base} + ${bu.pf.leftover} unspent SP = ${bu.pf.total}`,'```');
+    if(ds.spMods.length) push(`Ship Point budget: Warrant ${bu.sp.base}${ds.spMods.map(m=>` ${sign(m.value)} ${m.cause||'unnamed'}`).join('')} = **${bu.sp.budget}**`);
+    const sit=ds.stats.filter(x=>x.situational.length); if(sit.length){ sit.forEach(x=>push(`- ${x.label}: ${x.situational.join('; ')}`)); }
+    push('','## Weapons');
+    if(ds.weapons.length){ push('```'); push('Slot       Weapon                             Type          Str  Dmg     Crit  Rng'); ds.weapons.forEach(w=>push(`${w.slot.padEnd(10)} ${w.name.padEnd(34)} ${w.kind.padEnd(13)} ${String(w.str).padEnd(4)} ${w.dmg.padEnd(7)} ${String(w.crit).padEnd(5)} ${w.range}${w.notes?'   '+w.notes:''}`)); push('```'); } else push('None.');
+    const compMd=c=>{ push(`**${c.name}** (p.${c.page})${c.slot?' — '+c.slot:''}${c.locked?' — built into the hull':''} — ${costStr(c)}${c.tech!=='standard'?' — '+cap(c.tech):''}`);
+      if(c.weapon) push(`- ${wStr(c.weapon)}`); c.text.forEach(t=>push(`- **${t.title}:** ${t.body}`)); if(!c.text.length&&!c.weapon&&c.blurb) push(`- ${c.blurb}`); if(c.dataNote) push(`- Note: ${c.dataNote}`); };
+    push('','## Essential components'); ds.components.forEach(c=>{ push(`### ${c.category}`); compMd(c); });
+    ds.groups.forEach(g=>{ push('',`## ${g.name}`); if(!g.items.length) push('None.'); g.items.forEach(compMd); });
+    if(ds.rules.length){ push('','## Hull rules'); ds.rules.forEach(t=>push(`- **${t.title}:** ${t.body}`)); }
+    if(ds.complications.length){ push('','## Complications'); ds.complications.forEach(c=>{ push(`**${c.kind} ${c.roll}: ${c.name}**`); c.text.forEach(t=>push(`- ${t.body}`)); }); }
+    const led=ds.ledgers; if(led.ap.length||led.skills.length||led.loss.length){ push('','## Bonuses and modifiers');
+      led.ap.forEach(x=>push(`- ${x.label}: **${sign(x.value)} AP** (${x.parts.join(', ')})`));
+      led.skills.forEach(x=>push(`- ${x.label}: **${sign(x.value)}** (${x.parts.join(', ')})`));
+      led.loss.forEach(x=>push(`- ${x.label}: **${sign(x.value)}** (${x.parts.join(', ')})`)); }
+    if(ds.notes.trim()){ push('','## Notes',ds.notes.trim()); }
+    push('',`_Voidship Builder · Rogue Trader Core Rulebook pp. 194–208 · share code:_ \`${ds.shareCode}\``);
+    return L.join('\n');
+  }
+  function chunks(md,limit=1900){
+    const paras=md.split('\n\n'); const parts=[]; let cur=''; let openFence=false;
+    const fences=t=>(t.match(/^```/gm)||[]).length%2===1;
+    const flush=()=>{ if(!cur) return; if(openFence) cur+='\n```'; parts.push(cur); cur=openFence?'```\n':''; };
+    const add=p=>{ const cand=cur?cur+'\n\n'+p:p; if(cand.length>limit&&cur){ flush(); const c2=cur?cur+p:p; if(c2.length>limit){ addLines(p); } else { cur=c2; openFence=fences(cur);} } else { cur=cand; openFence=fences(cur);} };
+    const addLines=p=>{ for(const line of p.split('\n')){ const cand=cur?cur+'\n'+line:line; if(cand.length>limit){ flush(); cur=(cur?cur:'')+line; } else cur=cand; openFence=fences(cur);} };
+    for(const p of paras){ if(p.length>limit) addLines(p); else add(p); }
+    if(cur) parts.push(cur);
+    if(parts.length>1) return parts.map((p,i)=>p+`\n_(part ${i+1}/${parts.length})_`);
+    return parts;
+  }
+  function html(ds){
+    const bu=ds.budgets; const led=ds.ledgers; const spirit=ds.complications.find(c=>c.kind==='Machine Spirit Oddity'); const hist=ds.complications.find(c=>c.kind==='Past History');
+    const cost=c=>c.cost?`${c.generates?'Power <b>+'+c.cost.power+'</b>':'Power <b>'+c.cost.power+'</b>'} · Space <b>${c.cost.space}</b>${c.cost.sp?' · SP <b>'+c.cost.sp+'</b>':''}`:`<span class="unavail">not available on this hull</span>`;
+    const compRow=c=>`<tr><td class="aname">${esc(c.name)}${c.tech!=='standard'?`<span class="tag navy">${esc(cap(c.tech))}</span>`:''}${c.slot?`<span class="tag">${esc(c.slot)}</span>`:''}${c.locked?'<span class="tag">Built in</span>':''}<small>Core Rulebook p.${c.page}${c.once?' · once per ship':''}${c.external?' · external':''}</small></td><td class="acost">${cost(c)}</td><td class="aeff">${c.weapon?`<p><b>${esc(c.weapon.kind==='lance'?'Lance':'Macrobattery')}:</b> Strength ${c.weapon.str} · ${esc(c.weapon.dmg)} · Crit ${c.weapon.crit} · Range ${c.weapon.range}</p>`:''}${c.text.map(t=>`<p><b>${esc(t.title)}:</b> ${esc(t.body)}</p>`).join('')}${!c.text.length&&!c.weapon?`<p>${esc(c.blurb||'No special rules.')}</p>`:''}${c.dataNote?`<p><b>Note:</b> ${esc(c.dataNote)}</p>`:''}</td></tr>`;
+    const catRow=label=>`<tr class="category"><td colspan="3">${esc(label)}</td></tr>`;
+    const colg='<colgroup><col style="width:31%"><col style="width:19%"><col></colgroup>';
+    const catTable=(label,items,cls)=>`<table class="ability-table cat ${cls||''}">${colg}<tbody>${label?catRow(label):''}${items.map(compRow).join('')}</tbody></table>`;
+    const groupTables=(label,items)=>{ if(!items.length) return `<table class="ability-table cat small">${colg}<tbody>${catRow(label)}<tr><td colspan="3" class="none">None installed.</td></tr></tbody></table>`;
+      if(items.length<=3) return catTable(label,items,'small'); return catTable(label,items.slice(0,1),'small')+catTable(null,items.slice(1),'cont'); };
+    const essTables=ds.components.map(c=>catTable(c.category,[c],'small'));
+    const suppTables=ds.groups.map(g=>groupTables(g.name,g.items));
+    const statCell=x=>`<div class="characteristic"><span>${esc(x.label).replace('Manoeuvrability','Manoeu&shy;vrability').replace('Crew Population','Crew Popu&shy;lation').replace('Hull Integrity','Hull Integ&shy;rity')}</span><b>${esc(x.value).replace(/ \((.*)\)$/,' <small>($1)</small>').replace(/ max$/,' <small>max</small>')}</b>${x.situational.length?`<i>${x.situational.map(esc).join('<br>')}</i>`:''}</div>`;
+    const ledgerRow=(x,unit='')=>`<div><span>${esc(x.label)}<small>${esc(x.parts.join(' · '))}</small></span><b class="${x.value<0?'neg':''}">${sign(x.value)}${unit}</b></div>`;
+    const hasLedger=led.ap.length||led.skills.length||led.loss.length;
+    return `<div class="sheet">
+      <header class="page-header"><div><p class="eyebrow">Voidship dossier</p><h1>${esc(ds.title.name)}</h1><p class="identity-note"><b>${esc(ds.title.hull)}</b> · ${esc(ds.title.cls)} · Core Rulebook p.${ds.title.page}</p></div>
+        <p class="page-marker">${spirit?`<span>Machine Spirit: ${esc(spirit.name)}</span>`:'<span>Machine Spirit: unrolled</span>'}${hist?`<span>Past History: ${esc(hist.name)}</span>`:'<span>Past History: unrolled</span>'}</p></header>
+      <div class="rule-double masthead-rule"></div>
+      ${ds.issues.length?`<div class="errors"><b>Build has errors:</b> ${esc(ds.issues.join('; '))}</div>`:''}
+      <section class="section"><div class="section-head"><h2>Characteristics</h2><p>Resolved with complications applied</p></div>
+        <div class="characteristics">${ds.stats.map(statCell).join('')}</div>
+        <div class="band-row"><div class="band-cell ${bu.power.used>bu.power.gen?'over':''}"><span>Power</span><b>${bu.power.used} <small>/ ${bu.power.gen} generated</small></b></div><div class="band-cell ${bu.space.used>bu.space.total?'over':''}"><span>Space</span><b>${bu.space.used} <small>/ ${bu.space.total}</small></b></div><div class="band-cell ${bu.sp.spent>bu.sp.budget?'over':''}"><span>Ship Points</span><b>${bu.sp.spent} <small>/ ${bu.sp.budget}${ds.spMods.length?` (Warrant ${bu.sp.base}${ds.spMods.map(m=>` ${sign(m.value)} ${esc(m.cause||'unnamed')}`).join('')})`:''}</small></b></div><div class="band-cell"><span>Starting Profit Factor</span><b>${bu.pf.total} <small>= ${bu.pf.base} + ${bu.pf.leftover} unspent SP</small></b></div></div></section>
+      <section class="section"><div class="section-head"><h2>Weapons</h2><p>${ds.weapons.length} of ${ds.weapons.length+ (ds.groups[0]?.items.filter(i=>!i.slot).length||0)} mounted</p></div>
+        ${ds.weapons.length?`<table class="weapon-table"><thead><tr><th>Slot</th><th>Weapon</th><th>Type</th><th class="wtest">Str</th><th class="wtest">Damage</th><th class="wtest">Crit</th><th class="wtest">Range</th><th>Notes</th></tr></thead><tbody>${ds.weapons.map(w=>`<tr><td>${esc(w.slot)}</td><td class="wname">${esc(w.name)}</td><td>${w.kind}</td><td class="wtest">${w.str}</td><td class="wtest">${esc(w.dmg)}</td><td class="wtest">${w.crit}</td><td class="wtest">${w.range}</td><td>${esc(w.notes)}</td></tr>`).join('')}</tbody></table>`:'<p style="color:var(--muted);font-size:var(--fs-secondary)">No weapons mounted.</p>'}</section>
+      <section class="section flow"><div class="keep"><div class="section-head"><h2>Essential components</h2><p>One of each · costs in Power · Space · Ship Points</p></div>${essTables[0]||''}</div>${essTables.slice(1).join('')}</section>
+      <section class="section flow"><div class="keep"><div class="section-head"><h2>Supplemental components</h2><p>${ds.groups.reduce((n,g)=>n+g.items.length,0)} installed</p></div>${suppTables[0]||''}</div>${suppTables.slice(1).join('')}</section>
+      ${ds.complications.length||ds.rules.length?`<section class="section"><div class="section-head"><h2>Complications &amp; hull rules</h2><p>Tables 8-1 and 8-2</p></div><div class="cards">
+        ${ds.complications.map(c=>`<article class="card"><div class="meta"><span>${esc(c.kind)}</span><span>Roll ${c.roll}</span></div><h3>${esc(c.name)}</h3>${c.text.map(t=>`<p>${esc(t.body)}</p>`).join('')}</article>`).join('')}
+        ${ds.rules.map(t=>`<article class="card"><div class="meta"><span>Hull rule</span><span>${esc(ds.title.hull)}</span></div><h3>${esc(t.title)}</h3><p>${esc(t.body)}</p></article>`).join('')}</div></section>`:''}
+      ${hasLedger?`<section class="section"><div class="section-head"><h2>Bonuses &amp; modifiers</h2><p>Sources in small print</p></div><div class="ledger">
+        ${led.ap.map(x=>ledgerRow(x,' AP')).join('')}${led.skills.map(x=>ledgerRow(x)).join('')}${led.loss.map(x=>ledgerRow(x)).join('')}</div></section>`:''}
+      ${ds.notes.trim()?`<section class="section notes"><div class="section-head"><h2>Captain's notes</h2></div><p>${esc(ds.notes.trim())}</p></section>`:''}
+      <footer class="page-footer"><div class="rule-double"></div><p><span>Voidship Builder</span><span>Rogue Trader Core Rulebook pp. 194–208 with Errata</span></p><p class="code">Share code: ${esc(ds.shareCode)}</p></footer>
+    </div>`;
+  }
+  let current=null;
+  function open(){
+    const ds=dossier(Store.build,Store.derived); const md=markdown(ds); const parts=chunks(md); current={ds,md,parts};
+    const dlg=$('#export');
+    dlg.innerHTML=`<div class="ex-head"><h2 style="margin:0">Export dossier</h2><div class="btns">
+        ${parts.length>1?parts.map((p,i)=>`<button class="small primary" data-part="${i}" title="${p.length} characters">Discord ${i+1}/${parts.length}</button>`).join(''):`<button class="small primary" data-part="0">Copy for Discord</button>`}
+        <button class="small" id="exMd">Copy Markdown</button><button class="small" id="exPrint">Print / PDF</button><button class="small" id="exClose">Close</button></div></div>
+      <div class="ex-body">${html(ds)}</div>
+      <div class="ex-fallback" id="exFallback" hidden>Clipboard access is blocked in this viewer. The text is selected below; press <kbd>Ctrl</kbd>+<kbd>C</kbd> (or <kbd>Cmd</kbd>+<kbd>C</kbd>) to copy it.<textarea id="exText" readonly></textarea></div>`;
+    $$('[data-part]',dlg).forEach(x=>x.addEventListener('click',()=>copy(parts[+x.dataset.part],parts.length>1?`Part ${+x.dataset.part+1} of ${parts.length} copied`:'Copied for Discord')));
+    $('#exMd').addEventListener('click',()=>copy(md,'Markdown copied'));
+    $('#exPrint').addEventListener('click',print);
+    $('#exClose').addEventListener('click',close);
+    if(!dlg.open) dlg.showModal();
+  }
+  function close(){ const dlg=$('#export'); if(dlg.open) dlg.close(); }
+  async function copy(text,msg){
+    try{ await navigator.clipboard.writeText(text); toast(msg); $('#exFallback').hidden=true; return true; }
+    catch(e){ const fb=$('#exFallback'); fb.hidden=false; const ta=$('#exText'); ta.value=text; ta.focus(); ta.select();
+      let ok=false; try{ ok=document.execCommand('copy'); }catch(_){ } toast(ok?msg:'Select the text below and copy it'); return ok; }
+  }
+  function print(){
+    const ds=current?current.ds:dossier(Store.build,Store.derived); $('#printsheet').innerHTML=html(ds);
+    document.body.dataset.print='1'; const dlg=$('#export'); const wasOpen=dlg.open; if(wasOpen) dlg.close();
+    const done=()=>{ delete document.body.dataset.print; window.removeEventListener('afterprint',done); if(wasOpen) open(); };
+    window.addEventListener('afterprint',done);
+    let threw=false; try{ window.print(); }catch(e){ threw=true; }
+    if(threw||!window.print){ done(); toast('Printing is blocked in this viewer; open the offline copy or use Copy Markdown'); }
+    else setTimeout(()=>{ if(document.body.dataset.print==='1') done(); },1500);
+  }
+  return {dossier,markdown,chunks,html,open,close,copy,print};
+})();
+
+/* ========================================================================
+   APP — boot, persistence glue, keyboard, theme
+   ======================================================================== */
+const App=(()=>{
+  let saveT=null;
+  function applyTheme(){ const t=Persist.mem.prefs.theme||'auto'; if(t==='auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme',t); }
+  function cycleTheme(){ const order=['auto','light','dark']; const t=Persist.mem.prefs.theme||'auto'; Persist.mem.prefs.theme=order[(order.indexOf(t)+1)%3]; Persist.save(); applyTheme(); toast('Theme: '+Persist.mem.prefs.theme); }
+  function defaultBuild(){
+    const b=Actions.newBuild('Havoc of Sebastian'); b.hull='havoc'; b.spirit='martial_hubris'; b.history='space_hulk';
+    b.essentials={plasma_drive:'jovian_2',warp_engine:'strelov_1',gellar_field:'geller_field',void_shield:'single_void_shield',bridge:'combat_bridge',life_sustainer:'vitae_life',crew_quarters:'voidsmen_quarters',auger_array:'m100_auger'};
+    b.supplementals=[{uid:Actions.uid(),id:'mars_macro',slot:'dorsal:0'},{uid:Actions.uid(),id:'mars_macro',slot:'prow:0'},{uid:Actions.uid(),id:'temple_shrine'},{uid:Actions.uid(),id:'trophy_room'},{uid:Actions.uid(),id:'observation_dome'}];
+    return b;
+  }
+  function swordTestBuild(){
+    const b=Actions.newBuild('Sword of Sebastian'); b.hull='sword'; b.spirit='martial_hubris'; b.history='space_hulk'; b.warrant={roll:5,pf:40,sp:50,manual:false};
+    b.essentials={plasma_drive:'jovian_2',warp_engine:'strelov_1',gellar_field:'geller_field',void_shield:'single_void_shield',bridge:'combat_bridge',life_sustainer:'vitae_life',crew_quarters:'voidsmen_quarters',auger_array:'m100_auger'};
+    b.supplementals=[{uid:Actions.uid(),id:'mars_macro',slot:'dorsal:0'},{uid:Actions.uid(),id:'mars_macro',slot:'dorsal:1'}];
+    return b;
+  }
+  function loadBuild(id){ const e=Persist.mem.builds[id]; if(!e) return; Persist.mem.activeId=id; Persist.save(); Store.ui.compare=null; Store.set(Actions.clone(e.build),{record:false}); }
+  function newBuild(){ const b=Actions.newBuild('New vessel'); Persist.create(b); Store.ui.compare=null; Store.set(b,{record:false}); toast('New build'); }
+  function duplicate(id){ const e=Persist.mem.builds[id]; if(!e) return; const b=Actions.clone(e.build); b.name=e.name+' (copy)'; Persist.create(b); Store.set(b,{record:false}); toast('Duplicated'); }
+  function remove(id){ const e=Persist.mem.builds[id]; if(!e) return;
+    if(Store.ui.pendingDelete!==id){ Store.ui.pendingDelete=id; Render.aside(); return; }
+    Store.ui.pendingDelete=null; Persist.remove(id); Store.ui.selected.delete(id); toast('Deleted "'+e.name+'"');
+    if(Persist.mem.activeId) loadBuild(Persist.mem.activeId); else { const b=defaultBuild(); Persist.create(b); Store.set(b,{record:false}); } }
+  function copy(text,msg){ (navigator.clipboard?.writeText(text)||Promise.reject()).then(()=>toast(msg)).catch(()=>{ const i=$('#shareCode'); i.value=text; i.select(); toast('Select and copy the code field'); }); }
+  function importCode(){ Store.ui.importOpen=!Store.ui.importOpen; Render.aside(); if(Store.ui.importOpen) $('#importIn')?.focus(); }
+  function importFrom(text){ const code=(text||'').trim(); if(!code) return; const m=code.match(/#b=([A-Za-z0-9_-]+)/); if(tryImport(m?m[1]:code)) Store.ui.importOpen=false; Render.aside(); }
+  function tryImport(code,{silent}={}){ try{ const {build,warnings}=Share.decode(code); const existing=Persist.findByCode(Share.encode(build)); if(existing){ loadBuild(existing); toast('"'+build.name+'" is already in your builds'); return true; } Persist.create(build); Store.set(build,{record:false}); toast(warnings.length?'Imported with warnings: '+warnings.join('; '):'Imported "'+build.name+'"'); return true; }catch(e){ if(!silent) toast('That code could not be read'); return false; } }
+  function persistActive(){ clearTimeout(saveT); saveT=setTimeout(()=>{ const id=Persist.mem.activeId; if(id&&Persist.mem.builds[id]) Persist.update(id,Store.build); },300); }
+  function keys(){
+    document.addEventListener('keydown',e=>{
+      const tag=(e.target.tagName||'').toLowerCase(); const typing=tag==='input'||tag==='textarea'||tag==='select';
+      if(e.key==='Escape'){ Preview.clear(); if(Store.ui.picker){ e.preventDefault(); Picker.close(); } return; }
+      if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!typing){ e.preventDefault(); if(Store.undo()) toast('Undone'); return; }
+      if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){ e.preventDefault(); clearTimeout(saveT); const id=Persist.mem.activeId; if(id) Persist.update(id,Store.build); toast(Persist.ok?'Saved':'Storage unavailable; use the share code'); return; }
+      if(typing) return;
+      if(e.key==='/'){ e.preventDefault(); if(Store.ui.picker) $('#pkSearch')?.focus(); return; }
+      if(e.key==='?'){ e.preventDefault(); $('#help').showModal(); return; }
+      if(e.key==='g'){ Store.dispatch({type:'toggleGm'}); toast('GM override '+(Store.build.gmOverride?'on':'off')); return; }
+      if(e.key==='e'){ e.preventDefault(); Export.open(); return; }
+    });
+    $('#picker').addEventListener('close',()=>{ Preview.clear(); Store.ui.picker=null; });
+    $('#picker').addEventListener('cancel',e=>{ e.preventDefault(); Picker.close(); });
+  }
+  function boot(){
+    Persist.load(); applyTheme();
+    const hash=location.hash;
+    Store.subscribe(()=>{ Render.all(); persistActive(); });
+    let booted=false;
+    if(hash.startsWith('#c=')){ const codes=hash.slice(3).split(','); const ids=[]; for(const c of codes){ try{ const {build}=Share.decode(c); ids.push(Persist.create(build)); }catch(e){} } if(ids.length>=2){ Store.ui.compare=ids; ids.forEach(i=>Store.ui.selected.add(i)); Store.set(Persist.mem.builds[ids[0]].build,{record:false}); booted=true; } }
+    else if(hash.startsWith('#b=')){ booted=tryImport(hash.slice(3),{silent:true}); if(booted) toast('Loaded shared build'); }
+    if(!booted){
+      if(Persist.mem.activeId&&Persist.mem.builds[Persist.mem.activeId]) Store.set(Actions.clone(Persist.mem.builds[Persist.mem.activeId].build),{record:false});
+      else { const b=defaultBuild(); Persist.create(b); Store.set(b,{record:false}); }
+    }
+    keys();
+    if(location.search.includes('selftest')) SelfTest.run();
+  }
+  return {boot,cycleTheme,loadBuild,newBuild,duplicate,remove,copy,importCode,importFrom,defaultBuild,swordTestBuild};
+})();
+
+/* ========================================================================
+   SELFTEST (?selftest) — rule assertions in the console
+   ======================================================================== */
+const SelfTest=(()=>{
+  function run(){
+    const out=[]; const ok=(name,cond)=>out.push((cond?'PASS ':'FAIL ')+name);
+    const R=(b,a)=>Actions.reduce(b,a); const D=Derive.derive; const has=(d,code)=>d.issues.some(i=>i.code===code);
+    { const db=App.defaultBuild(); const dd=D(db); ok('default (40 SP Havoc) is valid and spends every SP',dd.valid&&dd.budgets.sp.spent===40&&dd.budgets.sp.budget===40&&dd.pf.total===50&&dd.budgets.power.used===35&&dd.budgets.space.used===34); }
+    let b=App.swordTestBuild(); let d=D(b);
+    ok('default power 33/45',d.budgets.power.used===33&&d.budgets.power.gen===45);
+    ok('default space 31/40',d.budgets.space.used===31&&d.budgets.space.total===40);
+    ok('default sp 42/50 pf 48',d.budgets.sp.spent===42&&d.pf.total===48);
+    ok('default stats',d.stats.speed.value===9&&d.stats.man.value===23&&d.stats.det.value===15&&d.stats.armour.value===19&&d.stats.hi.value===35&&d.stats.turret.value===2&&d.stats.shields.value===1);
+    ok('default skills',d.skills.bs_fire.value===5&&d.skills.pilot_disengage.value===-15);
+    ok('sword: third weapon blocked',!Rules.availability(DATA.COMP.sunsear,b).ok);
+    ok('sword: lance blocked (no prow)',/Prow/.test(Rules.availability(DATA.COMP.titanforge_lance,b).reason||''));
+    let b2=R(b,{type:'setHull',id:'dauntless'}); ok('dauntless: lance auto-slots prow',Rules.availability(DATA.COMP.titanforge_lance,b2).slot==='prow:0');
+    b2=R(b2,{type:'addSupp',id:'titanforge_lance'}); const lu=b2.supplementals[2].uid; ok('dauntless: lance in port is legal',!has(D(R(b2,{type:'moveWeapon',uid:lu,slot:'port:0'})),'slot_rule'));
+    { let bh=R(Actions.newBuild(),{type:'setHull',id:'hazeroth'}); bh=R(bh,{type:'fixEssentials'}); bh=R(bh,{type:'addSupp',id:'starbreaker'}); ok('raider: lance auto prow',bh.supplementals[0].slot==='prow:0'); ok('raider: lance in dorsal → error',has(D(R(bh,{type:'moveWeapon',uid:bh.supplementals[0].uid,slot:'dorsal:0'})),'slot_rule')); }
+    ok('broadside blocked on sword',!Rules.availability(DATA.COMP.mars_broadside,b).ok);
+    ok('catalog has 61 components incl. runecaster',DATA.COMPS.length===61&&!!DATA.COMP.runecaster&&DATA.COMPS.filter(c=>c.tech==='xenotech').length===5&&DATA.COMPS.filter(c=>c.tech==='archeotech').length===6);
+    ok('errata: titanforge battery LC/C only',!Rules.availability(DATA.COMP.titanforge_battery,b).ok&&/Cruiser/.test(Rules.availability(DATA.COMP.titanforge_battery,b).reason)&&!!Rules.variantFor(DATA.COMP.titanforge_battery,'C'));
+    let b3=R(App.swordTestBuild(),{type:'setHull',id:'lunar'}); b3=R(b3,{type:'fixEssentials'}); b3.supplementals=[];
+    ok('lunar fixEssentials → jovian_4/strelov_2',b3.essentials.plasma_drive==='jovian_4'&&b3.essentials.warp_engine==='strelov_2');
+    ok('broadside prow → error',has(D(R(b3,{type:'addSupp',id:'mars_broadside',slot:'prow:0'})),'slot_rule'));
+    ok('broadside port ok',!has(D(R(b3,{type:'addSupp',id:'mars_broadside',slot:'port:0'})),'slot_rule'));
+    let b4=R(b3,{type:'addSupp',id:'armoured_prow'}); ok('armoured prow blocks prow weapon',has(D(R(b4,{type:'addSupp',id:'mars_macro',slot:'prow:0'})),'slot_rule'));
+    ok('armoured prow once',!Rules.availability(DATA.COMP.armoured_prow,b4).ok); ok('armour 21 (25 fore)',D(b4).stats.armour.value===21&&D(b4).stats.armour.fore===4);
+    let b5=R(b,{type:'addSupp',id:'temple_shrine'}); ok('temple once',!Rules.availability(DATA.COMP.temple_shrine,b5).ok);
+    let b6=R(R(b,{type:'addSupp',id:'compartmentalised_cargo'}),{type:'addSupp',id:'compartmentalised_cargo'}); ok('cargo hold twice allowed',!has(D(b6),'once'));
+    ok('archeotech gated',/Reliquary/.test(Rules.availability(DATA.COMP.ancient_life,b).reason||''));
+    let b7=R(b,{type:'setHistory',id:'reliquary_of_mars'}); ok('archeotech allowed with reliquary',Rules.availability(DATA.COMP.ancient_life,b7).ok);
+    b7=R(b7,{type:'setEssential',cat:'life_sustainer',id:'ancient_life'}); ok('one archeotech ok',!has(D(b7),'grant_limit')); ok('techuse −20',D(b7).skills.techuse_repair.value===-20+10);
+    let b8=R(b7,{type:'setEssential',cat:'bridge',id:'bridge_of_antiquity'}); ok('two archeotech → error',has(D(b8),'grant_limit')); ok('gm clears',!has(D(R(b8,{type:'toggleGm'})),'grant_limit'));
+    let b9=R(R(b,{type:'setHistory',id:'xenophilous'}),{type:'addSupp',id:'ghost_field'}); ok('ghost field with xenophilous',!has(D(b9),'gated')&&D(b9).ghost);
+    ok('techuse −30 → −10 with FL',D(b9).skills.techuse_repair.value===-30+10&&D(R(b9,{type:'toggleFL'})).skills.techuse_repair.value===-10+10);
+    let bj=R(Actions.newBuild(),{type:'setHull',id:'jericho'}); bj=R(bj,{type:'fixEssentials'}); const dj=D(bj);
+    ok('jericho preinstalled hold',dj.rows.some(r=>r.kind==='pre')&&dj.ap.trade.value===125&&dj.budgets.power.used>=2);
+    ok('wolf −2 power',D(R(b,{type:'setHistory',id:'wolf_in_sheeps_clothing'})).budgets.power.gen===43);
+    let bm=b7; ['temple_shrine','supply_vaults','observation_dome'].forEach(id=>bm=R(bm,{type:'addSupp',id})); ok('morale 107',D(bm).stats.morale.value===107);
+    ok('haunted → morale −10',D(R(bm,{type:'setHistory',id:'haunted'})).stats.morale.value===97); ok('death cult crew 92',D(R(b,{type:'setHistory',id:'death_cult'})).stats.crew.value===92);
+    let bs=R(b,{type:'setWarrantManual',sp:41}); ok('sp overspend error, pf base',has(D(bs),'sp')&&D(bs).pf.total===40);
+    let bmu=R(b,{type:'addSupp',id:'munitorium'}); ok('munitorium +1 macro dmg',D(bmu).weapons[0].dmg==='1d10+3'); ok('lance unaffected by munitorium',D(R(R(b2,{type:'addSupp',id:'munitorium'}),{type:'setHull',id:'dauntless'})).weapons.find(w=>w.kind==='lance').dmg==='1d10+4');
+    let bd=R(R(b,{type:'setHistory',id:'reliquary_of_mars'}),{type:'setEssential',cat:'plasma_drive',id:'mod_jovian'}); ok('modified drive space 6 speed +1',D(bd).rows[0].variant.space===6&&D(bd).stats.speed.value===9);
+    let bl=R(b,{type:'setHull',id:'lunar'}); ok('sword→lunar flags essentials',has(D(bl),'hull_mismatch')); ok('combat bridge becomes 2/2',D(bl).rows.find(r=>r.cat==='bridge').variant.power===2);
+    ok('wrothful situational only',D(R(b,{type:'setSpirit',id:'wrothful'})).stats.speed.value===9&&D(R(b,{type:'setSpirit',id:'wrothful'})).stats.speed.situational.length===2);
+    { const bb=App.swordTestBuild(); const dd=D(bb); const ds=Export.dossier(bb,dd); const md=Export.markdown(ds);
+      ok('export dossier lists every row',ds.components.length+ds.groups.reduce((n,g)=>n+g.items.length,0)===dd.rows.length);
+      ok('export md has core parts',['Sword of Sebastian','Mars Pattern Macrocannons','Damage Control Station','Martial Hubris','Wrested from a Space Hulk','Profit Factor 40 + 8','Dorsal 1','share code'].every(t=>md.includes(t)));
+      const norm=t=>t.replace(/_\(part \d+\/\d+\)_/g,'').replace(/```/g,'').replace(/\s+/g,'');
+      const parts=Export.chunks(md); ok('export chunks ≤1900 and lossless',parts.every(p=>p.length<=1900)&&norm(parts.join('\n\n'))===norm(md));
+      let big=R(Actions.newBuild('Big'),{type:'setHull',id:'lunar'}); big=R(big,{type:'fixEssentials'}); big=R(big,{type:'setSpirit',id:'wrothful'}); big=R(big,{type:'setHistory',id:'reliquary_of_mars'});
+      ['mars_broadside','mars_broadside','titanforge_lance','mars_macro','mars_macro','temple_shrine','trophy_room','observation_dome','supply_vaults','munitorium','librarium','murder_servitors','crew_reclamation','barracks','luxury_quarters','tenebro_maze','armour_plating','bulkheads','retro_thrusters','teleportarium'].forEach(id=>big=R(big,{type:'addSupp',id}));
+      const bigParts=Export.chunks(Export.markdown(Export.dossier(big,D(big)))); ok('export big build chunks ≤1900, numbered',bigParts.length>2&&bigParts.every((p,i)=>p.length<=1900&&p.endsWith(`_(part ${i+1}/${bigParts.length})_`)));
+      ok('export html renders',Export.html(ds).includes('Sword of Sebastian')&&Export.html(ds).includes('Mars Pattern Macrocannons')&&Export.html(ds).includes('class="sheet"')&&Export.html(Export.dossier(big,D(big))).includes('Teleportarium')); }
+    { let bm=R(App.swordTestBuild(),{type:'addSpMod',cause:'GM provides the hull',value:40}); bm=R(bm,{type:'addSpMod',cause:'Crack crew',value:-5}); const dm=D(bm);
+      ok('sp adjustments sum into budget',dm.budgets.sp.budget===85&&dm.budgets.sp.left===43&&dm.pf.total===40+43);
+      ok('parseMod signs',Actions.parseMod('+40')===40&&Actions.parseMod('-5')===-5&&Actions.parseMod('−5')===-5&&Actions.parseMod('7')===7&&Actions.parseMod('x')===null);
+      const rt=Share.decode(Share.encode(bm)).build; ok('sp adjustments survive share code',rt.spMods.length===2&&rt.spMods[1].value===-5&&rt.spMods[0].cause==='GM provides the hull');
+      ok('sp adjustments in export',Export.markdown(Export.dossier(bm,dm)).includes('GM provides the hull')&&Export.html(Export.dossier(bm,dm)).includes('GM provides the hull')); }
+    { const code=Backup.encode(); const o=Backup.parse(code); ok('backup code parses',code.startsWith('VSB1.')&&o.builds.length===Persist.mem.order.length&&o.builds.every(b=>Share.decode(b.code)));
+      ok('backup json parses',Backup.parse(Backup.json()).builds.length===o.builds.length); let bad=false; try{ Backup.parse('nonsense'); }catch(e){ bad=true; } ok('bad backup rejected',bad); }
+    ok('share roundtrip',JSON.stringify(Share.decode(Share.encode(b)).build.essentials)===JSON.stringify(b.essentials));
+    let bad=false; try{ Share.decode('nope'); }catch(e){ bad=true; } ok('corrupt code rejected',bad);
+    console.log(out.join('\n')); const fails=out.filter(l=>l.startsWith('FAIL')).length; console.log(fails?`${fails} FAILED`:'ALL PASSED'); toast(fails?fails+' self-tests failed (see console)':'All self-tests passed');
+    return out;
+  }
+  return {run};
+})();
+
+App.boot();
+</script>
