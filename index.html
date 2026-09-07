@@ -1172,9 +1172,10 @@ const Picker=(()=>{
       if(e.target.closest('[data-expand]')){const id=row.dataset.comp; Store.ui.expanded.has(id)?Store.ui.expanded.delete(id):Store.ui.expanded.add(id); render(); return;}
       if(row.dataset.ok==='1'&&(e.target.closest('[data-add]')||!e.target.closest('button'))) install(row);
     });
-    lst.addEventListener('mouseover',e=>{const row=e.target.closest('.prow'); if(row?.dataset.act&&!row.classList.contains('cur')) Preview.show(JSON.parse(row.dataset.act),row.dataset.ok!=='1');});
+    // Touch-generated hover/focus must not move the install button during a tap.
+    lst.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse') return; const row=e.target.closest('.prow'); if(row?.dataset.act&&!row.classList.contains('cur')) Preview.show(JSON.parse(row.dataset.act),row.dataset.ok!=='1');});
     lst.addEventListener('mouseleave',()=>Preview.clear());
-    lst.addEventListener('focusin',e=>{const row=e.target.closest('.prow'); if(row?.dataset.act&&!row.classList.contains('cur')) Preview.show(JSON.parse(row.dataset.act),row.dataset.ok!=='1');});
+    lst.addEventListener('focusin',e=>{if(!e.target.matches(':focus-visible')) return; const row=e.target.closest('.prow'); if(row?.dataset.act&&!row.classList.contains('cur')) Preview.show(JSON.parse(row.dataset.act),row.dataset.ok!=='1');});
     lst.addEventListener('keydown',e=>{
       const row=e.target.closest('.prow'); if(!row) return;
       if(e.key==='Enter'&&row.dataset.ok==='1'){e.preventDefault();install(row);}

@@ -84,7 +84,7 @@ test('F8 applies the viewport in a touch mobile browser', async ({ browser, base
   }
 });
 
-for (const viewport of [{ width: 320, height: 568 }, { width: 640, height: 360 }]) {
+for (const viewport of [{ width: 320, height: 568 }, { width: 640, height: 360 }, { width: 650, height: 360 }]) {
   test(`expanded options leave the editor usable at ${viewport.width}x${viewport.height}`, async ({ browser, baseURL }, testInfo) => {
     const context = await browser.newContext({ baseURL, viewport, isMobile: true, hasTouch: true });
     try {
@@ -127,6 +127,27 @@ for (const viewport of [{ width: 320, height: 568 }, { width: 640, height: 360 }
     }
   });
 }
+
+test('component previews follow mouse hover and keyboard navigation', async ({ page }) => {
+  await page.goto('./');
+  await page.locator('[data-pick="bridge"]').click();
+  const armoured = page.locator('[data-comp="armoured_bridge"]');
+  const summary = page.locator('.pk-summary');
+  await armoured.hover();
+  await expect(summary).toHaveText('If installed: Tech-Use repair -10');
+  await page.locator('#pkClose').hover();
+  await expect(summary).toBeEmpty();
+
+  await page.locator('#pkFree').focus();
+  await page.keyboard.press('Tab');
+  await expect(page.locator('[data-comp="combat_bridge"]')).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(summary).toContainText('Command +5');
+  await page.keyboard.press('ArrowDown');
+  await expect(armoured).toBeFocused();
+  await expect(summary).toHaveText('If installed: Tech-Use repair -10');
+  expect(await page.evaluate(() => Store.build.essentials.bridge)).toBe('combat_bridge');
+});
 
 for (const width of [320, 390, 640, 1280]) {
   test(`F8 keeps editor controls within ${width}px across expanded and modal states`, async ({ page }, testInfo) => {
