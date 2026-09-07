@@ -16,6 +16,8 @@ Press `?` in the app for the help sheet, including keyboard shortcuts.
 
 ## Saving
 
+With no saved builds, the builder opens **Righeous Path**, a Sword-class frigate with Resolute and Xenophilous. Existing saved builds still reopen at the last active ship; **New** starts a blank vessel.
+
 Builds autosave in the browser, tied to the page's address. A downloaded copy, a hosted copy and each device keep separate lists. Use *Copy backup code* / *Download backup* and *Restore backup…* in the Builds panel to move them.
 
 Switching ships saves outgoing edits and clears Undo history. Ctrl+S / Cmd+S and switching away from the tab save the field being edited and preserve its focus and text selection. Incomplete imports remain editable with warnings.
