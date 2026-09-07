@@ -61,11 +61,14 @@ h3{font:600 11px/1.3 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.1em;
 .hdr .identity{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 10px;min-width:0;max-width:100%}
 .hdr .tools{margin-left:auto;display:flex;flex-wrap:wrap;gap:6px}
 .field{display:flex;align-items:center;gap:6px;min-width:0;max-width:100%}
-.hdr .field select{min-width:0;max-width:100%;flex:1;overflow:hidden;text-overflow:ellipsis}
+/* Some native WebKit selects ignore overflow; contain their text in an ordinary box. */
+.hdr .select-wrap{display:flex;min-width:0;max-width:100%;flex:1;overflow:hidden;border-radius:3px}
+.hdr .select-wrap:focus-within{outline:2px solid var(--focus);outline-offset:1px}
+.hdr .field select{min-width:0;max-width:100%;flex:1;text-overflow:ellipsis}
 .hdr .field>button{flex-shrink:0}
 .hdr .warrant-fields,.spmods>.field{flex-wrap:wrap}
 .spmods>.field{overflow-wrap:anywhere}
-.hdr .warrant-fields>select{flex:0 1 auto}
+.hdr .warrant-fields>.select-wrap{flex:0 1 auto}
 .field label,.field .flabel{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
 #buildName{font:600 20px/1.1 "Cormorant Garamond",Georgia,serif;width:240px;min-width:0;max-width:100%;background:transparent;border:1px solid transparent;border-bottom:1px dashed var(--rule-strong);border-radius:3px 3px 0 0;padding:2px 6px}
 #buildName:hover,#buildName:focus{border-color:var(--rule-strong);border-bottom-style:solid;background:var(--panel)}
@@ -952,9 +955,9 @@ const Render=(()=>{
     $('#hdr').innerHTML=`
       <div class="row">
         <div class="identity"><h1>Voidship Builder</h1><input id="buildName" type="text" value="${esc(b.name)}" aria-label="Build name"></div>
-        <div class="field"><label for="hullSel">Hull</label><select id="hullSel">${HULLS.map(h=>`<option value="${h.id}" ${h.id===b.hull?'selected':''}>${esc(h.name)} (${CLASS_NAME[h.cls]}, ${h.sp} SP)</option>`).join('')}</select></div>
-        <div class="field"><label for="spiritSel">Machine Spirit</label><select id="spiritSel"><option value="">— none —</option>${SPIRITS.map(s=>`<option value="${s.id}" ${s.id===b.spirit?'selected':''}>${s.roll}. ${esc(s.name)}</option>`).join('')}</select><button class="small" id="rollSpirit" title="Roll d10">d10</button></div>
-        <div class="field"><label for="historySel">Past History</label><select id="historySel"><option value="">— none —</option>${HISTORIES.map(s=>`<option value="${s.id}" ${s.id===b.history?'selected':''}>${s.roll}. ${esc(s.name)}</option>`).join('')}</select><button class="small" id="rollHistory" title="Roll d10">d10</button></div>
+        <div class="field"><label for="hullSel">Hull</label><span class="select-wrap"><select id="hullSel">${HULLS.map(h=>`<option value="${h.id}" ${h.id===b.hull?'selected':''}>${esc(h.name)} (${CLASS_NAME[h.cls]}, ${h.sp} SP)</option>`).join('')}</select></span></div>
+        <div class="field"><label for="spiritSel">Machine Spirit</label><span class="select-wrap"><select id="spiritSel"><option value="">— none —</option>${SPIRITS.map(s=>`<option value="${s.id}" ${s.id===b.spirit?'selected':''}>${s.roll}. ${esc(s.name)}</option>`).join('')}</select></span><button class="small" id="rollSpirit" title="Roll d10">d10</button></div>
+        <div class="field"><label for="historySel">Past History</label><span class="select-wrap"><select id="historySel"><option value="">— none —</option>${HISTORIES.map(s=>`<option value="${s.id}" ${s.id===b.history?'selected':''}>${s.roll}. ${esc(s.name)}</option>`).join('')}</select></span><button class="small" id="rollHistory" title="Roll d10">d10</button></div>
         <div class="tools"><button class="small primary" id="exportBtn" title="Export dossier (e)">Export</button><button class="small" id="undoBtn" ${Store.canUndo()?'':'disabled'} title="Undo last change (Ctrl+Z)">Undo</button><button class="small" id="themeBtn" title="Cycle theme: auto, light, dark" aria-label="Theme: ${theme}. Change theme">Theme: ${theme}</button><button class="small" id="helpBtn" title="Help and keyboard shortcuts (?)" aria-label="Help">?</button></div>
       </div>
       <div class="row meters">
@@ -966,7 +969,7 @@ const Render=(()=>{
       </div>
       <details class="opts" ${b.warrant.manual||b.gmOverride||b.forbiddenLoreXenos||(b.spMods||[]).length?'open':''}><summary>Warrant &amp; options</summary>
         <div class="row">
-          <div class="field warrant-fields"><label for="warrantSel">Warrant roll</label><select id="warrantSel" ${w.manual?'disabled':''}>${[1,2,3,4,5,6,7,8,9,10].map(r=>{const x=Rules.pfRow(r);return `<option value="${r}" ${r===w.roll?'selected':''}>Roll ${r}: PF ${x.pf} / SP ${x.sp}</option>`;}).join('')}</select><button class="small" id="rollWarrant" title="Roll d10 on Table 1-5">d10</button>
+          <div class="field warrant-fields"><label for="warrantSel">Warrant roll</label><span class="select-wrap"><select id="warrantSel" ${w.manual?'disabled':''}>${[1,2,3,4,5,6,7,8,9,10].map(r=>{const x=Rules.pfRow(r);return `<option value="${r}" ${r===w.roll?'selected':''}>Roll ${r}: PF ${x.pf} / SP ${x.sp}</option>`;}).join('')}</select></span><button class="small" id="rollWarrant" title="Roll d10 on Table 1-5">d10</button>
             <label for="manualW" style="display:flex;gap:4px;align-items:center;text-transform:none;letter-spacing:0"><input type="checkbox" id="manualW" ${w.manual?'checked':''}> manual</label>
             ${w.manual?`<span class="field"><label for="pfIn">PF</label><input type="text" id="pfIn" class="n" size="3" value="${w.pf}"><label for="spIn">SP</label><input type="text" id="spIn" class="n" size="3" value="${w.sp}"></span>`:''}</div>
           <label class="field" for="gmChk" style="gap:5px"><input type="checkbox" id="gmChk" ${b.gmOverride?'checked':''}> <span>GM override: unlock Archeotech / Xeno-tech</span></label>

@@ -30,7 +30,7 @@ jobs:
       - run: npm test
       - name: Retain test reports and failure evidence
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: browser-test-report
           path: |
@@ -39,7 +39,7 @@ jobs:
           retention-days: 14
       - name: Retain the tested site
         if: ${{ success() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: tested-site
           path: _site/
@@ -55,7 +55,7 @@ jobs:
       contents: read
       pages: read
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           name: tested-site
           path: _site

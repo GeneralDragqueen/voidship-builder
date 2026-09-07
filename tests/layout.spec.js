@@ -36,6 +36,24 @@ test('F8 uses standards mode and mobile document metadata', async ({ page }) => 
   await expect(page.locator('meta[name="viewport"]')).toHaveAttribute('content', 'width=device-width, initial-scale=1');
 });
 
+test('F8 contains native select overflow and preserves its keyboard focus indicator', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 1000 });
+  await page.goto('./');
+  // Linux WebKit keeps overflow visible on native selects regardless of the authored value.
+  await page.addStyleTag({ content: '#hdr select { overflow: visible !important; }' });
+  await expectContained(page, 'native select overflow');
+  await page.locator('#buildName').focus();
+  await page.keyboard.press('Tab');
+  await expect(page.locator('#hullSel')).toBeFocused();
+  const focus = page.locator('.select-wrap').filter({ has: page.locator('#hullSel') });
+  await expect(focus).toHaveCSS('outline-style', 'solid');
+  await expect(focus).toHaveCSS('outline-width', '2px');
+  await page.locator('#hullSel').selectOption('jericho');
+  await expect(page.locator('#hullSel')).toHaveValue('jericho');
+  expect(await page.evaluate(() => Store.build.hull)).toBe('jericho');
+  await expectContained(page, 'native select hull change');
+});
+
 test('F8 applies the viewport in a touch mobile browser', async ({ browser, baseURL }, testInfo) => {
   const context = await browser.newContext({
     baseURL,
