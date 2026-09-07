@@ -825,14 +825,40 @@ const BuildInput=(()=>{
 
 const Persist=(()=>{
   const KEY='voidship-builder:v1', RECOVERY='voidship-builder:recovery:';
-  let mem=null,storageOk=true,blocked=false,recovery=null;
+  let mem=null,storageOk=true,blocked=false,recovery=null,recoveryPending=false;
   const empty=()=>({version:1,activeId:null,order:[],prefs:{theme:'auto'},builds:Object.create(null)});
-  // Ignore object-key order, but preserve the original before any normalization changes its data.
+  const recoveredMessage='Some saved data needed recovery. Usable ships are available below; download the original data to keep a recovery copy.';
+  // Ignore key order and these lossless legacy representations only; other changes need an original copy.
   const canonical=value=>JSON.stringify(value,(_key,v)=>BuildInput.object(v)?Object.fromEntries(Object.keys(v).sort().map(k=>[k,v[k]])):v);
+  function canonicalBuild(input){
+    const b={...input,spMods:input.spMods===undefined?[]:input.spMods};
+    if(Array.isArray(b.supplementals)) b.supplementals=b.supplementals.map(item=>{
+      if(!BuildInput.object(item)||item.slot!==null) return item;
+      const {slot,...rest}=item; return rest;
+    });
+    return canonical(b);
+  }
+  function recoveryCopies(){
+    try{return Object.keys(localStorage).filter(key=>key.startsWith(RECOVERY)).sort().reverse().map(key=>({key,protected:recoveryPending&&key===recovery?.key}));}catch(e){return [];}
+  }
+  function latestRecovery(){
+    try{const key=recoveryCopies()[0]?.key; recovery=key?{key,raw:localStorage.getItem(key),message:'Original data from an earlier recovery is available to download.'}:null;}catch(e){recovery=null;}
+  }
+  function archiveOriginal(){
+    try{
+      // A retained byte-identical original already provides the required protection, even at quota.
+      let key=Object.keys(localStorage).find(key=>key.startsWith(RECOVERY)&&localStorage.getItem(key)===recovery.raw);
+      if(!key){
+        do{key=RECOVERY+Date.now()+'-'+Math.random().toString(36).slice(2);}while(localStorage.getItem(key)!==null);
+        localStorage.setItem(key,recovery.raw);
+      }
+      recovery.key=key; recovery.message=recoveredMessage; blocked=false; return true;
+    }catch(e){blocked=true;storageOk=false;recovery.message='Recovered ships are available in this tab. Original storage is unchanged because a recovery copy could not be saved. Download both the original data and a backup before closing.';return false;}
+  }
   function load(){
-    mem=empty(); storageOk=true; blocked=false; recovery=null; let raw;
+    mem=empty(); storageOk=true; blocked=false; recovery=null; recoveryPending=false; let raw;
     try{raw=localStorage.getItem(KEY);}catch(e){storageOk=false;blocked=true;return mem;}
-    if(!raw) return mem;
+    if(!raw){latestRecovery();return mem;}
     let repaired=false;
     try{
       const saved=JSON.parse(raw);
@@ -844,7 +870,7 @@ const Persist=(()=>{
           if(!/^[-\w]+$/.test(i)||!BuildInput.object(entry)) throw new Error('Invalid saved entry');
           const {build,warnings}=BuildInput.normalize(entry.build);
           mem.builds[i]={id:i,name:build.name,createdAt:BuildInput.number(entry.createdAt,Date.now()),updatedAt:BuildInput.number(entry.updatedAt,Date.now()),build};
-          if(warnings.length||canonical(entry.build)!==canonical(build)) repaired=true;
+          if(warnings.length||canonicalBuild(entry.build)!==canonicalBuild(build)) repaired=true;
         }catch(e){repaired=true;}
       }
       const order=Array.isArray(saved.order)?saved.order:[];
@@ -853,23 +879,39 @@ const Persist=(()=>{
       if(JSON.stringify(order)!==JSON.stringify(mem.order)||saved.activeId!==mem.activeId||!Array.isArray(saved.order)) repaired=true;
     }catch(e){repaired=true;}
     if(repaired){
-      recovery={raw,key:RECOVERY+Date.now()+'-'+Math.random().toString(36).slice(2),message:'Some saved data needed recovery. Usable ships are available below; download the original data to keep a recovery copy.'};
-      try{localStorage.setItem(recovery.key,raw);}catch(e){blocked=true;storageOk=false;recovery.message='Recovered ships are available in this tab. Original storage is unchanged because a recovery copy could not be saved. Download both the original data and a backup before closing.';}
+      recovery={raw,key:null,message:recoveredMessage}; recoveryPending=true; archiveOriginal();
     }else{
       // Keep the original recovery download reachable after a successful reload.
-      try{ const key=Object.keys(localStorage).filter(k=>k.startsWith(RECOVERY)).sort().pop(); if(key) recovery={key,raw:localStorage.getItem(key),message:'Original data from an earlier recovery is available to download.'}; }catch(e){}
+      latestRecovery();
     }
     return mem;
   }
   let lastSaved=null;
-  function save(){ if(blocked) return false; try{ localStorage.setItem(KEY,JSON.stringify(mem)); storageOk=true; lastSaved=Date.now(); return true; }catch(e){ storageOk=false; return false; } }
+  function save(){ if(blocked) return false; try{ localStorage.setItem(KEY,JSON.stringify(mem)); storageOk=true; recoveryPending=false; lastSaved=Date.now(); return true; }catch(e){ storageOk=false; return false; } }
+  function retrySave(){
+    if(recoveryPending){if(!archiveOriginal()) return false;}
+    return save();
+  }
   const id=()=>'b'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
   function create(input){ const {build}=BuildInput.normalize(input); const i=id(); mem.builds[i]={id:i,name:build.name,createdAt:Date.now(),updatedAt:Date.now(),build}; mem.order.push(i); save(); return i; }
   function update(i,build){ const e=mem.builds[i]; if(!e) return; e.build=Actions.clone(build); e.name=build.name; e.updatedAt=Date.now(); save(); }
   function remove(i){ delete mem.builds[i]; mem.order=mem.order.filter(x=>x!==i); if(mem.activeId===i) mem.activeId=mem.order[0]||null; save(); }
   function findByCode(code){ return mem.order.find(i=>Share.encode(mem.builds[i].build)===code)||null; }
-  function downloadRecovery(){ if(!recovery) return; const url=URL.createObjectURL(new Blob([recovery.raw],{type:'application/json'})); const a=document.createElement('a'); a.href=url; a.download='voidship-original-storage.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000); }
-  return {load,save,create,update,remove,findByCode,downloadRecovery,get mem(){return mem;},get recovery(){return recovery;},get blocked(){return blocked;},get ok(){return storageOk;},get lastSaved(){return lastSaved;}};
+  function downloadRecovery(key=recovery?.key){
+    let raw; try{raw=key===recovery?.key?recovery?.raw:typeof key==='string'&&key.startsWith(RECOVERY)?localStorage.getItem(key):null;}catch(e){return;}
+    if(typeof raw!=='string') return;
+    const url=URL.createObjectURL(new Blob([raw],{type:'application/json'})); const a=document.createElement('a'); a.href=url; a.download='voidship-original-storage.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+  function removeRecovery(key){
+    if(typeof key!=='string'||!key.startsWith(RECOVERY)||(recoveryPending&&key===recovery?.key)) return false;
+    try{
+      if(localStorage.getItem(key)===null) return false;
+      localStorage.removeItem(key);
+      if(key===recovery?.key) latestRecovery();
+      return true;
+    }catch(e){return false;}
+  }
+  return {load,save,retrySave,create,update,remove,findByCode,downloadRecovery,recoveryCopies,removeRecovery,get mem(){return mem;},get recovery(){return recovery;},get blocked(){return blocked;},get ok(){return storageOk;},get lastSaved(){return lastSaved;}};
 })();
 
 const Share=(()=>{
@@ -1076,12 +1118,20 @@ const Render=(()=>{
   function aside(){
     const b=Store.build,d=Store.derived,ui=Store.ui;
     const mem=Persist.mem; const active=mem.activeId;
+    const recoveryCopies=Persist.recoveryCopies();
+    const recoveryRows=recoveryCopies.map((copy,index)=>{
+      const stamp=Number(copy.key.slice('voidship-builder:recovery:'.length).split('-')[0]);
+      const label=Number.isFinite(stamp)?new Date(stamp).toLocaleString():'Saved copy '+(index+1);
+      return `<div style="margin-top:8px"><div>${esc(label)}</div><div class="actions"><button class="small" data-recovery-download="${esc(copy.key)}">Download</button><button class="small" data-recovery-delete="${esc(copy.key)}" ${copy.protected?'disabled':''}>${ui.recoveryDelete===copy.key?'Delete permanently?':'Delete'}</button>${ui.recoveryDelete===copy.key?'<button class="small" data-recovery-keep>Keep</button>':''}</div>${copy.protected?'<div class="muted">Needed until the recovered ships are saved.</div>':''}</div>`;
+    }).join('');
     const builds=mem.order.map(id=>{const e=mem.builds[id]; const dd=Derive.derive(e.build);
       return `<div class="brow ${id===active?'active':''}"><input type="checkbox" data-cmp="${id}" ${ui.selected.has(id)?'checked':''} aria-label="Select for compare"><span><button class="link" data-load="${id}" style="font-weight:600">${esc(e.name)}</button><div class="meta">${esc(dd.hull.name)} · PF ${dd.pf.total} · ${dd.valid?'<span class="good">valid</span>':`<span class="bad">${dd.errors} error${dd.errors>1?'s':''}</span>`}</div></span>
         <span style="display:flex;gap:3px">${ui.pendingDelete===id?`<button class="small" style="border-color:var(--bad);color:var(--bad)" data-del="${id}">Delete?</button><button class="small" data-undel="${id}">Keep</button>`:`<button class="small" data-dup="${id}" title="Duplicate" aria-label="Duplicate ${esc(e.name)}">⧉</button><button class="small" data-del="${id}" title="Delete" aria-label="Delete ${esc(e.name)}">✕</button>`}</span></div>`;}).join('');
     $('#aside .body').innerHTML=`
       <div class="banner">${Persist.ok?'':'Browser storage is unavailable here; builds live only in this tab. Use share codes to keep them.'}</div>
       ${Persist.recovery?`<div class="banner" id="recoveryNotice" role="status">${esc(Persist.recovery.message)} <button class="small" id="recoveryDownload">Download original data</button></div>`:''}
+      ${Persist.recovery&&!Persist.ok?'<div class="actions"><button class="small" id="recoveryRetry">Retry saving</button></div>':''}
+      ${recoveryCopies.length?`<details id="recoveryCopies" ${ui.recoveryOpen?'open':''} style="font-size:12px;margin-bottom:12px"><summary>Saved recovery copies (${recoveryCopies.length})</summary><p>Download any copy you want to keep before deleting it. Deleting a copy does not change your current ships.</p>${recoveryRows}</details>`:''}
       <h3 id="issues" style="margin-top:0">Issues</h3>
       <div aria-live="polite">${d.issues.map(i=>`<div class="issue ${i.level}" data-ref="${esc(i.ref||'')}"><span class="code">${i.level}</span> ${esc(i.msg)}</div>`).join('')||'<div class="issue info">No issues. Ship is ready to sail.</div>'}</div>
       <h3>Builds</h3>
@@ -1105,6 +1155,17 @@ const Render=(()=>{
     $('#bkCode').addEventListener('click',()=>App.copy(Backup.encode(),'Backup code copied ('+Persist.mem.order.length+' builds)'));
     $('#bkFile').addEventListener('click',()=>Backup.download());
     $('#recoveryDownload')?.addEventListener('click',()=>Persist.downloadRecovery());
+    $('#recoveryCopies')?.addEventListener('toggle',e=>{ui.recoveryOpen=e.target.open;});
+    $$('[data-recovery-download]').forEach(button=>button.addEventListener('click',()=>Persist.downloadRecovery(button.dataset.recoveryDownload)));
+    $$('[data-recovery-delete]').forEach(button=>button.addEventListener('click',()=>{
+      const key=button.dataset.recoveryDelete; ui.recoveryOpen=true;
+      if(ui.recoveryDelete!==key){ui.recoveryDelete=key;aside();return;}
+      App.flushSave(); ui.recoveryDelete=null;
+      if(Persist.removeRecovery(key)){Persist.retrySave();toast('Recovery copy deleted');}else toast('This recovery copy is still needed or could not be deleted');
+      aside();
+    }));
+    $('[data-recovery-keep]')?.addEventListener('click',()=>{ui.recoveryDelete=null;aside();});
+    $('#recoveryRetry')?.addEventListener('click',()=>{App.flushSave();const saved=Persist.retrySave();aside();toast(saved?'Saved':'Still unable to save; download a backup and your original data');});
     $('#bkRestore').addEventListener('click',()=>{ui.restoreOpen=!ui.restoreOpen;aside(); if(ui.restoreOpen) $('#bkIn')?.focus();});
     const doRestore=text=>{ try{ const r=App.restoreBackup(text); ui.restoreOpen=false; aside(); toast(`Restored ${r.added} build${r.added===1?'':'s'}${r.skipped?', '+r.skipped+' already present':''}${r.bad?', '+r.bad+' unreadable':''}${r.warnings.length?'; '+r.warnings.join('; '):''}`); }catch(e){ toast('That backup could not be read'); } };
     $('#bkGo')?.addEventListener('click',()=>doRestore($('#bkIn').value));
@@ -1497,6 +1558,7 @@ const Export=(()=>{
    ======================================================================== */
 const App=(()=>{
   let saveT=null,pendingSave=null;
+  const committedEditors=new WeakMap();
   function applyTheme(){ const t=Persist.mem.prefs.theme||'auto'; if(t==='auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme',t); }
   function cycleTheme(){ const order=['auto','light','dark']; const t=Persist.mem.prefs.theme||'auto'; Persist.mem.prefs.theme=order[(order.indexOf(t)+1)%3]; Persist.save(); applyTheme(); Render.header(); $('#themeBtn')?.focus(); toast('Theme: '+Persist.mem.prefs.theme); }
   function defaultBuild(){
@@ -1545,12 +1607,34 @@ const App=(()=>{
     if(pendingSave&&pendingSave.id!==Store.buildId) flushSave();
     clearTimeout(saveT); pendingSave={id:Store.buildId,build:Actions.clone(Store.build)}; saveT=setTimeout(flushSave,300);
   }
+  function preserveFocusedField(action){
+    const active=document.activeElement;
+    if(!active?.matches('input,textarea,select')){action();return;}
+    const row=active.closest('[data-spmod]');
+    const selector=active.id?'#'+CSS.escape(active.id):row?`[data-spmod="${CSS.escape(row.dataset.spmod)}"] .${active.classList.contains('cause')?'cause':'val'}`:null;
+    const start=active.selectionStart,end=active.selectionEnd,direction=active.selectionDirection;
+    const top=active.scrollTop,left=active.scrollLeft,x=window.scrollX,y=window.scrollY;
+    action();
+    const field=active.isConnected?active:selector?$(selector):null;
+    if(!field) return;
+    // A replacement has no native undo history; use ship Undo until typing resumes.
+    if(field!==active) committedEditors.set(field,field.value);
+    for(let parent=field.parentElement;parent;parent=parent.parentElement){ if(parent.tagName==='DETAILS') parent.open=true; }
+    field.focus({preventScroll:true});
+    if(start!=null&&end!=null) field.setSelectionRange(start,end,direction);
+    field.scrollTop=top; field.scrollLeft=left; window.scrollTo(x,y);
+  }
+  function commitFocusedField(){
+    // Use the existing change handler so field validation and normalization stay consistent.
+    preserveFocusedField(()=>document.activeElement?.blur());
+  }
   function keys(){
+    document.addEventListener('input',e=>committedEditors.delete(e.target));
     document.addEventListener('keydown',e=>{
       const tag=(e.target.tagName||'').toLowerCase(); const typing=tag==='input'||tag==='textarea'||tag==='select';
       if(e.key==='Escape'){ Preview.clear(); if(Store.ui.picker){ e.preventDefault(); Picker.close(); } return; }
-      if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!typing){ e.preventDefault(); if(Store.undo()) toast('Undone'); return; }
-      if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){ e.preventDefault(); document.activeElement?.blur(); flushSave(); if(Store.buildId) Persist.update(Store.buildId,Store.build); toast(Persist.ok?'Saved':'Storage unavailable; use the share code'); return; }
+      if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&(!typing||(!e.shiftKey&&committedEditors.has(e.target)&&committedEditors.get(e.target)===e.target.value))){ e.preventDefault(); preserveFocusedField(()=>{if(Store.undo()) toast('Undone');}); return; }
+      if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){ e.preventDefault(); commitFocusedField(); flushSave(); if(Store.buildId) Persist.update(Store.buildId,Store.build); toast(Persist.ok?'Saved':'Storage unavailable; use the share code'); return; }
       if(typing||Persist.mem.prefs.keys===false) return;
       if(e.key==='/'){ e.preventDefault(); if(Store.ui.picker) $('#pkSearch')?.focus(); return; }
       if(e.key==='?'){ e.preventDefault(); $('#help').showModal(); return; }
@@ -1567,7 +1651,7 @@ const App=(()=>{
     const kc=$('#keysChk'); if(kc){ kc.checked=Persist.mem.prefs.keys!==false; kc.addEventListener('change',()=>{ Persist.mem.prefs.keys=kc.checked; Persist.save(); toast(kc.checked?'Single-key shortcuts on':'Single-key shortcuts off'); }); }
     const hash=location.hash;
     Store.subscribe(({edited})=>{ if(edited) persistActive(); Render.all(); });
-    const saveOnExit=()=>{document.activeElement?.blur();flushSave();};
+    const saveOnExit=()=>{commitFocusedField();flushSave();};
     window.addEventListener('pagehide',saveOnExit);
     document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden') saveOnExit();});
     let booted=false;

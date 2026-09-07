@@ -213,7 +213,7 @@ for (const width of [320, 390, 640, 1280]) {
 test('offline file opens and print export renders the dossier', async ({ page }) => {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
-  const root = process.env.SITE_ROOT || process.cwd();
+  const root = process.env.SITE_ROOT || path.resolve('_site');
   await page.goto(pathToFileURL(path.join(root, 'index.html')).href);
   await expect(page.locator('#hullSel')).toBeVisible();
   const name = await page.locator('#buildName').inputValue();
