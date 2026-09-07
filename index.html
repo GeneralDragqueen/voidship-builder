@@ -202,6 +202,11 @@ kbd{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;border:1px
 .cmp th.anchor{color:var(--brass)}
 .cmp td.best{font-weight:600;color:var(--good)}
 .cmp .d{font-size:11px;margin-left:4px}
+/* Expanded options must scroll away when screen space is limited. */
+@media screen and (max-width:860px), screen and (max-height:600px){
+  html{scroll-padding-top:0}
+  .hdr{position:static}
+}
 @media screen and (max-width:600px){
   .hdr .identity,.hdr>.row>.field{width:100%}
   .hdr .identity #buildName{flex:1 1 180px;width:auto}
@@ -807,7 +812,7 @@ const BuildInput=(()=>{
     }
     const spMods=mods.map(m=>{ if(!object(m)) throw new Error('Invalid SP adjustment'); return {id:uid(m.id),cause:String(m.cause??'').slice(0,80),value:number(m.value,0)}; });
     const roll=number(warrant.roll,5);
-    const build={v:1,name:String(input.name||'Shared vessel').slice(0,80),hull:input.hull,
+    const build={v:1,name:String(input.name||'Shared vessel'),hull:input.hull,
       spirit:has(DATA.SPIRIT,input.spirit)?input.spirit:null,history:has(DATA.HISTORY,input.history)?input.history:null,
       essentials:e,supplementals:s,gmOverride:!!input.gmOverride,forbiddenLoreXenos:!!input.forbiddenLoreXenos,
       warrant:{roll:Number.isInteger(roll)&&roll>=1&&roll<=10?roll:5,pf:number(warrant.pf,40),sp:number(warrant.sp,50),manual:!!warrant.manual},
@@ -896,7 +901,7 @@ const Backup=(()=>{
     const o=parse(text); App.flushSave(); let added=0,skipped=0,bad=0,lastId=null; const warnings=[];
     for(const b of o.builds){ try{
       if(!BuildInput.object(b)||typeof b.code!=='string') throw new Error('Invalid backup entry');
-      const decoded=Share.decode(b.code),build=decoded.build; if(b.name) build.name=String(b.name).slice(0,80);
+      const decoded=Share.decode(b.code),build=decoded.build; if(b.name) build.name=String(b.name);
       if(Persist.findByCode(Share.encode(build))){skipped++;continue;}
       lastId=Persist.create(build); added++; warnings.push(...decoded.warnings);
     }catch(e){bad++;} }

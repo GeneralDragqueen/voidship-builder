@@ -215,6 +215,50 @@ test('F3: valid saved builds do not trigger recovery when object key order chang
   }
 });
 
+test('F3: long names accepted by the editor survive reload and duplication without recovery', async ({ page }) => {
+  const name = 'Glorious Expeditionary Vessel of the Most Honourable Rogue Trader Dynasty Beyond the Western Stars';
+  await page.locator('#buildName').fill(name);
+  await page.locator('#buildName').press('Tab');
+  await page.clock.runFor(301);
+  const originalId = await page.evaluate(() => Store.buildId);
+  expect(await page.evaluate(key => {
+    const saved = JSON.parse(localStorage.getItem(key));
+    return saved.builds[saved.activeId].build.name;
+  }, STORAGE_KEY)).toBe(name);
+
+  for (let reload = 0; reload < 2; reload++) {
+    await page.reload();
+    await expect(page.locator('#buildName')).toHaveValue(name);
+    expect(await page.evaluate(() => Object.keys(localStorage).filter(key => key.startsWith('voidship-builder:recovery:')))).toEqual([]);
+    await expect(page.locator('#recoveryNotice')).toHaveCount(0);
+  }
+
+  await page.locator(`[data-dup="${originalId}"]`).click();
+  await expect(page.locator('#buildName')).toHaveValue(name + ' (copy)');
+  await page.reload();
+  await expect(page.locator('#buildName')).toHaveValue(name + ' (copy)');
+  expect(await page.evaluate(id => Persist.mem.builds[id].build.name, originalId)).toBe(name);
+  await expect(page.locator('#recoveryNotice')).toHaveCount(0);
+});
+
+test('F3: long names round-trip through shares and both backup formats', async ({ page }) => {
+  const name = 'Glorious Expeditionary Vessel of the Most Honourable Rogue Trader Dynasty Beyond the Western Stars';
+  await page.locator('#buildName').fill(name);
+  await page.locator('#buildName').press('Tab');
+  const result = await page.evaluate(() => {
+    const shareName = Share.decode(Share.encode(Store.build)).build.name;
+    const backupCode = Backup.encode();
+    const backupJson = Backup.json();
+    const restore = text => {
+      for (const id of [...Persist.mem.order]) Persist.remove(id);
+      const result = App.restoreBackup(text);
+      return { added: result.added, name: Store.build.name };
+    };
+    return { shareName, code: restore(backupCode), json: restore(backupJson) };
+  });
+  expect(result).toEqual({ shareName: name, code: { added: 1, name }, json: { added: 1, name } });
+});
+
 test('F3: failed recovery archival retains original storage while healthy ship stays usable', async ({ page }) => {
   const raw = await page.evaluate(key => {
     const healthy = App.swordTestBuild();

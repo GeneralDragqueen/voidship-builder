@@ -84,6 +84,50 @@ test('F8 applies the viewport in a touch mobile browser', async ({ browser, base
   }
 });
 
+for (const viewport of [{ width: 320, height: 568 }, { width: 640, height: 360 }]) {
+  test(`expanded options leave the editor usable at ${viewport.width}x${viewport.height}`, async ({ browser, baseURL }, testInfo) => {
+    const context = await browser.newContext({ baseURL, viewport, isMobile: true, hasTouch: true });
+    try {
+      await context.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//, route => route.abort());
+      const mobile = await context.newPage();
+      await mobile.goto('./');
+      await mobile.locator('.opts summary').tap();
+      await mobile.locator('#manualW').tap();
+      await expect(mobile.locator('#manualW')).toBeChecked();
+      await mobile.locator('#addSpMod').tap();
+      await expect(mobile.locator('.sprow')).toHaveCount(1);
+
+      // Scrolling must expose an actionable component button while options stay open.
+      const change = mobile.locator('[data-pick="bridge"]');
+      await change.scrollIntoViewIfNeeded();
+      await change.tap({ timeout: 5000 });
+      await expect(mobile.locator('#picker')).toBeVisible();
+      await mobile.locator('[data-comp="armoured_bridge"] [data-add]').tap();
+      await expect(mobile.locator('#picker')).toBeHidden();
+      expect(await mobile.evaluate(() => Store.build.essentials.bridge)).toBe('armoured_bridge');
+      await mobile.screenshot({ path: testInfo.outputPath('short-screen-component.png') });
+
+      // Returning to the expanded header must keep its lower controls reachable too.
+      await mobile.locator('.sprow .cause').tap();
+      await mobile.locator('.sprow .cause').fill('GM grant');
+      await mobile.locator('.sprow .cause').blur();
+      await mobile.locator('.sprow .val').tap();
+      await mobile.locator('.sprow .val').fill('5');
+      await mobile.locator('.sprow .val').blur();
+      expect(await mobile.evaluate(() => Store.build.spMods[0])).toMatchObject({ cause: 'GM grant', value: 5 });
+      await mobile.locator('#addSpMod').tap();
+      await expect(mobile.locator('.sprow')).toHaveCount(2);
+      await mobile.locator('[data-rmspmod]').last().tap();
+      await expect(mobile.locator('.sprow')).toHaveCount(1);
+      await mobile.screenshot({ path: testInfo.outputPath('short-screen-options.png') });
+      await mobile.locator('.opts summary').tap();
+      await expect(mobile.locator('.opts')).not.toHaveAttribute('open');
+    } finally {
+      await context.close();
+    }
+  });
+}
+
 for (const width of [320, 390, 640, 1280]) {
   test(`F8 keeps editor controls within ${width}px across expanded and modal states`, async ({ page }, testInfo) => {
     await page.setViewportSize({ width, height: 1000 });
