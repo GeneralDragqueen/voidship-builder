@@ -1,5 +1,9 @@
-<title>Voidship Builder</title>
+<!doctype html>
+<html lang="en">
+<head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voidship Builder</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=EB+Garamond:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
 :root{
@@ -54,9 +58,16 @@ h3{font:600 11px/1.3 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.1em;
 .hdr{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--rule);padding:10px 16px 8px}
 .hdr .row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
 .hdr .row+.row{margin-top:8px}
-.field{display:flex;align-items:center;gap:6px}
+.hdr .identity{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 10px;min-width:0;max-width:100%}
+.hdr .tools{margin-left:auto;display:flex;flex-wrap:wrap;gap:6px}
+.field{display:flex;align-items:center;gap:6px;min-width:0;max-width:100%}
+.hdr .field select{min-width:0;max-width:100%;flex:1;overflow:hidden;text-overflow:ellipsis}
+.hdr .field>button{flex-shrink:0}
+.hdr .warrant-fields,.spmods>.field{flex-wrap:wrap}
+.spmods>.field{overflow-wrap:anywhere}
+.hdr .warrant-fields>select{flex:0 1 auto}
 .field label,.field .flabel{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
-#buildName{font:600 20px/1.1 "Cormorant Garamond",Georgia,serif;width:240px;background:transparent;border:1px solid transparent;border-bottom:1px dashed var(--rule-strong);border-radius:3px 3px 0 0;padding:2px 6px}
+#buildName{font:600 20px/1.1 "Cormorant Garamond",Georgia,serif;width:240px;min-width:0;max-width:100%;background:transparent;border:1px solid transparent;border-bottom:1px dashed var(--rule-strong);border-radius:3px 3px 0 0;padding:2px 6px}
 #buildName:hover,#buildName:focus{border-color:var(--rule-strong);border-bottom-style:solid;background:var(--panel)}
 .meters{display:grid;grid-template-columns:repeat(3,minmax(150px,1fr)) minmax(150px,auto) auto;gap:14px;align-items:end}
 @media (max-width:900px){.meters{grid-template-columns:repeat(2,1fr)}}
@@ -75,19 +86,23 @@ details.opts{font-size:12.5px}
 details.opts summary{cursor:pointer;color:var(--ink-3);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 0}
 details.opts .row{margin-top:6px}
 .sprow{display:flex;gap:6px;align-items:center;margin-top:4px}
-.sprow .cause{flex:1;max-width:360px}
-.sprow .val{width:64px;text-align:right}
+.sprow .cause{flex:1;min-width:0;max-width:360px}
+.sprow .val{flex:0 0 64px;width:64px;min-width:0;text-align:right}
 
 /* layout */
 .app{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;padding:14px 16px 60px;max-width:1240px;margin:0 auto}
-@media (max-width:860px){.app{grid-template-columns:1fr}}
-.panel{background:var(--panel);border:1px solid var(--rule);border-radius:4px}
+@media (max-width:860px){.app{grid-template-columns:minmax(0,1fr)}}
+.panel{min-width:0;background:var(--panel);border:1px solid var(--rule);border-radius:4px}
 .panel .body{padding:12px 14px}
+.app .body{min-width:0;overflow-wrap:anywhere}
+.app input[type=text],.app textarea{min-width:0;max-width:100%}
+.app .ledger{grid-template-columns:repeat(auto-fill,minmax(min(210px,100%),1fr))}
 
 /* stats */
 .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
 .stat{background:var(--panel-2);border:1px solid var(--rule-soft);border-radius:3px;padding:7px 9px}
 .stat .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.stat[data-stat="man"] .k{letter-spacing:0}
 .stat .v{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:22px;font-weight:600;line-height:1.2}
 .stat .v small{font-size:11px;font-weight:500;color:var(--ink-2)}
 .stat .parts{font-size:11px;color:var(--ink-3);margin-top:2px}
@@ -137,7 +152,8 @@ details.sec>summary .cnt{font-weight:400;color:var(--ink-3)}
 .issue.error{border-left-color:var(--bad)}.issue.warn{border-left-color:var(--warn)}.issue.info{border-left-color:var(--ink-3)}
 .issue .code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
 .blist{display:grid;gap:4px}
-.brow{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;padding:5px 6px;border:1px solid var(--rule-soft);border-radius:3px;font-size:13px}
+.brow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;padding:5px 6px;border:1px solid var(--rule-soft);border-radius:3px;font-size:13px}
+.brow [data-load]{max-width:100%;overflow-wrap:anywhere;text-align:left}
 .brow.active{border-color:var(--brass);background:var(--brass-soft)}
 .brow .meta{font-size:11px;color:var(--ink-3)}
 .actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -147,7 +163,7 @@ details.sec>summary .cnt{font-weight:400;color:var(--ink-3)}
 .savestate.bad{color:var(--bad);font-weight:600}
 .legal{margin:14px 0 0;font-size:11px;color:var(--ink-3);line-height:1.5}
 .share input{width:100%;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px}
-.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:7px 14px;border-radius:4px;font-size:13px;z-index:60;opacity:0;transition:opacity .2s}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);max-width:calc(100vw - 32px);overflow-wrap:anywhere;background:var(--ink);color:var(--bg);padding:7px 14px;border-radius:4px;font-size:13px;z-index:60;opacity:0;transition:opacity .2s}
 .toast.on{opacity:1}
 dialog{background:var(--panel);color:var(--ink);border:1px solid var(--rule);border-radius:4px;padding:0}
 dialog::backdrop{background:rgba(0,0,0,.45)}
@@ -170,16 +186,36 @@ kbd{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;border:1px
 .prow:hover,.prow:focus-within{background:var(--panel-2)}
 .prow.cur{background:var(--sel)}
 .prow.na{opacity:.6}
-.prow .nm{font-weight:600}
+.prow .nm{font-weight:600;overflow-wrap:anywhere}
 .prow .nm .pg{font-weight:400;color:var(--ink-3);font-size:11px;margin-left:4px}
 .prow .fx{grid-column:1;font-size:12px}
 .prow .btns{grid-row:1/3;grid-column:2;display:flex;gap:6px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
 .prow .txt{grid-column:1/-1;font-size:12.5px;line-height:1.5;color:var(--ink-2);border-left:2px solid var(--rule);padding-left:8px;margin-top:3px}
 .prow .txt b{color:var(--ink)}
-.pk-foot{padding:8px 16px;border-top:1px solid var(--rule);display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--ink-3);align-items:center}
+.pk-foot{padding:8px 16px;border-top:1px solid var(--rule);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--ink-3);align-items:center}
+.cmp{min-width:560px}
+.cmp th,.cmp td{min-width:140px}
+.cmp th.n{white-space:normal;overflow-wrap:anywhere}
 .cmp th.anchor{color:var(--brass)}
 .cmp td.best{font-weight:600;color:var(--good)}
 .cmp .d{font-size:11px;margin-left:4px}
+@media screen and (max-width:600px){
+  .hdr .identity,.hdr>.row>.field{width:100%}
+  .hdr .identity #buildName{flex:1 1 180px;width:auto}
+  .hdr .tools{margin-left:0}
+  .hdr .meters{gap:8px 14px}
+  .hdr .meter{min-width:0}
+  .app .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .app .sechead,.app .ghead{flex-wrap:wrap}
+  .app .lrow{grid-template-columns:minmax(0,1fr) auto}
+  .app .lrow .cat{grid-column:1/-1}
+  .app .lrow .nm,.app .lrow .fxs{grid-column:1}
+  .app .lrow .btns{grid-column:2;grid-row:2/4}
+  .app .lrow .chip{white-space:normal;overflow-wrap:anywhere}
+  .prow{grid-template-columns:minmax(0,1fr)}
+  .prow .btns{grid-column:1;grid-row:auto;justify-content:flex-start}
+  .prow .chip{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+}
 
 /* export & print */
 #export{width:min(900px,96vw);max-height:92vh;display:none;flex-direction:column;overflow:hidden}
@@ -289,7 +325,8 @@ body[data-print="1"] #printsheet{display:block}
 }
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
-
+</head>
+<body>
 <header class="hdr" id="hdr"></header>
 <div class="app">
   <main class="panel" id="sheet"><div class="body"></div></main>
@@ -609,7 +646,7 @@ const Derive=(()=>{
     const spirit=b.spirit?SPIRIT[b.spirit]:null, history=b.history?HISTORY[b.history]:null;
     if(spirit){applyMods('Machine Spirit: '+spirit.name,spirit.mods); spirit.text.forEach(t=>texts.push({src:'Machine Spirit: '+spirit.name,...t}));}
     if(history){applyMods('Past History: '+history.name,history.mods); history.text.forEach(t=>texts.push({src:'Past History: '+history.name,...t}));}
-    const ghost=rows.some(r=>r.comp.id==='ghost_field'&&r.variant);
+    const ghost=rows.some(r=>r.comp?.id==='ghost_field'&&r.variant);
     // weapons
     const weapons=rows.filter(r=>r.kind==='supp'&&r.comp.weapon).map(r=>{const w=r.comp.weapon; const bonus=w.dmg.bonus+(w.kind==='macrobattery'?macroDmg:0);
       return {uid:r.uid,name:r.comp.name,slot:r.slot,kind:w.kind,str:w.str,dmg:`${w.dmg.dice}+${bonus}`,crit:w.crit,range:w.range,notes:(w.kind==='macrobattery'&&macroDmg?['+'+macroDmg+' Munitorium']:[]),available:!!r.variant};});
@@ -644,7 +681,7 @@ const Derive=(()=>{
     for(const [id,n] of Object.entries(counts)) if(COMP[id]?.once && n>1) issue('error','once',`${COMP[id].name} may only be installed once`,id);
     // tech gating
     for(const tech of ['archeotech','xenotech']){
-      const installed=rows.filter(r=>r.comp.tech===tech&&r.kind!=='pre'); if(!installed.length) continue;
+      const installed=rows.filter(r=>r.comp?.tech===tech&&r.kind!=='pre'); if(!installed.length) continue;
       const label=tech==='archeotech'?'Archeotech':'Xeno-tech'; const need=tech==='archeotech'?'Reliquary of Mars':'Xenophilous';
       if(b.gmOverride) issue('info','gm',`${label} allowed by GM override (${installed.length} installed)`,'gm');
       else if(Rules.grantOf(b)!==tech) issue('error','gated',`${label} requires the ${need} Past History or a GM override`,installed[0].uid);
@@ -653,7 +690,7 @@ const Derive=(()=>{
     }
     if(ghost) issue('warn','ghost',`Ghost Field: choose Ghost Field or Void Shields at the start of each combat`,'ghost_field');
     if(loss.morale.parts.length>1 && loss.morale.value>0) issue('warn','morale_loss',`Morale losses increased by ${loss.morale.value} (${loss.morale.parts.map(p=>p.src).join(' + ')})`,'ledger');
-    rows.filter(r=>r.comp.dataNote&&r.variant&&r.comp.id==='ryza_plasma').forEach(r=>issue('info','data',`${r.comp.name}: ${r.comp.dataNote}`,r.uid));
+    rows.filter(r=>r.comp?.dataNote&&r.variant&&r.comp.id==='ryza_plasma').forEach(r=>issue('info','data',`${r.comp.name}: ${r.comp.dataNote}`,r.uid));
     if(!b.spirit) issue('warn','no_spirit','No Machine Spirit Oddity: roll or pick one (Table 8-1)','spirit');
     if(!b.history) issue('warn','no_history','No Past History: roll or pick one (Table 8-2)','history');
     const order={error:0,warn:1,info:2}; issues.sort((x,y)=>order[x.level]-order[y.level]);
@@ -662,7 +699,7 @@ const Derive=(()=>{
   }
   return {derive,statKeys};
 })();
-function fmtSlot(s){ if(!s) return '—'; const [t,i]=s.split(':'); return t[0].toUpperCase()+t.slice(1)+' '+(+i+1); }
+function fmtSlot(s){ if(!s) return '—'; const [t,i]=s.split(':'); return (t?t[0].toUpperCase()+t.slice(1):'Unknown slot')+' '+(+i+1); }
 function sign(v){ return (v>0?'+':'')+v; }
 
 /* ========================================================================
@@ -718,29 +755,113 @@ const Actions=(()=>{
 })();
 
 const Store=(()=>{
-  let build=null; let derived=null; const undo=[]; const listeners=[];
+  let build=null; let buildId=null; let derived=null; const undo=[]; const listeners=[];
   const ui={picker:null,expanded:new Set(),compare:null,selected:new Set(),showParts:false,open:{},freeOnly:false,pendingDelete:null,importOpen:false};
-  function set(b,{record=true}={}){ if(record&&build){undo.push(build); if(undo.length>50) undo.shift();} build=b; derived=Derive.derive(build); listeners.forEach(f=>f()); }
+  function set(b,{record=true}={}){ const next=Derive.derive(b); if(record&&build){undo.push(build); if(undo.length>50) undo.shift();} build=b; derived=next; listeners.forEach(f=>f({edited:true})); }
+  function activate(id,b){
+    const next=Derive.derive(b); // Failed derivation must leave the current editor and history intact.
+    if(id!==buildId) undo.length=0;
+    buildId=id; build=b; derived=next; Persist.mem.activeId=id; Persist.save();
+    listeners.forEach(f=>f({edited:false}));
+  }
   function dispatch(a){ set(Actions.reduce(build,a)); }
-  function undoLast(){ if(!undo.length) return false; build=undo.pop(); derived=Derive.derive(build); listeners.forEach(f=>f()); return true; }
-  return {get build(){return build;},get derived(){return derived;},ui,set,dispatch,undo:undoLast,subscribe:f=>listeners.push(f),canUndo:()=>undo.length>0};
+  function undoLast(){ if(!undo.length) return false; const b=undo[undo.length-1]; const next=Derive.derive(b); undo.pop(); build=b; derived=next; listeners.forEach(f=>f({edited:true})); return true; }
+  return {get build(){return build;},get buildId(){return buildId;},get derived(){return derived;},ui,set,activate,dispatch,undo:undoLast,subscribe:f=>listeners.push(f),canUndo:()=>undo.length>0};
 })();
 
 /* ========================================================================
    PERSIST / SHARE
    ======================================================================== */
+const BuildInput=(()=>{
+  const object=o=>o!==null&&typeof o==='object'&&!Array.isArray(o);
+  const has=(o,key)=>typeof key==='string'&&Object.hasOwn(o,key);
+  function number(value,fallback){
+    if(typeof value!=='number'&&(typeof value!=='string'||!value.trim())) return fallback;
+    const n=Number(value); return Number.isFinite(n)?n:fallback;
+  }
+  function normalize(input){
+    if(!object(input)||input.v!==1||!has(DATA.HULL,input.hull)) throw new Error('Unknown build format or hull');
+    const warnings=[];
+    const collection=(value,kind,label,defaultValue)=>{ if(value===undefined) return defaultValue; if(!kind(value)) throw new Error('Invalid '+label); return value; };
+    const essentials=collection(input.essentials,object,'essentials',{});
+    const supplemental=collection(input.supplementals,Array.isArray,'supplementals',[]);
+    const warrant=collection(input.warrant,object,'warrant',{});
+    const mods=collection(input.spMods,Array.isArray,'SP adjustments',[]);
+    const e={};
+    for(const cat of DATA.ESSENTIAL_CATS){
+      const id=essentials[cat];
+      if(id!==undefined&&id!==null&&typeof id!=='string') throw new Error('Invalid component reference');
+      if(has(DATA.COMP,id)&&DATA.COMP[id].group==='essential'&&DATA.COMP[id].cat===cat) e[cat]=id;
+      else { e[cat]=null; if(id!=null) warnings.push('Unknown or misplaced component '+id); else if(!Object.hasOwn(essentials,cat)) warnings.push('Missing '+DATA.CAT[cat].name); }
+    }
+    const seen=new Set();
+    const uid=value=>{ let id=value; if(typeof id!=='string'||!/^[-\w]+$/.test(id)||seen.has(id)){ do{id=Actions.uid();}while(seen.has(id)); } seen.add(id); return id; };
+    const s=[];
+    for(const item of supplemental){
+      if(!object(item)||typeof item.id!=='string'||(item.slot!=null&&typeof item.slot!=='string')) throw new Error('Invalid supplemental component');
+      if(!has(DATA.COMP,item.id)||DATA.COMP[item.id].group==='essential'){warnings.push('Unknown or misplaced component '+item.id);continue;}
+      s.push({uid:uid(item.uid),id:item.id,...(item.slot?{slot:item.slot}:{})});
+    }
+    const spMods=mods.map(m=>{ if(!object(m)) throw new Error('Invalid SP adjustment'); return {id:uid(m.id),cause:String(m.cause??'').slice(0,80),value:number(m.value,0)}; });
+    const roll=number(warrant.roll,5);
+    const build={v:1,name:String(input.name||'Shared vessel').slice(0,80),hull:input.hull,
+      spirit:has(DATA.SPIRIT,input.spirit)?input.spirit:null,history:has(DATA.HISTORY,input.history)?input.history:null,
+      essentials:e,supplementals:s,gmOverride:!!input.gmOverride,forbiddenLoreXenos:!!input.forbiddenLoreXenos,
+      warrant:{roll:Number.isInteger(roll)&&roll>=1&&roll<=10?roll:5,pf:number(warrant.pf,40),sp:number(warrant.sp,50),manual:!!warrant.manual},
+      spMods,notes:String(input.notes??'')};
+    Derive.derive(build); // Structural safety is independent of game-rule validity.
+    return {build,warnings};
+  }
+  return {normalize,object,number};
+})();
+
 const Persist=(()=>{
-  const KEY='voidship-builder:v1'; let mem=null; let storageOk=true;
-  function load(){ try{ const raw=localStorage.getItem(KEY); if(raw){ mem=JSON.parse(raw); if(mem.version!==1) mem=null; } }catch(e){ storageOk=false; }
-    if(!mem) mem={version:1,activeId:null,order:[],prefs:{theme:'auto'},builds:{}}; return mem; }
+  const KEY='voidship-builder:v1', RECOVERY='voidship-builder:recovery:';
+  let mem=null,storageOk=true,blocked=false,recovery=null;
+  const empty=()=>({version:1,activeId:null,order:[],prefs:{theme:'auto'},builds:Object.create(null)});
+  // Ignore object-key order, but preserve the original before any normalization changes its data.
+  const canonical=value=>JSON.stringify(value,(_key,v)=>BuildInput.object(v)?Object.fromEntries(Object.keys(v).sort().map(k=>[k,v[k]])):v);
+  function load(){
+    mem=empty(); storageOk=true; blocked=false; recovery=null; let raw;
+    try{raw=localStorage.getItem(KEY);}catch(e){storageOk=false;blocked=true;return mem;}
+    if(!raw) return mem;
+    let repaired=false;
+    try{
+      const saved=JSON.parse(raw);
+      if(!BuildInput.object(saved)||saved.version!==1||!BuildInput.object(saved.builds)) throw new Error('Invalid saved-build collection');
+      const prefs=BuildInput.object(saved.prefs)?saved.prefs:{};
+      mem.prefs={theme:['auto','light','dark'].includes(prefs.theme)?prefs.theme:'auto',keys:prefs.keys!==false};
+      for(const [i,entry] of Object.entries(saved.builds)){
+        try{
+          if(!/^[-\w]+$/.test(i)||!BuildInput.object(entry)) throw new Error('Invalid saved entry');
+          const {build,warnings}=BuildInput.normalize(entry.build);
+          mem.builds[i]={id:i,name:build.name,createdAt:BuildInput.number(entry.createdAt,Date.now()),updatedAt:BuildInput.number(entry.updatedAt,Date.now()),build};
+          if(warnings.length||canonical(entry.build)!==canonical(build)) repaired=true;
+        }catch(e){repaired=true;}
+      }
+      const order=Array.isArray(saved.order)?saved.order:[];
+      mem.order=[...new Set([...order,...Object.keys(mem.builds)])].filter(i=>typeof i==='string'&&Object.hasOwn(mem.builds,i));
+      mem.activeId=typeof saved.activeId==='string'&&Object.hasOwn(mem.builds,saved.activeId)?saved.activeId:mem.order[0]||null;
+      if(JSON.stringify(order)!==JSON.stringify(mem.order)||saved.activeId!==mem.activeId||!Array.isArray(saved.order)) repaired=true;
+    }catch(e){repaired=true;}
+    if(repaired){
+      recovery={raw,key:RECOVERY+Date.now()+'-'+Math.random().toString(36).slice(2),message:'Some saved data needed recovery. Usable ships are available below; download the original data to keep a recovery copy.'};
+      try{localStorage.setItem(recovery.key,raw);}catch(e){blocked=true;storageOk=false;recovery.message='Recovered ships are available in this tab. Original storage is unchanged because a recovery copy could not be saved. Download both the original data and a backup before closing.';}
+    }else{
+      // Keep the original recovery download reachable after a successful reload.
+      try{ const key=Object.keys(localStorage).filter(k=>k.startsWith(RECOVERY)).sort().pop(); if(key) recovery={key,raw:localStorage.getItem(key),message:'Original data from an earlier recovery is available to download.'}; }catch(e){}
+    }
+    return mem;
+  }
   let lastSaved=null;
-  function save(){ try{ localStorage.setItem(KEY,JSON.stringify(mem)); storageOk=true; lastSaved=Date.now(); }catch(e){ storageOk=false; } }
+  function save(){ if(blocked) return false; try{ localStorage.setItem(KEY,JSON.stringify(mem)); storageOk=true; lastSaved=Date.now(); return true; }catch(e){ storageOk=false; return false; } }
   const id=()=>'b'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-  function create(build){ const i=id(); mem.builds[i]={id:i,name:build.name,createdAt:Date.now(),updatedAt:Date.now(),build}; mem.order.push(i); mem.activeId=i; save(); return i; }
-  function update(i,build){ const e=mem.builds[i]; if(!e) return; e.build=build; e.name=build.name; e.updatedAt=Date.now(); save(); }
+  function create(input){ const {build}=BuildInput.normalize(input); const i=id(); mem.builds[i]={id:i,name:build.name,createdAt:Date.now(),updatedAt:Date.now(),build}; mem.order.push(i); save(); return i; }
+  function update(i,build){ const e=mem.builds[i]; if(!e) return; e.build=Actions.clone(build); e.name=build.name; e.updatedAt=Date.now(); save(); }
   function remove(i){ delete mem.builds[i]; mem.order=mem.order.filter(x=>x!==i); if(mem.activeId===i) mem.activeId=mem.order[0]||null; save(); }
   function findByCode(code){ return mem.order.find(i=>Share.encode(mem.builds[i].build)===code)||null; }
-  return {load,save,create,update,remove,findByCode,get mem(){return mem;},get ok(){return storageOk;},get lastSaved(){return lastSaved;}};
+  function downloadRecovery(){ if(!recovery) return; const url=URL.createObjectURL(new Blob([recovery.raw],{type:'application/json'})); const a=document.createElement('a'); a.href=url; a.download='voidship-original-storage.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000); }
+  return {load,save,create,update,remove,findByCode,downloadRecovery,get mem(){return mem;},get recovery(){return recovery;},get blocked(){return blocked;},get ok(){return storageOk;},get lastSaved(){return lastSaved;}};
 })();
 
 const Share=(()=>{
@@ -748,12 +869,12 @@ const Share=(()=>{
   const unb64=s=>decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'/'))));
   function encode(b){ const o={v:1,n:b.name,h:b.hull,ms:b.spirit,ph:b.history,e:b.essentials,s:b.supplementals.map(x=>[x.id,x.slot||null]),g:b.gmOverride?1:0,fl:b.forbiddenLoreXenos?1:0,w:[b.warrant.roll,b.warrant.pf,b.warrant.sp,b.warrant.manual?1:0],sm:(b.spMods||[]).map(m=>[m.cause||'',+m.value||0]),no:b.notes||''}; return b64(JSON.stringify(o)); }
   function decode(code){
-    const o=JSON.parse(unb64(code)); if(o.v!==1||!DATA.HULL[o.h]) throw new Error('unknown format');
-    const warnings=[]; const e={}; for(const cat of DATA.ESSENTIAL_CATS){ const id=o.e?.[cat]; if(id&&DATA.COMP[id]) e[cat]=id; else {e[cat]=null; if(id) warnings.push('Unknown component '+id);} }
-    const s=(o.s||[]).filter(([id])=>{ if(DATA.COMP[id]) return true; warnings.push('Unknown component '+id); return false; }).map(([id,slot])=>({uid:Actions.uid(),id,slot:slot||undefined}));
-    const b={v:1,name:String(o.n||'Shared vessel').slice(0,80),hull:o.h,spirit:DATA.SPIRIT[o.ms]?o.ms:null,history:DATA.HISTORY[o.ph]?o.ph:null,essentials:e,supplementals:s,gmOverride:!!o.g,forbiddenLoreXenos:!!o.fl,
-      warrant:{roll:+o.w?.[0]||5,pf:+o.w?.[1]||40,sp:+o.w?.[2]||50,manual:!!o.w?.[3]},spMods:(Array.isArray(o.sm)?o.sm:[]).map(([c,v])=>({id:Actions.uid(),cause:String(c||'').slice(0,80),value:+v||0})),notes:String(o.no||'')};
-    return {build:b,warnings};
+    const o=JSON.parse(unb64(code)); if(!BuildInput.object(o)) throw new Error('Unknown share format');
+    for(const k of ['s','w','sm']) if(o[k]!==undefined&&!Array.isArray(o[k])) throw new Error('Invalid '+k);
+    const s=(o.s||[]).map(t=>{ if(!Array.isArray(t)||t.length<1||t.length>2) throw new Error('Invalid component tuple'); return {id:t[0],slot:t[1]}; });
+    const sm=(o.sm||[]).map(t=>{ if(!Array.isArray(t)||t.length!==2) throw new Error('Invalid adjustment tuple'); return {cause:t[0],value:t[1]}; });
+    return BuildInput.normalize({v:o.v,name:o.n,hull:o.h,spirit:o.ms,history:o.ph,essentials:o.e,supplementals:s,gmOverride:o.g,forbiddenLoreXenos:o.fl,
+      warrant:{roll:o.w?.[0],pf:o.w?.[1],sp:o.w?.[2],manual:o.w?.[3]},spMods:sm,notes:o.no});
   }
   return {encode,decode};
 })();
@@ -762,13 +883,22 @@ const Share=(()=>{
    BACKUP — every build in one code or file, restorable on any device
    ======================================================================== */
 const Backup=(()=>{
-  function payload(){ const mem=Persist.mem; return {v:1,app:'voidship-builder',at:new Date().toISOString(),builds:mem.order.map(i=>({name:mem.builds[i].name,code:Share.encode(mem.builds[i].build)}))}; }
+  function payload(){ App.flushSave(); const mem=Persist.mem; return {v:1,app:'voidship-builder',at:new Date().toISOString(),builds:mem.order.map(i=>({name:mem.builds[i].name,code:Share.encode(mem.builds[i].build)}))}; }
   const b64=s=>btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   const unb64=s=>decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'/'))));
   function encode(){ return 'VSB1.'+b64(JSON.stringify(payload())); }
   function json(){ return JSON.stringify(payload(),null,2); }
-  function parse(text){ let t=String(text||'').trim(); if(!t) throw new Error('empty'); let o; if(t.startsWith('VSB1.')) o=JSON.parse(unb64(t.slice(5))); else o=JSON.parse(t); if(!o||o.app!=='voidship-builder'||!Array.isArray(o.builds)) throw new Error('not a backup'); return o; }
-  function restore(text){ const o=parse(text); let added=0,skipped=0,bad=0; for(const b of o.builds){ try{ if(Persist.findByCode(b.code)){skipped++;continue;} const {build}=Share.decode(b.code); if(b.name) build.name=String(b.name).slice(0,80); Persist.create(build); added++; }catch(e){ bad++; } } return {added,skipped,bad,total:o.builds.length}; }
+  function parse(text){ let t=String(text||'').trim(); if(!t) throw new Error('empty'); let o; if(t.startsWith('VSB1.')) o=JSON.parse(unb64(t.slice(5))); else o=JSON.parse(t); if(!o||o.v!==1||o.app!=='voidship-builder'||!Array.isArray(o.builds)) throw new Error('not a backup'); return o; }
+  function restore(text){
+    const o=parse(text); App.flushSave(); let added=0,skipped=0,bad=0,lastId=null; const warnings=[];
+    for(const b of o.builds){ try{
+      if(!BuildInput.object(b)||typeof b.code!=='string') throw new Error('Invalid backup entry');
+      const decoded=Share.decode(b.code),build=decoded.build; if(b.name) build.name=String(b.name).slice(0,80);
+      if(Persist.findByCode(Share.encode(build))){skipped++;continue;}
+      lastId=Persist.create(build); added++; warnings.push(...decoded.warnings);
+    }catch(e){bad++;} }
+    return {added,skipped,bad,total:o.builds.length,lastId,warnings};
+  }
   async function download(){ const name='voidship-builds-'+new Date().toISOString().slice(0,10)+'.json'; const data=json();
     let dl=null; try{ dl=window.claude?.use?await window.claude.use('downloads'):null; }catch(e){ dl=null; }
     if(dl){ try{ await dl.save({filename:name,data}); toast('Backup saved'); return; }catch(e){ if(e&&e.code==='declined') return; } }
@@ -821,11 +951,11 @@ const Render=(()=>{
     const b=Store.build,d=Store.derived; const w=b.warrant; const theme=Persist.mem.prefs.theme||'auto';
     $('#hdr').innerHTML=`
       <div class="row">
-        <div style="display:flex;align-items:baseline;gap:10px"><h1>Voidship Builder</h1><input id="buildName" type="text" value="${esc(b.name)}" aria-label="Build name"></div>
+        <div class="identity"><h1>Voidship Builder</h1><input id="buildName" type="text" value="${esc(b.name)}" aria-label="Build name"></div>
         <div class="field"><label for="hullSel">Hull</label><select id="hullSel">${HULLS.map(h=>`<option value="${h.id}" ${h.id===b.hull?'selected':''}>${esc(h.name)} (${CLASS_NAME[h.cls]}, ${h.sp} SP)</option>`).join('')}</select></div>
         <div class="field"><label for="spiritSel">Machine Spirit</label><select id="spiritSel"><option value="">— none —</option>${SPIRITS.map(s=>`<option value="${s.id}" ${s.id===b.spirit?'selected':''}>${s.roll}. ${esc(s.name)}</option>`).join('')}</select><button class="small" id="rollSpirit" title="Roll d10">d10</button></div>
         <div class="field"><label for="historySel">Past History</label><select id="historySel"><option value="">— none —</option>${HISTORIES.map(s=>`<option value="${s.id}" ${s.id===b.history?'selected':''}>${s.roll}. ${esc(s.name)}</option>`).join('')}</select><button class="small" id="rollHistory" title="Roll d10">d10</button></div>
-        <div style="margin-left:auto;display:flex;gap:6px"><button class="small primary" id="exportBtn" title="Export dossier (e)">Export</button><button class="small" id="undoBtn" ${Store.canUndo()?'':'disabled'} title="Undo last change (Ctrl+Z)">Undo</button><button class="small" id="themeBtn" title="Cycle theme: auto, light, dark" aria-label="Theme: ${theme}. Change theme">Theme: ${theme}</button><button class="small" id="helpBtn" title="Help and keyboard shortcuts (?)" aria-label="Help">?</button></div>
+        <div class="tools"><button class="small primary" id="exportBtn" title="Export dossier (e)">Export</button><button class="small" id="undoBtn" ${Store.canUndo()?'':'disabled'} title="Undo last change (Ctrl+Z)">Undo</button><button class="small" id="themeBtn" title="Cycle theme: auto, light, dark" aria-label="Theme: ${theme}. Change theme">Theme: ${theme}</button><button class="small" id="helpBtn" title="Help and keyboard shortcuts (?)" aria-label="Help">?</button></div>
       </div>
       <div class="row meters">
         ${meter('power',d.budgets.power.used,d.budgets.power.gen,'Power',d.budgets.power.used>d.budgets.power.gen)}
@@ -836,7 +966,7 @@ const Render=(()=>{
       </div>
       <details class="opts" ${b.warrant.manual||b.gmOverride||b.forbiddenLoreXenos||(b.spMods||[]).length?'open':''}><summary>Warrant &amp; options</summary>
         <div class="row">
-          <div class="field"><label for="warrantSel">Warrant roll</label><select id="warrantSel" ${w.manual?'disabled':''}>${[1,2,3,4,5,6,7,8,9,10].map(r=>{const x=Rules.pfRow(r);return `<option value="${r}" ${r===w.roll?'selected':''}>Roll ${r}: PF ${x.pf} / SP ${x.sp}</option>`;}).join('')}</select><button class="small" id="rollWarrant" title="Roll d10 on Table 1-5">d10</button>
+          <div class="field warrant-fields"><label for="warrantSel">Warrant roll</label><select id="warrantSel" ${w.manual?'disabled':''}>${[1,2,3,4,5,6,7,8,9,10].map(r=>{const x=Rules.pfRow(r);return `<option value="${r}" ${r===w.roll?'selected':''}>Roll ${r}: PF ${x.pf} / SP ${x.sp}</option>`;}).join('')}</select><button class="small" id="rollWarrant" title="Roll d10 on Table 1-5">d10</button>
             <label for="manualW" style="display:flex;gap:4px;align-items:center;text-transform:none;letter-spacing:0"><input type="checkbox" id="manualW" ${w.manual?'checked':''}> manual</label>
             ${w.manual?`<span class="field"><label for="pfIn">PF</label><input type="text" id="pfIn" class="n" size="3" value="${w.pf}"><label for="spIn">SP</label><input type="text" id="spIn" class="n" size="3" value="${w.sp}"></span>`:''}</div>
           <label class="field" for="gmChk" style="gap:5px"><input type="checkbox" id="gmChk" ${b.gmOverride?'checked':''}> <span>GM override: unlock Archeotech / Xeno-tech</span></label>
@@ -943,6 +1073,7 @@ const Render=(()=>{
         <span style="display:flex;gap:3px">${ui.pendingDelete===id?`<button class="small" style="border-color:var(--bad);color:var(--bad)" data-del="${id}">Delete?</button><button class="small" data-undel="${id}">Keep</button>`:`<button class="small" data-dup="${id}" title="Duplicate" aria-label="Duplicate ${esc(e.name)}">⧉</button><button class="small" data-del="${id}" title="Delete" aria-label="Delete ${esc(e.name)}">✕</button>`}</span></div>`;}).join('');
     $('#aside .body').innerHTML=`
       <div class="banner">${Persist.ok?'':'Browser storage is unavailable here; builds live only in this tab. Use share codes to keep them.'}</div>
+      ${Persist.recovery?`<div class="banner" id="recoveryNotice" role="status">${esc(Persist.recovery.message)} <button class="small" id="recoveryDownload">Download original data</button></div>`:''}
       <h3 id="issues" style="margin-top:0">Issues</h3>
       <div aria-live="polite">${d.issues.map(i=>`<div class="issue ${i.level}" data-ref="${esc(i.ref||'')}"><span class="code">${i.level}</span> ${esc(i.msg)}</div>`).join('')||'<div class="issue info">No issues. Ship is ready to sail.</div>'}</div>
       <h3>Builds</h3>
@@ -965,12 +1096,13 @@ const Render=(()=>{
     $('#newBuild').addEventListener('click',()=>App.newBuild());
     $('#bkCode').addEventListener('click',()=>App.copy(Backup.encode(),'Backup code copied ('+Persist.mem.order.length+' builds)'));
     $('#bkFile').addEventListener('click',()=>Backup.download());
+    $('#recoveryDownload')?.addEventListener('click',()=>Persist.downloadRecovery());
     $('#bkRestore').addEventListener('click',()=>{ui.restoreOpen=!ui.restoreOpen;aside(); if(ui.restoreOpen) $('#bkIn')?.focus();});
-    const doRestore=text=>{ try{ const r=Backup.restore(text); ui.restoreOpen=false; toast(`Restored ${r.added} build${r.added===1?'':'s'}${r.skipped?', '+r.skipped+' already present':''}${r.bad?', '+r.bad+' unreadable':''}`); if(r.added&&Persist.mem.activeId) App.loadBuild(Persist.mem.activeId); else aside(); }catch(e){ toast('That backup could not be read'); } };
+    const doRestore=text=>{ try{ const r=App.restoreBackup(text); ui.restoreOpen=false; aside(); toast(`Restored ${r.added} build${r.added===1?'':'s'}${r.skipped?', '+r.skipped+' already present':''}${r.bad?', '+r.bad+' unreadable':''}${r.warnings.length?'; '+r.warnings.join('; '):''}`); }catch(e){ toast('That backup could not be read'); } };
     $('#bkGo')?.addEventListener('click',()=>doRestore($('#bkIn').value));
     $('#bkIn')?.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); doRestore(e.target.value); } });
     $('#bkFileIn')?.addEventListener('change',e=>{ const f=e.target.files?.[0]; if(!f) return; f.text().then(doRestore); });
-    $('#cmpBtn').addEventListener('click',()=>{ui.compare=[...ui.selected];sheet();aside();});
+    $('#cmpBtn').addEventListener('click',()=>{App.flushSave();ui.compare=[...ui.selected];sheet();aside();});
     $('#backBtn')?.addEventListener('click',()=>{ui.compare=null;sheet();aside();});
     $('#copyCode').addEventListener('click',()=>App.copy($('#shareCode').value,'Share code copied'));
     $('#copyLink').addEventListener('click',()=>App.copy(location.href.split('#')[0]+'#b='+$('#shareCode').value,'Link copied'));
@@ -1096,9 +1228,9 @@ const Compare=(()=>{
       return `<tr><td>${esc(label)}</td>${vals.map((v,i)=>{const delta=numeric&&i!==ai?nums[i]-nums[ai]:0; const cls=numeric&&nums[i]===best&&new Set(nums).size>1?'best':'';
         return `<td class="n ${cls}">${fmt(v)}${delta?`<span class="d ${(delta>0)===higherBetter?'good':'bad'}">${sign(delta)}</span>`:''}</td>`;}).join('')}</tr>`;};
     const st=k=>x=>x.d.stats[k].value;
-    const compList=x=>[...x.d.rows.filter(r=>r.kind!=='pre').map(r=>r.comp?.name||'?')];
-    const common=compList(ds[0]).filter(n=>ds.every(x=>compList(x).includes(n)));
-    const diffRow=`<tr><td>Components not shared</td>${ds.map(x=>{const mine=compList(x); const only=mine.filter(n=>!common.includes(n)); const counts={}; only.forEach(n=>counts[n]=(counts[n]||0)+1); return `<td style="font-size:12px">${Object.entries(counts).map(([n,c])=>esc(n)+(c>1?' ×'+c:'')).join('<br>')||'<span class="muted">—</span>'}</td>`;}).join('')}</tr>`;
+    const quantities=ds.map(x=>{const counts=new Map(); x.d.rows.filter(r=>r.kind!=='pre'&&r.comp).forEach(r=>counts.set(r.comp.id,(counts.get(r.comp.id)||0)+1)); return counts;});
+    const shared=new Map([...quantities[0]].map(([id,count])=>[id,Math.min(count,...quantities.slice(1).map(counts=>counts.get(id)||0))]));
+    const diffRow=`<tr><td>Components not shared</td>${quantities.map(counts=>{const excess=[...counts].map(([id,count])=>[id,count-(shared.get(id)||0)]).filter(([,count])=>count>0); return `<td style="font-size:12px">${excess.map(([id,count])=>esc(DATA.COMP[id].name)+(count>1?' ×'+count:'')).join('<br>')||'<span class="muted">—</span>'}</td>`;}).join('')}</tr>`;
     $('#sheet .body').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px"><h2>Compare builds</h2><span class="muted" style="font-size:12px">Deltas are relative to the anchor column; click a header to re-anchor.</span></div>
       <div class="tblwrap"><table class="cmp"><thead><tr><th></th>${ds.map((x,i)=>`<th class="n ${i===ai?'anchor':''}" style="cursor:pointer" data-anchor="${x.id}">${esc(x.name)}${i===ai?' ⚓':''}<br><span class="muted" style="text-transform:none;letter-spacing:0">${esc(x.d.hull.name)}</span></th>`).join('')}</tr></thead><tbody>
       ${row('Valid',x=>x.d.valid?'yes':x.d.errors+' errors',{numeric:false})}
@@ -1196,15 +1328,92 @@ const Export=(()=>{
     return L.join('\n');
   }
   function chunks(md,limit=1900){
-    const paras=md.split('\n\n'); const parts=[]; let cur=''; let openFence=false;
-    const fences=t=>(t.match(/^```/gm)||[]).length%2===1;
-    const flush=()=>{ if(!cur) return; if(openFence) cur+='\n```'; parts.push(cur); cur=openFence?'```\n':''; };
-    const add=p=>{ const cand=cur?cur+'\n\n'+p:p; if(cand.length>limit&&cur){ flush(); const c2=cur?cur+p:p; if(c2.length>limit){ addLines(p); } else { cur=c2; openFence=fences(cur);} } else { cur=cand; openFence=fences(cur);} };
-    const addLines=p=>{ for(const line of p.split('\n')){ const cand=cur?cur+'\n'+line:line; if(cand.length>limit){ flush(); cur=(cur?cur:'')+line; } else cur=cand; openFence=fences(cur);} };
-    for(const p of paras){ if(p.length>limit) addLines(p); else add(p); }
-    if(cur) parts.push(cur);
-    if(parts.length>1) return parts.map((p,i)=>p+`\n_(part ${i+1}/${parts.length})_`);
-    return parts;
+    if(!Number.isInteger(limit)||limit<1) throw new RangeError('Message limit must be a positive integer');
+    if(md.length<=limit) return md?[md]:[];
+    const footer=(i,n)=>`\n_(part ${i}/${n})_`;
+    const safeEnd=(text,end)=>end>0&&end<text.length&&/[\uD800-\uDBFF]/.test(text[end-1])&&/[\uDC00-\uDFFF]/.test(text[end])?end-1:end;
+    // Oversized fence syntax cannot be repeated inside a bounded message. Keep
+    // that Markdown as literal, reconstructable fragments instead of aborting.
+    function literalText(text,budget,atomic){
+      const parts=[],heading='Markdown text fragment (join in order):\n';
+      const capacity=budget-heading.length-8;
+      if(capacity<2) throw new RangeError('Message limit is too small for code formatting');
+      const add=source=>{
+        for(let offset=0;offset<source.length;){
+          const end=safeEnd(source,Math.min(source.length,offset+capacity)),slice=source.slice(offset,end);
+          const choices=['```','~~~'].map(marker=>{
+            const collision=(marker==='```'?/^ {0,3}`{3,}/m:/^ {0,3}~{3,}/m).exec(slice);
+            return {marker,end:collision?offset+collision.index:end};
+          }).sort((a,b)=>b.end-a.end);
+          const choice=choices[0];
+          parts.push(heading+choice.marker+'\n'+source.slice(offset,choice.end)+'\n'+choice.marker); offset=choice.end;
+        }
+      };
+      let offset=0;
+      for(const range of atomic){add(text.slice(offset,range.start)); parts.push(text.slice(range.start,range.end)); offset=range.end;}
+      add(text.slice(offset)); return parts;
+    }
+    // Consume original slices verbatim; only fence continuations and numbering are added.
+    function splitText(text,budget,atomic=[]){
+      const events=[]; let fence=null; const pattern=/^ {0,3}(`{3,}|~{3,})([^\n]*)(?:\n|$)/gm; let match;
+      while((match=pattern.exec(text))){
+        const marker=match[1];
+        if(fence){ if(marker[0]!==fence.marker[0]||marker.length<fence.marker.length||match[2].trim()) continue; fence=null; }
+        else { if(marker[0]==='`'&&match[2].includes('`')) continue; fence={marker,opener:match[0].replace(/\n$/,'')+'\n'}; }
+        events.push({start:match.index,end:pattern.lastIndex,after:fence});
+      }
+      const protectedRanges=[...events,...atomic];
+      const stateAt=end=>{let state=null; for(const event of events){if(event.end>end) break; state=event.after;} return state;};
+      const parts=[]; let offset=0;
+      while(offset<text.length){
+        const prefix=stateAt(offset)?.opener||'';
+        const fit=end=>{
+          for(;;){
+            const previous=end; end=safeEnd(text,end);
+            for(const range of protectedRanges) if(range.start<end&&end<range.end) end=Math.min(end,range.start);
+            const state=stateAt(end),close=state?'\n'+state.marker:'';
+            if(prefix.length+end-offset+close.length>budget) end=offset+budget-prefix.length-close.length;
+            if(end===previous) return end;
+          }
+        };
+        let end=fit(Math.min(text.length,offset+budget-prefix.length));
+        if(end<text.length){
+          const halfway=offset+Math.floor((end-offset)/2);
+          const paragraph=text.lastIndexOf('\n\n',end-2)+2, line=text.lastIndexOf('\n',end-1)+1;
+          if(paragraph>halfway) end=fit(paragraph); else if(line>halfway) end=fit(line);
+        }
+        if(end<=offset) return literalText(text,budget,atomic);
+        const state=stateAt(end); parts.push(prefix+text.slice(offset,end)+(state?'\n'+state.marker:'')); offset=end;
+      }
+      return parts;
+    }
+    function splitShare(code,budget){
+      let expected=1;
+      for(;;){
+        const heading=(i,n)=>`Share code fragment ${i}/${n} (join in order):\n\``;
+        const capacity=budget-heading(expected,expected).length-1;
+        if(capacity<2) throw new RangeError('Message limit is too small for share-code guidance');
+        const fragments=[]; for(let offset=0;offset<code.length;){const end=safeEnd(code,Math.min(code.length,offset+capacity)); fragments.push(code.slice(offset,end)); offset=end;}
+        if(fragments.length===expected) return fragments.map((part,i)=>heading(i+1,fragments.length)+part+'`');
+        expected=fragments.length;
+      }
+    }
+    // Numbering can gain a digit at 10/100 parts, so repeat with the final count.
+    let expected=2;
+    for(;;){
+      const budget=limit-footer(expected,expected).length;
+      if(budget<2) throw new RangeError('Message limit is too small for numbering');
+      const share=md.match(/(_Voidship Builder[^\n]*share code:_ )`([^`\n]+)`$/);
+      let parts;
+      if(share&&share[2].length+2>budget){
+        parts=splitText(md.slice(0,share.index+share[1].length),budget).concat(splitShare(share[2],budget));
+      } else {
+        const atomic=share?[{start:share[0].length<=budget?share.index:share.index+share[1].length,end:md.length}]:[];
+        parts=splitText(md,budget,atomic);
+      }
+      if(parts.length===expected) return parts.map((part,i)=>part+footer(i+1,parts.length));
+      expected=parts.length;
+    }
   }
   function html(ds){
     const bu=ds.budgets; const led=ds.ledgers; const spirit=ds.complications.find(c=>c.kind==='Machine Spirit Oddity'); const hist=ds.complications.find(c=>c.kind==='Past History');
@@ -1278,7 +1487,7 @@ const Export=(()=>{
    APP — boot, persistence glue, keyboard, theme
    ======================================================================== */
 const App=(()=>{
-  let saveT=null;
+  let saveT=null,pendingSave=null;
   function applyTheme(){ const t=Persist.mem.prefs.theme||'auto'; if(t==='auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme',t); }
   function cycleTheme(){ const order=['auto','light','dark']; const t=Persist.mem.prefs.theme||'auto'; Persist.mem.prefs.theme=order[(order.indexOf(t)+1)%3]; Persist.save(); applyTheme(); Render.header(); $('#themeBtn')?.focus(); toast('Theme: '+Persist.mem.prefs.theme); }
   function defaultBuild(){
@@ -1293,24 +1502,46 @@ const App=(()=>{
     b.supplementals=[{uid:Actions.uid(),id:'mars_macro',slot:'dorsal:0'},{uid:Actions.uid(),id:'mars_macro',slot:'dorsal:1'}];
     return b;
   }
-  function loadBuild(id){ const e=Persist.mem.builds[id]; if(!e) return; Persist.mem.activeId=id; Persist.save(); Store.ui.compare=null; Store.set(Actions.clone(e.build),{record:false}); }
-  function newBuild(){ const b=Actions.newBuild('New vessel'); Persist.create(b); Store.ui.compare=null; Store.set(b,{record:false}); toast('New build'); }
-  function duplicate(id){ const e=Persist.mem.builds[id]; if(!e) return; const b=Actions.clone(e.build); b.name=e.name+' (copy)'; Persist.create(b); Store.set(b,{record:false}); toast('Duplicated'); }
+  function loadBuild(id,{compare=null}={}){
+    if(!Object.hasOwn(Persist.mem.builds,id)) return;
+    flushSave(); const b=Actions.clone(Persist.mem.builds[id].build); Derive.derive(b);
+    if(Store.buildId!==id){ Preview.clear(); if(Store.ui.picker) Picker.close(); Store.ui.pendingDelete=null; }
+    Store.ui.compare=compare; Store.activate(id,b);
+  }
+  function newBuild(){ flushSave(); loadBuild(Persist.create(Actions.newBuild('New vessel'))); toast('New build'); }
+  function duplicate(id){ flushSave(); const e=Persist.mem.builds[id]; if(!e) return; const b=Actions.clone(e.build); b.name=e.name+' (copy)'; loadBuild(Persist.create(b)); toast('Duplicated'); }
   function remove(id){ const e=Persist.mem.builds[id]; if(!e) return;
     if(Store.ui.pendingDelete!==id){ Store.ui.pendingDelete=id; Render.aside(); return; }
-    Store.ui.pendingDelete=null; Persist.remove(id); Store.ui.selected.delete(id); toast('Deleted "'+e.name+'"');
-    if(Persist.mem.activeId) loadBuild(Persist.mem.activeId); else { const b=defaultBuild(); Persist.create(b); Store.set(b,{record:false}); } }
+    flushSave(); Store.ui.pendingDelete=null; Persist.remove(id); Store.ui.selected.delete(id);
+    if(Persist.mem.activeId) loadBuild(Persist.mem.activeId); else loadBuild(Persist.create(defaultBuild())); toast('Deleted "'+e.name+'"'); }
   function copy(text,msg){ (navigator.clipboard?.writeText(text)||Promise.reject()).then(()=>toast(msg)).catch(()=>{ const i=$('#shareCode'); i.value=text; i.select(); toast('Select and copy the code field'); }); }
   function importCode(){ Store.ui.importOpen=!Store.ui.importOpen; Render.aside(); if(Store.ui.importOpen) $('#importIn')?.focus(); }
   function importFrom(text){ const code=(text||'').trim(); if(!code) return; const m=code.match(/#b=([A-Za-z0-9_-]+)/); if(tryImport(m?m[1]:code)) Store.ui.importOpen=false; Render.aside(); }
-  function tryImport(code,{silent}={}){ try{ const {build,warnings}=Share.decode(code); const existing=Persist.findByCode(Share.encode(build)); if(existing){ loadBuild(existing); toast('"'+build.name+'" is already in your builds'); return true; } Persist.create(build); Store.set(build,{record:false}); toast(warnings.length?'Imported with warnings: '+warnings.join('; '):'Imported "'+build.name+'"'); return true; }catch(e){ if(!silent) toast('That code could not be read'); return false; } }
-  function persistActive(){ clearTimeout(saveT); saveT=setTimeout(()=>{ const id=Persist.mem.activeId; if(id&&Persist.mem.builds[id]) Persist.update(id,Store.build); },300); }
+  function tryImport(code,{silent}={}){ try{ const {build,warnings}=Share.decode(code); flushSave(); const existing=Persist.findByCode(Share.encode(build)); if(existing){ loadBuild(existing); toast('"'+build.name+'" is already in your builds'); return true; } loadBuild(Persist.create(build)); toast(warnings.length?'Imported with warnings: '+warnings.join('; '):'Imported "'+build.name+'"'); return true; }catch(e){ if(!silent) toast('That code could not be read'); return false; } }
+  function importComparison(codes){
+    const candidates=[]; let bad=0;
+    for(const code of codes){try{candidates.push(Share.decode(code));}catch(e){bad++;}}
+    if(candidates.length<2||candidates.length>3){toast('A comparison needs two or three readable ships');return false;}
+    flushSave(); const ids=candidates.map(({build})=>Persist.create(build));
+    Store.ui.selected=new Set(ids); loadBuild(ids[0],{compare:ids});
+    const warnings=candidates.flatMap(c=>c.warnings); if(bad||warnings.length) toast('Comparison loaded with warnings'+(bad?': '+bad+' unreadable ship(s) skipped':'')+(warnings.length?'; '+warnings.join('; '):''));
+    return true;
+  }
+  function restoreBackup(text){ const result=Backup.restore(text); if(result.lastId) loadBuild(result.lastId); return result; }
+  function flushSave(){
+    clearTimeout(saveT); saveT=null; const pending=pendingSave; pendingSave=null;
+    if(pending&&Object.hasOwn(Persist.mem.builds,pending.id)) Persist.update(pending.id,pending.build);
+  }
+  function persistActive(){
+    if(pendingSave&&pendingSave.id!==Store.buildId) flushSave();
+    clearTimeout(saveT); pendingSave={id:Store.buildId,build:Actions.clone(Store.build)}; saveT=setTimeout(flushSave,300);
+  }
   function keys(){
     document.addEventListener('keydown',e=>{
       const tag=(e.target.tagName||'').toLowerCase(); const typing=tag==='input'||tag==='textarea'||tag==='select';
       if(e.key==='Escape'){ Preview.clear(); if(Store.ui.picker){ e.preventDefault(); Picker.close(); } return; }
       if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!typing){ e.preventDefault(); if(Store.undo()) toast('Undone'); return; }
-      if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){ e.preventDefault(); clearTimeout(saveT); const id=Persist.mem.activeId; if(id) Persist.update(id,Store.build); toast(Persist.ok?'Saved':'Storage unavailable; use the share code'); return; }
+      if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){ e.preventDefault(); document.activeElement?.blur(); flushSave(); if(Store.buildId) Persist.update(Store.buildId,Store.build); toast(Persist.ok?'Saved':'Storage unavailable; use the share code'); return; }
       if(typing||Persist.mem.prefs.keys===false) return;
       if(e.key==='/'){ e.preventDefault(); if(Store.ui.picker) $('#pkSearch')?.focus(); return; }
       if(e.key==='?'){ e.preventDefault(); $('#help').showModal(); return; }
@@ -1326,18 +1557,21 @@ const App=(()=>{
     window.addEventListener('resize',syncHeaderHeight);
     const kc=$('#keysChk'); if(kc){ kc.checked=Persist.mem.prefs.keys!==false; kc.addEventListener('change',()=>{ Persist.mem.prefs.keys=kc.checked; Persist.save(); toast(kc.checked?'Single-key shortcuts on':'Single-key shortcuts off'); }); }
     const hash=location.hash;
-    Store.subscribe(()=>{ Render.all(); persistActive(); });
+    Store.subscribe(({edited})=>{ if(edited) persistActive(); Render.all(); });
+    const saveOnExit=()=>{document.activeElement?.blur();flushSave();};
+    window.addEventListener('pagehide',saveOnExit);
+    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden') saveOnExit();});
     let booted=false;
-    if(hash.startsWith('#c=')){ const codes=hash.slice(3).split(','); const ids=[]; for(const c of codes){ try{ const {build}=Share.decode(c); ids.push(Persist.create(build)); }catch(e){} } if(ids.length>=2){ Store.ui.compare=ids; ids.forEach(i=>Store.ui.selected.add(i)); Store.set(Persist.mem.builds[ids[0]].build,{record:false}); booted=true; } }
+    if(hash.startsWith('#c=')){ booted=importComparison(hash.slice(3).split(',')); }
     else if(hash.startsWith('#b=')){ booted=tryImport(hash.slice(3),{silent:true}); if(booted) toast('Loaded shared build'); }
     if(!booted){
-      if(Persist.mem.activeId&&Persist.mem.builds[Persist.mem.activeId]) Store.set(Actions.clone(Persist.mem.builds[Persist.mem.activeId].build),{record:false});
-      else { const b=defaultBuild(); Persist.create(b); Store.set(b,{record:false}); }
+      if(Persist.mem.activeId&&Persist.mem.builds[Persist.mem.activeId]) loadBuild(Persist.mem.activeId);
+      else loadBuild(Persist.create(defaultBuild()));
     }
     keys();
     if(location.search.includes('selftest')) SelfTest.run();
   }
-  return {boot,cycleTheme,loadBuild,newBuild,duplicate,remove,copy,importCode,importFrom,defaultBuild,swordTestBuild,syncHeaderHeight};
+  return {boot,cycleTheme,loadBuild,newBuild,duplicate,remove,copy,importCode,importFrom,importComparison,restoreBackup,flushSave,defaultBuild,swordTestBuild,syncHeaderHeight};
 })();
 
 /* ========================================================================
@@ -1412,3 +1646,5 @@ const SelfTest=(()=>{
 
 App.boot();
 </script>
+</body>
+</html>

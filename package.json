@@ -1,0 +1,14 @@
+{
+  "name": "voidship-builder",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "stage:site": "node tools/stage-site.mjs",
+    "test": "npm run stage:site && playwright test",
+    "test:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  }
+}
