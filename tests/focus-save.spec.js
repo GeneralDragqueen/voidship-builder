@@ -61,17 +61,18 @@ for (const trigger of ['Ctrl+S', 'Meta+S', 'hidden tab', 'pagehide']) {
 }
 
 test('saving names and repeated adjustment fields preserves the exact editor and commits each edit once', async ({ page }) => {
-  await page.evaluate(() => {
+  const adjustmentId = await page.evaluate(() => {
     Store.dispatch({ type: 'setWarrantManual', pf: 50, sp: 40 });
     Store.dispatch({ type: 'addSpMod', cause: 'First', value: 1 });
     Store.dispatch({ type: 'addSpMod', cause: 'Second', value: 2 });
+    return Store.build.spMods.at(-1).id;
   });
   const cases = [
     ['#buildName', 'Voyager', b => b.name],
     ['#pfIn', '65', b => String(b.warrant.pf)],
     ['#spIn', '55', b => String(b.warrant.sp)],
-    ['.sprow:nth-of-type(3) .cause', 'Second reason', b => b.spMods[1].cause],
-    ['.sprow:nth-of-type(3) .val', '-15', b => String(b.spMods[1].value)],
+    [`[data-spmod="${adjustmentId}"] .cause`, 'Second reason', b => b.spMods.at(-1).cause],
+    [`[data-spmod="${adjustmentId}"] .val`, '-15', b => String(b.spMods.at(-1).value)],
   ];
   for (const [selector, value, read] of cases) {
     const field = page.locator(selector);

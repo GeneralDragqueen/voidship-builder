@@ -34,13 +34,14 @@ test('missing optional SP adjustments migrate without a recovery warning or arch
 });
 
 test('a weapon deliberately left without a slot reloads without false recovery', async ({ page }) => {
-  await page.evaluate(() => {
+  const weaponUid = await page.evaluate(() => {
     const weapon = Store.build.supplementals.find(item => item.slot);
     Store.dispatch({ type: 'moveWeapon', uid: weapon.uid, slot: null });
     App.flushSave();
+    return weapon.uid;
   });
   await page.reload();
-  expect(await page.evaluate(() => Store.build.supplementals[0].slot ?? null)).toBeNull();
+  expect(await page.evaluate(uid => Store.build.supplementals.find(item => item.uid === uid).slot ?? null, weaponUid)).toBeNull();
   expect(await page.evaluate(prefix => Object.keys(localStorage).filter(key => key.startsWith(prefix)), RECOVERY)).toEqual([]);
   await expect(page.locator('#recoveryNotice')).toHaveCount(0);
 });

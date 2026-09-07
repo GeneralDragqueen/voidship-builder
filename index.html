@@ -1562,9 +1562,10 @@ const App=(()=>{
   function applyTheme(){ const t=Persist.mem.prefs.theme||'auto'; if(t==='auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme',t); }
   function cycleTheme(){ const order=['auto','light','dark']; const t=Persist.mem.prefs.theme||'auto'; Persist.mem.prefs.theme=order[(order.indexOf(t)+1)%3]; Persist.save(); applyTheme(); Render.header(); $('#themeBtn')?.focus(); toast('Theme: '+Persist.mem.prefs.theme); }
   function defaultBuild(){
-    const b=Actions.newBuild('Righteous Path'); b.hull='sword'; b.spirit='resolute'; b.history='xenophilous'; b.warrant={roll:2,pf:5,sp:80,manual:true};
+    const b=Actions.newBuild('Righteous Path'); b.hull='sword'; b.spirit='resolute'; b.history='xenophilous';
     b.essentials={plasma_drive:'jovian_2',warp_engine:'strelov_1',gellar_field:'geller_field',void_shield:'single_void_shield',bridge:'combat_bridge',life_sustainer:'vitae_life',crew_quarters:'voidsmen_quarters',auger_array:'m201_auger'};
     b.supplementals=[{uid:Actions.uid(),id:'tenebro_maze'},{uid:Actions.uid(),id:'sunsear',slot:'dorsal:0'},{uid:Actions.uid(),id:'sunsear',slot:'dorsal:1'},{uid:Actions.uid(),id:'runecaster'},{uid:Actions.uid(),id:'trophy_room'},{uid:Actions.uid(),id:'temple_shrine'}];
+    b.warrant={roll:2,pf:5,sp:80,manual:true};
     b.spMods=[{id:Actions.uid(),cause:'Regiment',value:-1},{id:Actions.uid(),cause:'Astropath',value:-2}];
     return b;
   }
@@ -1675,7 +1676,7 @@ const SelfTest=(()=>{
   function run(){
     const out=[]; const ok=(name,cond)=>out.push((cond?'PASS ':'FAIL ')+name);
     const R=(b,a)=>Actions.reduce(b,a); const D=Derive.derive; const has=(d,code)=>d.issues.some(i=>i.code===code);
-    { const db=App.defaultBuild(); const dd=D(db); ok('default Righteous Path is valid with the supplied budgets',dd.valid&&dd.budgets.sp.spent===48&&dd.budgets.sp.budget===77&&dd.pf.total===34&&dd.budgets.power.used===42&&dd.budgets.space.used===40); }
+    { const db=App.defaultBuild(); const dd=D(db); ok('default (Righteous Path) is valid with its warrant and SP adjustments',dd.valid&&dd.budgets.sp.spent===48&&dd.budgets.sp.budget===77&&dd.pf.total===34&&dd.budgets.power.used===42&&dd.budgets.space.used===40); }
     let b=App.swordTestBuild(); let d=D(b);
     ok('default power 33/45',d.budgets.power.used===33&&d.budgets.power.gen===45);
     ok('default space 31/40',d.budgets.space.used===31&&d.budgets.space.total===40);
