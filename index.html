@@ -3,38 +3,39 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=EB+Garamond:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
 :root{
-  --bg:#efe9df; --panel:#f7f3ea; --panel-2:#f1ece1; --ink:#241f1a; --ink-2:#5a5148; --ink-3:#8a7f74;
+  --bg:#efe9df; --panel:#f7f3ea; --panel-2:#f1ece1; --ink:#241f1a; --ink-2:#5a5148; --ink-3:#6c635a;
   --rule:#cfc4b4; --rule-soft:#e2d9cb; --brass:#8a5a1e; --brass-soft:#f0e2c8; --brass-ink:#5c3a10;
-  --good:#3f6b3a; --good-soft:#dfeadb; --bad:#8f3a2c; --bad-soft:#f3dcd6; --warn:#8a6a14; --warn-soft:#f3e9c9;
-  --stripe:#ebe4d7; --meter:#b58a48; --meter-over:#b0463a; --ghost:#6b4f8a; --focus:#2d5fa8; --sel:#e7dcc4;
+  --good:#3f6b3a; --good-soft:#dfeadb; --bad:#8f3a2c; --bad-soft:#f3dcd6; --warn:#7d5f10; --warn-soft:#f3e9c9;
+  --stripe:#ebe4d7; --meter:#96702e; --meter-over:#b0463a; --ghost:#6b4f8a; --focus:#2d5fa8; --sel:#e7dcc4; --rule-strong:#8a7f74; --on-brass:#fff;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#1a1714; --panel:#221e1a; --panel-2:#2a2520; --ink:#ebe3d6; --ink-2:#b9ae9f; --ink-3:#85796b;
+    --bg:#1a1714; --panel:#221e1a; --panel-2:#2a2520; --ink:#ebe3d6; --ink-2:#b9ae9f; --ink-3:#9d9184;
     --rule:#3f372f; --rule-soft:#2e2823; --brass:#d2a15a; --brass-soft:#3a2d1a; --brass-ink:#e8c48a;
     --good:#8fbf85; --good-soft:#24331f; --bad:#e08a78; --bad-soft:#3d231d; --warn:#d9b45a; --warn-soft:#3a3018;
-    --stripe:#27221d; --meter:#c9a15e; --meter-over:#d15f4f; --ghost:#b79fd8; --focus:#8fb4ee; --sel:#3a3123;
+    --stripe:#27221d; --meter:#c9a15e; --meter-over:#d15f4f; --ghost:#b79fd8; --focus:#8fb4ee; --sel:#3a3123; --rule-strong:#7a6e62; --on-brass:#1a1714;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#1a1714; --panel:#221e1a; --panel-2:#2a2520; --ink:#ebe3d6; --ink-2:#b9ae9f; --ink-3:#85796b;
+  --bg:#1a1714; --panel:#221e1a; --panel-2:#2a2520; --ink:#ebe3d6; --ink-2:#b9ae9f; --ink-3:#9d9184;
   --rule:#3f372f; --rule-soft:#2e2823; --brass:#d2a15a; --brass-soft:#3a2d1a; --brass-ink:#e8c48a;
   --good:#8fbf85; --good-soft:#24331f; --bad:#e08a78; --bad-soft:#3d231d; --warn:#d9b45a; --warn-soft:#3a3018;
-  --stripe:#27221d; --meter:#c9a15e; --meter-over:#d15f4f; --ghost:#b79fd8; --focus:#8fb4ee; --sel:#3a3123;
+  --stripe:#27221d; --meter:#c9a15e; --meter-over:#d15f4f; --ghost:#b79fd8; --focus:#8fb4ee; --sel:#3a3123; --rule-strong:#7a6e62; --on-brass:#1a1714;
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink)}
+html{scroll-padding-top:var(--hdr-h,130px)}
 body{font:14px/1.45 "IBM Plex Sans",system-ui,sans-serif}
 button,input,select,textarea{font:inherit;color:inherit}
-button{cursor:pointer;background:var(--panel);border:1px solid var(--rule);border-radius:3px;padding:4px 10px}
+button{cursor:pointer;background:var(--panel);border:1px solid var(--rule);border-radius:3px;padding:4px 10px;min-height:24px}
 button:hover{border-color:var(--brass)}
-button.primary{background:var(--brass);color:#fff;border-color:var(--brass)}
-button.small{padding:2px 8px;font-size:12px}
-button.link{border:none;background:none;padding:0;color:var(--brass);text-decoration:underline}
-button.x{border-color:transparent;color:var(--ink-3);padding:2px 7px;font-size:14px;line-height:1}
+button.primary{background:var(--brass);color:var(--on-brass);border-color:var(--brass)}
+button.small{padding:3px 8px;font-size:12px;min-height:24px}
+button.link{border:none;background:none;padding:2px 0;min-height:24px;color:var(--brass);text-decoration:underline}
+button.x{border-color:transparent;color:var(--ink-3);padding:2px 7px;min-width:24px;min-height:24px;font-size:14px;line-height:1}
 button.x:hover{color:var(--bad);border-color:var(--bad)}
 button:disabled{opacity:.5;cursor:default}
-input[type=text],select,textarea{background:var(--panel);border:1px solid var(--rule);border-radius:3px;padding:4px 7px}
+input[type=text],select,textarea{background:var(--panel);border:1px solid var(--rule-strong);border-radius:3px;padding:4px 7px;min-height:24px}
 input[type=text]:focus,select:focus,textarea:focus,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
 .mono,.n{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
 .good{color:var(--good)}.bad{color:var(--bad)}.warn{color:var(--warn)}.muted{color:var(--ink-3)}.dim{color:var(--ink-2)}
@@ -54,9 +55,9 @@ h3{font:600 11px/1.3 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.1em;
 .hdr .row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
 .hdr .row+.row{margin-top:8px}
 .field{display:flex;align-items:center;gap:6px}
-.field label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
-#buildName{font:600 20px/1.1 "Cormorant Garamond",Georgia,serif;width:240px;background:transparent;border:1px solid transparent;padding:2px 6px}
-#buildName:hover,#buildName:focus{border-color:var(--rule);background:var(--panel)}
+.field label,.field .flabel{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
+#buildName{font:600 20px/1.1 "Cormorant Garamond",Georgia,serif;width:240px;background:transparent;border:1px solid transparent;border-bottom:1px dashed var(--rule-strong);border-radius:3px 3px 0 0;padding:2px 6px}
+#buildName:hover,#buildName:focus{border-color:var(--rule-strong);border-bottom-style:solid;background:var(--panel)}
 .meters{display:grid;grid-template-columns:repeat(3,minmax(150px,1fr)) minmax(150px,auto) auto;gap:14px;align-items:end}
 @media (max-width:900px){.meters{grid-template-columns:repeat(2,1fr)}}
 .meter .lbl{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
@@ -67,11 +68,11 @@ h3{font:600 11px/1.3 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.1em;
 .meter .bar i.gh{background:repeating-linear-gradient(45deg,var(--ghost) 0 3px,transparent 3px 6px);opacity:.8}
 .ghost{font-family:"IBM Plex Mono",ui-monospace,monospace;color:var(--ghost);font-size:12px;margin-left:6px}
 .ghost:empty{display:none}
-.badge{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border-radius:3px;border:1px solid var(--rule);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;cursor:pointer;background:var(--panel)}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;min-height:24px;border-radius:3px;border:1px solid var(--rule);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;cursor:pointer;background:var(--panel)}
 .badge.err{border-color:var(--bad);color:var(--bad)}
 .badge.wrn{border-color:var(--warn);color:var(--warn)}
 details.opts{font-size:12.5px}
-details.opts summary{cursor:pointer;color:var(--ink-3);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+details.opts summary{cursor:pointer;color:var(--ink-3);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 0}
 details.opts .row{margin-top:6px}
 .sprow{display:flex;gap:6px;align-items:center;margin-top:4px}
 .sprow .cause{flex:1;max-width:360px}
@@ -86,7 +87,7 @@ details.opts .row{margin-top:6px}
 /* stats */
 .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
 .stat{background:var(--panel-2);border:1px solid var(--rule-soft);border-radius:3px;padding:7px 9px}
-.stat .k{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.stat .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
 .stat .v{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:22px;font-weight:600;line-height:1.2}
 .stat .v small{font-size:11px;font-weight:500;color:var(--ink-2)}
 .stat .parts{font-size:11px;color:var(--ink-3);margin-top:2px}
@@ -102,17 +103,17 @@ details.opts .row{margin-top:6px}
 .lrow:last-child{border-bottom:none}
 .lrow.err{box-shadow:inset 3px 0 var(--bad)}
 .lrow.empty .nm{color:var(--ink-3);font-weight:400;font-style:italic}
-.lrow .cat{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.lrow .cat{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
 .lrow .nm{font-weight:600;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
 .lrow .nm .cost{font-weight:400}
 .lrow .fxs{grid-column:2;font-size:12px}
 .lrow .btns{display:flex;gap:4px;align-items:center;grid-row:1/3;grid-column:3}
-.lrow select.slot{font-size:12px;padding:2px 4px}
+.lrow select.slot{font-size:12px;padding:2px 4px;min-height:24px}
 .tech-a{color:var(--brass)}.tech-x{color:var(--ghost)}
 
 /* tables and ledgers */
 table{border-collapse:collapse;width:100%;font-size:13px}
-th{font:500 10.5px "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:5px 7px;border-bottom:1px solid var(--rule)}
+th{font:500 11px "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:5px 7px;border-bottom:1px solid var(--rule)}
 td{padding:5px 7px;border-bottom:1px solid var(--rule-soft);vertical-align:top}
 td.n,th.n{text-align:right;white-space:nowrap}
 tbody tr:nth-child(even) td{background:var(--stripe)}
@@ -121,12 +122,12 @@ tbody tr:nth-child(even) td{background:var(--stripe)}
 .ledger div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dotted var(--rule-soft);padding:2px 0}
 .ledger .n{font-weight:600}
 .ledger .src{font-size:11px;color:var(--ink-3)}
-.texts{font-size:12.5px;color:var(--ink-2)}
+.texts{font-size:12.5px;line-height:1.5;color:var(--ink-2)}
 .texts p{margin:4px 0}
 .texts b{color:var(--ink)}
 .texts .src{color:var(--ink-3);font-size:11px;font-family:"IBM Plex Mono",ui-monospace,monospace}
 details.sec{margin-top:14px;border-top:1px solid var(--rule-soft);padding-top:6px}
-details.sec>summary{cursor:pointer;font:600 11px/1.3 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);list-style:none;display:flex;gap:8px;align-items:center}
+details.sec>summary{cursor:pointer;font:600 11px/1.3 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);list-style:none;display:flex;gap:8px;align-items:center;padding:6px 0}
 details.sec>summary::before{content:"▸";font-size:10px}
 details.sec[open]>summary::before{content:"▾"}
 details.sec>summary .cnt{font-weight:400;color:var(--ink-3)}
@@ -144,13 +145,13 @@ details.sec>summary .cnt{font-weight:400;color:var(--ink-3)}
 .banner:empty{display:none}
 .savestate{font-size:11.5px;color:var(--ink-3);margin-bottom:6px;line-height:1.35}
 .savestate.bad{color:var(--bad);font-weight:600}
-.legal{margin:14px 0 0;font-size:10.5px;color:var(--ink-3);line-height:1.4}
+.legal{margin:14px 0 0;font-size:11px;color:var(--ink-3);line-height:1.5}
 .share input{width:100%;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px}
 .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:7px 14px;border-radius:4px;font-size:13px;z-index:60;opacity:0;transition:opacity .2s}
 .toast.on{opacity:1}
 dialog{background:var(--panel);color:var(--ink);border:1px solid var(--rule);border-radius:4px;padding:0}
 dialog::backdrop{background:rgba(0,0,0,.45)}
-#help{max-width:560px;padding:16px 20px}
+#help{max-width:560px;padding:16px 20px;font-size:15px;line-height:1.5}
 kbd{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;border:1px solid var(--rule);border-bottom-width:2px;border-radius:3px;padding:0 5px;background:var(--panel-2)}
 
 /* picker */
@@ -173,7 +174,7 @@ kbd{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;border:1px
 .prow .nm .pg{font-weight:400;color:var(--ink-3);font-size:11px;margin-left:4px}
 .prow .fx{grid-column:1;font-size:12px}
 .prow .btns{grid-row:1/3;grid-column:2;display:flex;gap:6px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
-.prow .txt{grid-column:1/-1;font-size:12.5px;color:var(--ink-2);border-left:2px solid var(--rule);padding-left:8px;margin-top:3px}
+.prow .txt{grid-column:1/-1;font-size:12.5px;line-height:1.5;color:var(--ink-2);border-left:2px solid var(--rule);padding-left:8px;margin-top:3px}
 .prow .txt b{color:var(--ink)}
 .pk-foot{padding:8px 16px;border-top:1px solid var(--rule);display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--ink-3);align-items:center}
 .cmp th.anchor{color:var(--brass)}
@@ -289,17 +290,17 @@ body[data-print="1"] #printsheet{display:block}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 
-<div class="hdr" id="hdr"></div>
+<header class="hdr" id="hdr"></header>
 <div class="app">
-  <div class="panel" id="sheet"><div class="body"></div></div>
+  <main class="panel" id="sheet"><div class="body"></div></main>
   <aside class="panel" id="aside"><div class="body"></div></aside>
 </div>
 <dialog id="picker" aria-label="Component picker"></dialog>
 <dialog id="export" aria-label="Export ship dossier"></dialog>
 <div id="printsheet"></div>
-<div class="toast" id="toast"></div>
-<dialog id="help">
-  <h2>How to use</h2>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<dialog id="help" aria-labelledby="helpTitle">
+  <h2 id="helpTitle">How to use</h2>
   <p>Every category in the loadout shows what is installed. <b>Change</b> or <b>Add</b> opens a picker listing everything that fits this hull, with the items that do not fit shown below and the reason why. Hover or arrow through a row to see what it would do to your budgets and stats before you install it. <b>✕</b> removes a supplemental component; essentials are required and can only be swapped.</p>
   <p><b>Export</b> (or <kbd>e</kbd>) builds a full dossier of the ship: stats, budgets, every component with its rules text, weapons, bonuses and complications. Copy it as Discord-ready text (split into message-sized parts) or Markdown, or print it to PDF. If this viewer blocks printing or the clipboard, the text appears in a box you can select and copy by hand; the offline copy of this file prints normally.</p>
   <h2>Sources</h2>
@@ -312,6 +313,7 @@ body[data-print="1"] #printsheet{display:block}
   <p>Space comes from the hull, Power from the plasma drive, Ship Points from your Warrant roll. None may overflow at creation. Leftover Ship Points are added to your starting Profit Factor (p. 207). After creation only Space, Power and Profit Factor matter. Spare Power has no use in play under the Core rules: damage makes components unpowered but never lowers what the drive generates. Its only value is headroom for components you buy later.</p>
   <h2>Keyboard</h2>
   <p><kbd>/</kbd> search in the open picker · <kbd>↑</kbd><kbd>↓</kbd> move through picker rows (focus previews) · <kbd>Enter</kbd> install · <kbd>Esc</kbd> close · <kbd>Ctrl</kbd>+<kbd>Z</kbd> undo · <kbd>Ctrl</kbd>+<kbd>S</kbd> save now · <kbd>g</kbd> GM override · <kbd>?</kbd> this sheet</p>
+  <p><label for="keysChk" style="display:flex;gap:8px;align-items:flex-start"><input type="checkbox" id="keysChk" style="margin-top:4px"> <span>Single-key shortcuts (<kbd>/</kbd> <kbd>?</kbd> <kbd>g</kbd> <kbd>e</kbd>). Turn these off if they conflict with speech input or another tool; <kbd>Esc</kbd>, <kbd>Ctrl</kbd>+<kbd>Z</kbd> and <kbd>Ctrl</kbd>+<kbd>S</kbd> keep working.</span></label></p>
   <p style="text-align:right"><button onclick="this.closest('dialog').close()">Close</button></p>
 </dialog>
 
@@ -781,7 +783,7 @@ const Backup=(()=>{
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const $=(sel,root=document)=>root.querySelector(sel);
 const $$=(sel,root=document)=>Array.from(root.querySelectorAll(sel));
-let toastT; function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('on'),1800); }
+let toastT; function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toastT); const ms=Math.min(8000,Math.max(2500,1200+String(msg).length*45)); toastT=setTimeout(()=>t.classList.remove('on'),ms); }
 
 function modLabel(m,b){
   const v=(m.altFL!==undefined&&b?.forbiddenLoreXenos)?m.altFL:m.v; const cls=v>0?'good':v<0?'bad':'';
@@ -816,32 +818,32 @@ const Render=(()=>{
   const meter=(k,used,total,label,over)=>`<div class="meter" data-meter="${k}"><div class="lbl"><span>${label}</span><span class="val">${used}<span class="muted">/${total}</span><span class="ghost" data-ghost="m:${k}"></span></span></div>
       <div class="bar"><i class="${over?'over':''}" style="width:${total?Math.min(100,used/total*100):0}%"></i><i class="gh" data-gbar="${k}" style="width:0"></i></div></div>`;
   function header(){
-    const b=Store.build,d=Store.derived; const w=b.warrant;
+    const b=Store.build,d=Store.derived; const w=b.warrant; const theme=Persist.mem.prefs.theme||'auto';
     $('#hdr').innerHTML=`
       <div class="row">
         <div style="display:flex;align-items:baseline;gap:10px"><h1>Voidship Builder</h1><input id="buildName" type="text" value="${esc(b.name)}" aria-label="Build name"></div>
-        <div class="field"><label>Hull</label><select id="hullSel">${HULLS.map(h=>`<option value="${h.id}" ${h.id===b.hull?'selected':''}>${esc(h.name)} (${CLASS_NAME[h.cls]}, ${h.sp} SP)</option>`).join('')}</select></div>
-        <div class="field"><label>Machine Spirit</label><select id="spiritSel"><option value="">— none —</option>${SPIRITS.map(s=>`<option value="${s.id}" ${s.id===b.spirit?'selected':''}>${s.roll}. ${esc(s.name)}</option>`).join('')}</select><button class="small" id="rollSpirit" title="Roll d10">d10</button></div>
-        <div class="field"><label>Past History</label><select id="historySel"><option value="">— none —</option>${HISTORIES.map(s=>`<option value="${s.id}" ${s.id===b.history?'selected':''}>${s.roll}. ${esc(s.name)}</option>`).join('')}</select><button class="small" id="rollHistory" title="Roll d10">d10</button></div>
-        <div style="margin-left:auto;display:flex;gap:6px"><button class="small primary" id="exportBtn" title="Export dossier (e)">Export</button><button class="small" id="undoBtn" ${Store.canUndo()?'':'disabled'} title="Ctrl+Z">Undo</button><button class="small" id="themeBtn">Theme</button><button class="small" id="helpBtn" title="Help">?</button></div>
+        <div class="field"><label for="hullSel">Hull</label><select id="hullSel">${HULLS.map(h=>`<option value="${h.id}" ${h.id===b.hull?'selected':''}>${esc(h.name)} (${CLASS_NAME[h.cls]}, ${h.sp} SP)</option>`).join('')}</select></div>
+        <div class="field"><label for="spiritSel">Machine Spirit</label><select id="spiritSel"><option value="">— none —</option>${SPIRITS.map(s=>`<option value="${s.id}" ${s.id===b.spirit?'selected':''}>${s.roll}. ${esc(s.name)}</option>`).join('')}</select><button class="small" id="rollSpirit" title="Roll d10">d10</button></div>
+        <div class="field"><label for="historySel">Past History</label><select id="historySel"><option value="">— none —</option>${HISTORIES.map(s=>`<option value="${s.id}" ${s.id===b.history?'selected':''}>${s.roll}. ${esc(s.name)}</option>`).join('')}</select><button class="small" id="rollHistory" title="Roll d10">d10</button></div>
+        <div style="margin-left:auto;display:flex;gap:6px"><button class="small primary" id="exportBtn" title="Export dossier (e)">Export</button><button class="small" id="undoBtn" ${Store.canUndo()?'':'disabled'} title="Undo last change (Ctrl+Z)">Undo</button><button class="small" id="themeBtn" title="Cycle theme: auto, light, dark" aria-label="Theme: ${theme}. Change theme">Theme: ${theme}</button><button class="small" id="helpBtn" title="Help and keyboard shortcuts (?)" aria-label="Help">?</button></div>
       </div>
       <div class="row meters">
         ${meter('power',d.budgets.power.used,d.budgets.power.gen,'Power',d.budgets.power.used>d.budgets.power.gen)}
         ${meter('space',d.budgets.space.used,d.budgets.space.total,'Space',d.budgets.space.used>d.budgets.space.total)}
         ${meter('sp',d.budgets.sp.spent,d.budgets.sp.budget,'Ship Points',d.budgets.sp.spent>d.budgets.sp.budget)}
         <div class="meter"><div class="lbl"><span>Profit Factor</span></div><div class="val">${d.pf.base} <span class="muted">+${d.pf.leftover} SP =</span> ${d.pf.total}<span class="ghost" data-ghost="pf"></span></div></div>
-        <div><span class="badge ${d.errors?'err':d.warns?'wrn':''}" id="issueBadge" role="button" tabindex="0">${d.errors?d.errors+' error'+(d.errors>1?'s':''):'valid'}${d.warns?' · '+d.warns+' warn':''}<span class="ghost" data-ghost="issues"></span></span></div>
+        <div><span class="badge ${d.errors?'err':d.warns?'wrn':''}" id="issueBadge" role="button" tabindex="0" title="Jump to the issues list">${d.errors?d.errors+' error'+(d.errors>1?'s':''):'valid'}${d.warns?' · '+d.warns+' warn':''}<span class="ghost" data-ghost="issues"></span></span></div>
       </div>
       <details class="opts" ${b.warrant.manual||b.gmOverride||b.forbiddenLoreXenos||(b.spMods||[]).length?'open':''}><summary>Warrant &amp; options</summary>
         <div class="row">
-          <div class="field"><label>Warrant roll</label><select id="warrantSel" ${w.manual?'disabled':''}>${[1,2,3,4,5,6,7,8,9,10].map(r=>{const x=Rules.pfRow(r);return `<option value="${r}" ${r===w.roll?'selected':''}>Roll ${r}: PF ${x.pf} / SP ${x.sp}</option>`;}).join('')}</select><button class="small" id="rollWarrant" title="Roll d10 on Table 1-5">d10</button>
-            <label style="display:flex;gap:4px;align-items:center;text-transform:none;letter-spacing:0"><input type="checkbox" id="manualW" ${w.manual?'checked':''}> manual</label>
-            ${w.manual?`<span class="field"><label>PF</label><input type="text" id="pfIn" class="n" size="3" value="${w.pf}"><label>SP</label><input type="text" id="spIn" class="n" size="3" value="${w.sp}"></span>`:''}</div>
-          <label class="field" style="gap:5px"><input type="checkbox" id="gmChk" ${b.gmOverride?'checked':''}> <span>GM override: unlock Archeotech / Xeno-tech</span></label>
-          <label class="field" style="gap:5px"><input type="checkbox" id="flChk" ${b.forbiddenLoreXenos?'checked':''}> <span>Repairer has Forbidden Lore (Xenos)</span></label>
+          <div class="field"><label for="warrantSel">Warrant roll</label><select id="warrantSel" ${w.manual?'disabled':''}>${[1,2,3,4,5,6,7,8,9,10].map(r=>{const x=Rules.pfRow(r);return `<option value="${r}" ${r===w.roll?'selected':''}>Roll ${r}: PF ${x.pf} / SP ${x.sp}</option>`;}).join('')}</select><button class="small" id="rollWarrant" title="Roll d10 on Table 1-5">d10</button>
+            <label for="manualW" style="display:flex;gap:4px;align-items:center;text-transform:none;letter-spacing:0"><input type="checkbox" id="manualW" ${w.manual?'checked':''}> manual</label>
+            ${w.manual?`<span class="field"><label for="pfIn">PF</label><input type="text" id="pfIn" class="n" size="3" value="${w.pf}"><label for="spIn">SP</label><input type="text" id="spIn" class="n" size="3" value="${w.sp}"></span>`:''}</div>
+          <label class="field" for="gmChk" style="gap:5px"><input type="checkbox" id="gmChk" ${b.gmOverride?'checked':''}> <span>GM override: unlock Archeotech / Xeno-tech</span></label>
+          <label class="field" for="flChk" style="gap:5px"><input type="checkbox" id="flChk" ${b.forbiddenLoreXenos?'checked':''}> <span>Repairer has Forbidden Lore (Xenos)</span></label>
         </div>
         <div class="spmods">
-          <div class="field" style="margin-top:8px"><label>Ship Point adjustments</label><span class="muted" style="font-size:12px">Warrant ${w.sp}${d.budgets.sp.mods.map(m=>` ${sign(m.value)} ${esc(m.cause||'…')}`).join('')} = <b class="n">${d.budgets.sp.budget}</b> SP</span></div>
+          <div class="field" style="margin-top:8px"><span class="flabel">Ship Point adjustments</span><span class="muted" style="font-size:12px">Warrant ${w.sp}${d.budgets.sp.mods.map(m=>` ${sign(m.value)} ${esc(m.cause||'…')}`).join('')} = <b class="n">${d.budgets.sp.budget}</b> SP</span></div>
           ${d.budgets.sp.mods.map(m=>`<div class="sprow" data-spmod="${m.id}"><input type="text" class="cause" value="${esc(m.cause)}" placeholder="Cause, e.g. GM provides the hull" aria-label="Cause"><input type="text" class="n val" value="${m.value>0?'+'+m.value:m.value}" size="5" aria-label="Modifier" title="Signed number, e.g. +40 or -5"><button class="x" data-rmspmod="${m.id}" title="Remove" aria-label="Remove adjustment">✕</button></div>`).join('')}
           <button class="small" id="addSpMod" style="margin-top:4px">+ Add adjustment</button>
         </div></details>`;
@@ -868,6 +870,7 @@ const Render=(()=>{
     $('#themeBtn').addEventListener('click',()=>App.cycleTheme());
     $('#helpBtn').addEventListener('click',()=>$('#help').showModal());
     $('#issueBadge').addEventListener('click',()=>{$('#issues')?.scrollIntoView({behavior:'smooth',block:'start'});});
+    App.syncHeaderHeight();
   }
 
   function statCell(k,s,d){
@@ -912,7 +915,7 @@ const Render=(()=>{
     const apCount=Object.values(d.ap).filter(v=>v.parts.length).length, skCount=Object.keys(d.skills).length;
     $('#sheet .body').innerHTML=`
       <div class="sechead"><h2>${esc(b.name)} <span class="muted" style="font-size:14px;font-family:'IBM Plex Sans',sans-serif">${esc(d.hull.name)} · ${CLASS_NAME[d.cls]} · p.${d.hull.page}</span></h2>
-        <label class="muted" style="font-size:12px;display:flex;gap:5px;align-items:center"><input type="checkbox" id="partsChk" ${ui.showParts?'checked':''}> breakdowns</label></div>
+        <label class="muted" for="partsChk" style="font-size:12px;display:flex;gap:5px;align-items:center"><input type="checkbox" id="partsChk" ${ui.showParts?'checked':''}> breakdowns</label></div>
       <div class="stats">${Derive.statKeys.map(k=>statCell(k,d.stats[k],d)).join('')}</div>
       <div class="group"><div class="ghead"><h3>Essential components</h3><span class="hint">one of each, required</span></div>${essRows}</div>
       ${d.issues.some(i=>i.code==='hull_mismatch'&&i.ref.startsWith('e:'))?`<div class="actions"><button class="primary small" id="fixEss">Fix essentials for this hull</button></div>`:''}
@@ -937,7 +940,7 @@ const Render=(()=>{
     const mem=Persist.mem; const active=mem.activeId;
     const builds=mem.order.map(id=>{const e=mem.builds[id]; const dd=Derive.derive(e.build);
       return `<div class="brow ${id===active?'active':''}"><input type="checkbox" data-cmp="${id}" ${ui.selected.has(id)?'checked':''} aria-label="Select for compare"><span><button class="link" data-load="${id}" style="font-weight:600">${esc(e.name)}</button><div class="meta">${esc(dd.hull.name)} · PF ${dd.pf.total} · ${dd.valid?'<span class="good">valid</span>':`<span class="bad">${dd.errors} error${dd.errors>1?'s':''}</span>`}</div></span>
-        <span style="display:flex;gap:3px">${ui.pendingDelete===id?`<button class="small" style="border-color:var(--bad);color:var(--bad)" data-del="${id}">Delete?</button><button class="small" data-undel="${id}">Keep</button>`:`<button class="small" data-dup="${id}" title="Duplicate">⧉</button><button class="small" data-del="${id}" title="Delete" aria-label="Delete ${esc(e.name)}">✕</button>`}</span></div>`;}).join('');
+        <span style="display:flex;gap:3px">${ui.pendingDelete===id?`<button class="small" style="border-color:var(--bad);color:var(--bad)" data-del="${id}">Delete?</button><button class="small" data-undel="${id}">Keep</button>`:`<button class="small" data-dup="${id}" title="Duplicate" aria-label="Duplicate ${esc(e.name)}">⧉</button><button class="small" data-del="${id}" title="Delete" aria-label="Delete ${esc(e.name)}">✕</button>`}</span></div>`;}).join('');
     $('#aside .body').innerHTML=`
       <div class="banner">${Persist.ok?'':'Browser storage is unavailable here; builds live only in this tab. Use share codes to keep them.'}</div>
       <h3 id="issues" style="margin-top:0">Issues</h3>
@@ -991,7 +994,7 @@ const Picker=(()=>{
     const variants=comp.variants.length>1?`<div class="muted">Other hulls: ${comp.variants.map(x=>x.hulls.join('/')+': '+(comp.generates?'+':'')+x.power+'P '+x.space+'S'+(x.sp?' '+x.sp+'SP':'')).join(' · ')}</div>`:'';
     const btn=cur?`<span class="chip brass">installed</span>`:av.ok?`<button class="small primary" data-add>${isEss?'Install':'Add'}${av.slot?' → '+fmtSlot(av.slot):''}</button>`:`<span class="chip warn">${esc(av.reason)}</span>`;
     const tech=comp.tech!=='standard'?`<span class="chip ${comp.tech==='archeotech'?'brass':'ghost'}">${comp.tech==='archeotech'?'Archeotech':'Xeno-tech'}</span>`:'';
-    return `<div class="prow ${cur?'cur':''} ${av.ok||cur?'':'na'}" tabindex="0" data-comp="${comp.id}" data-act='${esc(JSON.stringify(act))}' data-ok="${av.ok&&!cur?1:0}">
+    return `<div class="prow ${cur?'cur':''} ${av.ok||cur?'':'na'}" tabindex="0" role="group" aria-label="${esc(comp.name)}" data-comp="${comp.id}" data-act='${esc(JSON.stringify(act))}' data-ok="${av.ok&&!cur?1:0}">
       <div class="nm"><span class="${techCls(comp)}">${esc(comp.name)}</span><span class="pg">p.${comp.page}</span> ${tech}${comp.once?' <span class="chip">once</span>':''}${comp.external?' <span class="chip">external</span>':''} <span style="margin-left:6px">${costChips(v,comp)}</span></div>
       <div class="fx chips">${comp.weapon?weaponChip(comp.weapon):''}${modChips(comp.mods,b)}${!comp.mods.length&&!comp.weapon&&comp.blurb?`<span class="muted">${esc(comp.blurb)}</span>`:''}</div>
       ${expanded?`<div class="txt">${variants}${comp.text.map(t=>`<div><b>${esc(t.title)}:</b> ${esc(t.body)}</div>`).join('')}${comp.dataNote?`<div class="warn">Note: ${esc(comp.dataNote)}</div>`:''}${!comp.text.length&&comp.blurb?`<div>${esc(comp.blurb)}</div>`:''}</div>`:''}
@@ -1010,7 +1013,7 @@ const Picker=(()=>{
       <div class="pk-head"><h2>${isEss?'Choose '+CAT[cat].name:TITLES[cat]}</h2><div style="display:flex;gap:6px;align-items:center"><span class="muted" style="font-size:12px">${esc(d.hull.name)}</span><button class="small" id="pkClose">Close</button></div></div>
       <div class="pk-budget"><span>Power <b>${bud.power.used}/${bud.power.gen}</b><span class="ghost" data-ghost="m:power"></span></span><span>Space <b>${bud.space.used}/${bud.space.total}</b><span class="ghost" data-ghost="m:space"></span></span><span>SP <b>${bud.sp.spent}/${bud.sp.budget}</b><span class="ghost" data-ghost="m:sp"></span></span><span>PF <b>${d.pf.total}</b><span class="ghost" data-ghost="pf"></span></span><span>${d.errors?`<span class="bad">${d.errors} err</span>`:'<span class="good">valid</span>'}<span class="ghost" data-ghost="issues"></span></span></div>
       <div class="pk-summary" data-ghost="summary"></div>
-      <div class="pk-search" style="display:flex;gap:12px;align-items:center"><input type="text" id="pkSearch" placeholder="Filter…" value="${esc(pk.search)}" aria-label="Filter components">${isEss?`<label style="display:flex;gap:5px;align-items:center;white-space:nowrap;font-size:12.5px"><input type="checkbox" id="pkFree" ${Store.ui.freeOnly?'checked':''}> 0 SP only</label>`:''}</div>
+      <div class="pk-search" style="display:flex;gap:12px;align-items:center"><input type="text" id="pkSearch" placeholder="Filter…" value="${esc(pk.search)}" aria-label="Filter components">${isEss?`<label for="pkFree" style="display:flex;gap:5px;align-items:center;white-space:nowrap;font-size:12.5px"><input type="checkbox" id="pkFree" ${Store.ui.freeOnly?'checked':''}> 0 SP only</label>`:''}</div>
       <div class="pk-list" id="pkList">
         ${cur.length?`<div class="pk-sec">Installed</div>${cur.map(x=>rowHtml(x.c,b,x.av,true)).join('')}`:''}
         ${installedSupp.length?`<div class="pk-sec">Installed</div>${installedSupp.map(r=>`<div class="prow cur" data-ref="${r.uid}"><div class="nm"><span class="${techCls(r.comp)}">${esc(r.comp.name)}</span>${r.slot?` <span class="chip brass">${fmtSlot(r.slot)}</span>`:''}${r.kind==='pre'?' <span class="chip">locked</span>':''} <span style="margin-left:6px">${costChips(r.variant,r.comp)}</span></div><div class="fx chips">${r.comp.weapon?weaponChip(r.comp.weapon):''}${modChips(r.comp.mods,b)}</div><div class="btns">${r.kind==='pre'?'':`<button class="small" data-rm="${r.uid}">Remove</button>`}</div></div>`).join('')}`:''}
@@ -1277,7 +1280,7 @@ const Export=(()=>{
 const App=(()=>{
   let saveT=null;
   function applyTheme(){ const t=Persist.mem.prefs.theme||'auto'; if(t==='auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme',t); }
-  function cycleTheme(){ const order=['auto','light','dark']; const t=Persist.mem.prefs.theme||'auto'; Persist.mem.prefs.theme=order[(order.indexOf(t)+1)%3]; Persist.save(); applyTheme(); toast('Theme: '+Persist.mem.prefs.theme); }
+  function cycleTheme(){ const order=['auto','light','dark']; const t=Persist.mem.prefs.theme||'auto'; Persist.mem.prefs.theme=order[(order.indexOf(t)+1)%3]; Persist.save(); applyTheme(); Render.header(); $('#themeBtn')?.focus(); toast('Theme: '+Persist.mem.prefs.theme); }
   function defaultBuild(){
     const b=Actions.newBuild('Havoc of Sebastian'); b.hull='havoc'; b.spirit='martial_hubris'; b.history='space_hulk';
     b.essentials={plasma_drive:'jovian_2',warp_engine:'strelov_1',gellar_field:'geller_field',void_shield:'single_void_shield',bridge:'combat_bridge',life_sustainer:'vitae_life',crew_quarters:'voidsmen_quarters',auger_array:'m100_auger'};
@@ -1308,7 +1311,7 @@ const App=(()=>{
       if(e.key==='Escape'){ Preview.clear(); if(Store.ui.picker){ e.preventDefault(); Picker.close(); } return; }
       if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!typing){ e.preventDefault(); if(Store.undo()) toast('Undone'); return; }
       if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){ e.preventDefault(); clearTimeout(saveT); const id=Persist.mem.activeId; if(id) Persist.update(id,Store.build); toast(Persist.ok?'Saved':'Storage unavailable; use the share code'); return; }
-      if(typing) return;
+      if(typing||Persist.mem.prefs.keys===false) return;
       if(e.key==='/'){ e.preventDefault(); if(Store.ui.picker) $('#pkSearch')?.focus(); return; }
       if(e.key==='?'){ e.preventDefault(); $('#help').showModal(); return; }
       if(e.key==='g'){ Store.dispatch({type:'toggleGm'}); toast('GM override '+(Store.build.gmOverride?'on':'off')); return; }
@@ -1317,8 +1320,11 @@ const App=(()=>{
     $('#picker').addEventListener('close',()=>{ Preview.clear(); Store.ui.picker=null; });
     $('#picker').addEventListener('cancel',e=>{ e.preventDefault(); Picker.close(); });
   }
+  function syncHeaderHeight(){ const h=$('#hdr'); if(h) document.documentElement.style.setProperty('--hdr-h',(h.offsetHeight+12)+'px'); }
   function boot(){
     Persist.load(); applyTheme();
+    window.addEventListener('resize',syncHeaderHeight);
+    const kc=$('#keysChk'); if(kc){ kc.checked=Persist.mem.prefs.keys!==false; kc.addEventListener('change',()=>{ Persist.mem.prefs.keys=kc.checked; Persist.save(); toast(kc.checked?'Single-key shortcuts on':'Single-key shortcuts off'); }); }
     const hash=location.hash;
     Store.subscribe(()=>{ Render.all(); persistActive(); });
     let booted=false;
@@ -1331,7 +1337,7 @@ const App=(()=>{
     keys();
     if(location.search.includes('selftest')) SelfTest.run();
   }
-  return {boot,cycleTheme,loadBuild,newBuild,duplicate,remove,copy,importCode,importFrom,defaultBuild,swordTestBuild};
+  return {boot,cycleTheme,loadBuild,newBuild,duplicate,remove,copy,importCode,importFrom,defaultBuild,swordTestBuild,syncHeaderHeight};
 })();
 
 /* ========================================================================
