@@ -209,7 +209,7 @@ test('F3: valid saved builds do not trigger recovery when object key order chang
   }, STORAGE_KEY);
   for (let reload = 0; reload < 2; reload++) {
     await page.reload();
-    expect(await page.evaluate(() => Store.build.name)).toBe('Havoc of Sebastian');
+    expect(await page.evaluate(() => Store.build.name)).toBe('Righeous Path');
     expect(await page.evaluate(() => Object.keys(localStorage).filter(key => key.startsWith('voidship-builder:recovery:')))).toEqual([]);
     await expect(page.locator('#recoveryNotice')).toHaveCount(0);
   }

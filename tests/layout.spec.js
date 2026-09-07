@@ -71,11 +71,11 @@ test('F8 applies the viewport in a touch mobile browser', async ({ browser, base
       clientWidth: document.documentElement.clientWidth,
     }))).toEqual({ innerWidth: 390, clientWidth: 390 });
     await expectContained(mobile, 'touch mobile viewport');
-    await mobile.locator('#hullSel').selectOption('sword');
-    await expect(mobile.locator('#hullSel')).toHaveValue('sword');
-    expect(await mobile.evaluate(() => Store.build.hull)).toBe('sword');
+    await mobile.locator('#hullSel').selectOption('tempest');
+    await expect(mobile.locator('#hullSel')).toHaveValue('tempest');
+    expect(await mobile.evaluate(() => Store.build.hull)).toBe('tempest');
     await expectContained(mobile, 'touch mobile hull change');
-    await mobile.locator('.opts summary').tap();
+    if (await mobile.locator('.opts').getAttribute('open') === null) await mobile.locator('.opts summary').tap();
     await expect(mobile.locator('.opts')).toHaveAttribute('open', '');
     await expectContained(mobile, 'touch mobile options');
     await mobile.screenshot({ path: testInfo.outputPath('mobile-390.png') });
@@ -91,11 +91,12 @@ for (const viewport of [{ width: 320, height: 568 }, { width: 640, height: 360 }
       await context.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//, route => route.abort());
       const mobile = await context.newPage();
       await mobile.goto('./');
-      await mobile.locator('.opts summary').tap();
-      await mobile.locator('#manualW').tap();
+      if (await mobile.locator('.opts').getAttribute('open') === null) await mobile.locator('.opts summary').tap();
+      if (!await mobile.locator('#manualW').isChecked()) await mobile.locator('#manualW').tap();
       await expect(mobile.locator('#manualW')).toBeChecked();
+      const initialAdjustments = await mobile.locator('.sprow').count();
       await mobile.locator('#addSpMod').tap();
-      await expect(mobile.locator('.sprow')).toHaveCount(1);
+      await expect(mobile.locator('.sprow')).toHaveCount(initialAdjustments + 1);
 
       // Scrolling must expose an actionable component button while options stay open.
       const change = mobile.locator('[data-pick="bridge"]');
@@ -108,17 +109,17 @@ for (const viewport of [{ width: 320, height: 568 }, { width: 640, height: 360 }
       await mobile.screenshot({ path: testInfo.outputPath('short-screen-component.png') });
 
       // Returning to the expanded header must keep its lower controls reachable too.
-      await mobile.locator('.sprow .cause').tap();
-      await mobile.locator('.sprow .cause').fill('GM grant');
-      await mobile.locator('.sprow .cause').blur();
-      await mobile.locator('.sprow .val').tap();
-      await mobile.locator('.sprow .val').fill('5');
-      await mobile.locator('.sprow .val').blur();
-      expect(await mobile.evaluate(() => Store.build.spMods[0])).toMatchObject({ cause: 'GM grant', value: 5 });
+      await mobile.locator('.sprow .cause').last().tap();
+      await mobile.locator('.sprow .cause').last().fill('GM grant');
+      await mobile.locator('.sprow .cause').last().blur();
+      await mobile.locator('.sprow .val').last().tap();
+      await mobile.locator('.sprow .val').last().fill('5');
+      await mobile.locator('.sprow .val').last().blur();
+      expect(await mobile.evaluate(() => Store.build.spMods.at(-1))).toMatchObject({ cause: 'GM grant', value: 5 });
       await mobile.locator('#addSpMod').tap();
-      await expect(mobile.locator('.sprow')).toHaveCount(2);
+      await expect(mobile.locator('.sprow')).toHaveCount(initialAdjustments + 2);
       await mobile.locator('[data-rmspmod]').last().tap();
-      await expect(mobile.locator('.sprow')).toHaveCount(1);
+      await expect(mobile.locator('.sprow')).toHaveCount(initialAdjustments + 1);
       await mobile.screenshot({ path: testInfo.outputPath('short-screen-options.png') });
       await mobile.locator('.opts summary').tap();
       await expect(mobile.locator('.opts')).not.toHaveAttribute('open');
@@ -130,6 +131,8 @@ for (const viewport of [{ width: 320, height: 568 }, { width: 640, height: 360 }
 
 test('component previews follow mouse hover and keyboard navigation', async ({ page }) => {
   await page.goto('./');
+  // Spare capacity keeps this test focused on the bridge preview and navigation.
+  await page.evaluate(() => Store.dispatch({ type: 'replace', build: App.swordTestBuild() }));
   await page.locator('[data-pick="bridge"]').click();
   const armoured = page.locator('[data-comp="armoured_bridge"]');
   const summary = page.locator('.pk-summary');
@@ -156,22 +159,22 @@ for (const width of [320, 390, 640, 1280]) {
     await expect(page.locator('#hullSel')).toBeVisible();
     await expectContained(page, 'initial');
     await page.screenshot({ path: testInfo.outputPath(`editor-${width}.png`), fullPage: true });
-    await page.locator('#hullSel').selectOption('sword');
-    await expect(page.locator('#hullSel')).toHaveValue('sword');
-    expect(await page.evaluate(() => Store.build.hull)).toBe('sword');
-    await expect.poll(() => page.evaluate(() => Persist.mem.builds[Persist.mem.activeId].build.hull)).toBe('sword');
+    await page.locator('#hullSel').selectOption('tempest');
+    await expect(page.locator('#hullSel')).toHaveValue('tempest');
+    expect(await page.evaluate(() => Store.build.hull)).toBe('tempest');
+    await expect.poll(() => page.evaluate(() => Persist.mem.builds[Persist.mem.activeId].build.hull)).toBe('tempest');
 
-    await page.locator('.opts summary').click();
+    if (await page.locator('.opts').getAttribute('open') === null) await page.locator('.opts summary').click();
     await expectContained(page, 'options');
     await page.locator('#manualW').check();
     await page.locator('#pfIn').fill('0');
     await page.locator('#pfIn').press('Tab');
     await page.locator('#addSpMod').click();
-    await page.locator('.sprow .cause').fill('VeryLongAdjustmentCause'.repeat(4));
-    await page.locator('.sprow .cause').press('Tab');
+    await page.locator('.sprow .cause').last().fill('VeryLongAdjustmentCause'.repeat(4));
+    await page.locator('.sprow .cause').last().press('Tab');
     await expectContained(page, 'manual warrant and adjustment');
     for (const selector of ['#pfIn', '#spIn', '.sprow .cause', '.sprow .val']) {
-      const bounds = await page.locator(selector).boundingBox();
+      const bounds = await page.locator(selector).last().boundingBox();
       expect(bounds.x + bounds.width, `${selector} stays visible`).toBeLessThanOrEqual(width);
       expect(bounds.width, `${selector} remains operable`).toBeGreaterThan(24);
     }
