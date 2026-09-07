@@ -46,6 +46,61 @@ test('built-in assertions all pass', async ({ page }) => {
   expect(results.filter(line => line.startsWith('FAIL'))).toEqual([]);
 });
 
+test('default vessel matches the Righteous Path preset', async ({ page }) => {
+  const actual = await page.evaluate(() => ({
+    name: Store.build.name,
+    hull: Store.build.hull,
+    spirit: Store.build.spirit,
+    history: Store.build.history,
+    essentials: Store.build.essentials,
+    supplementals: Store.build.supplementals.map(({ id, slot = null }) => [id, slot]),
+    warrant: Store.build.warrant,
+    spMods: Store.build.spMods.map(({ cause, value }) => [cause, value]),
+    gmOverride: Store.build.gmOverride,
+    forbiddenLoreXenos: Store.build.forbiddenLoreXenos,
+    notes: Store.build.notes,
+    valid: Store.derived.valid,
+    budgets: Store.derived.budgets,
+    profitFactor: Store.derived.pf.total,
+  }));
+  expect(actual).toMatchObject({
+    name: 'Righteous Path',
+    hull: 'sword',
+    spirit: 'resolute',
+    history: 'xenophilous',
+    essentials: {
+      plasma_drive: 'jovian_2',
+      warp_engine: 'strelov_1',
+      gellar_field: 'geller_field',
+      void_shield: 'single_void_shield',
+      bridge: 'combat_bridge',
+      life_sustainer: 'vitae_life',
+      crew_quarters: 'voidsmen_quarters',
+      auger_array: 'm201_auger',
+    },
+    supplementals: [
+      ['tenebro_maze', null],
+      ['sunsear', 'dorsal:0'],
+      ['sunsear', 'dorsal:1'],
+      ['runecaster', null],
+      ['trophy_room', null],
+      ['temple_shrine', null],
+    ],
+    warrant: { roll: 2, pf: 5, sp: 80, manual: true },
+    spMods: [['Regiment', -1], ['Astropath', -2]],
+    gmOverride: false,
+    forbiddenLoreXenos: false,
+    notes: '',
+    valid: true,
+    budgets: {
+      power: { gen: 45, used: 42, free: 3 },
+      space: { total: 40, used: 40, free: 0 },
+      sp: { budget: 77, base: 80, adjust: -3, spent: 48, left: 29 },
+    },
+    profitFactor: 34,
+  });
+});
+
 test('F1: opening A clears B undo history and preserves both saved ships', async ({ page }) => {
   const ids = await savedPair(page);
   await page.evaluate(() => Store.dispatch({ type: 'setNotes', notes: 'B changed' }));
@@ -209,7 +264,7 @@ test('F3: valid saved builds do not trigger recovery when object key order chang
   }, STORAGE_KEY);
   for (let reload = 0; reload < 2; reload++) {
     await page.reload();
-    expect(await page.evaluate(() => Store.build.name)).toBe('Havoc of Sebastian');
+    expect(await page.evaluate(() => Store.build.name)).toBe('Righteous Path');
     expect(await page.evaluate(() => Object.keys(localStorage).filter(key => key.startsWith('voidship-builder:recovery:')))).toEqual([]);
     await expect(page.locator('#recoveryNotice')).toHaveCount(0);
   }

@@ -7,6 +7,13 @@ test.beforeEach(async ({ page }) => {
   await page.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//, route => route.abort());
 });
 
+async function loadFreshBuild(page) {
+  await page.evaluate(() => {
+    const id = Persist.create(Actions.newBuild('Layout test vessel'));
+    App.loadBuild(id);
+  });
+}
+
 async function expectContained(page, label) {
   const sizes = await page.evaluate(() => ({
     viewport: document.documentElement.clientWidth,
@@ -66,6 +73,7 @@ test('F8 applies the viewport in a touch mobile browser', async ({ browser, base
     await context.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//, route => route.abort());
     const mobile = await context.newPage();
     await mobile.goto('./');
+    await loadFreshBuild(mobile);
     expect(await mobile.evaluate(() => ({
       innerWidth: window.innerWidth,
       clientWidth: document.documentElement.clientWidth,
@@ -91,6 +99,7 @@ for (const viewport of [{ width: 320, height: 568 }, { width: 640, height: 360 }
       await context.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\//, route => route.abort());
       const mobile = await context.newPage();
       await mobile.goto('./');
+      await loadFreshBuild(mobile);
       await mobile.locator('.opts summary').tap();
       await mobile.locator('#manualW').tap();
       await expect(mobile.locator('#manualW')).toBeChecked();
@@ -130,6 +139,7 @@ for (const viewport of [{ width: 320, height: 568 }, { width: 640, height: 360 }
 
 test('component previews follow mouse hover and keyboard navigation', async ({ page }) => {
   await page.goto('./');
+  await loadFreshBuild(page);
   await page.locator('[data-pick="bridge"]').click();
   const armoured = page.locator('[data-comp="armoured_bridge"]');
   const summary = page.locator('.pk-summary');
@@ -153,6 +163,7 @@ for (const width of [320, 390, 640, 1280]) {
   test(`F8 keeps editor controls within ${width}px across expanded and modal states`, async ({ page }, testInfo) => {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto('./');
+    await loadFreshBuild(page);
     await expect(page.locator('#hullSel')).toBeVisible();
     await expectContained(page, 'initial');
     await page.screenshot({ path: testInfo.outputPath(`editor-${width}.png`), fullPage: true });
